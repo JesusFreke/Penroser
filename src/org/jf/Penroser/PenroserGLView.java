@@ -4,6 +4,7 @@ import android.content.Context;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLU;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 
 import javax.microedition.khronos.egl.EGL10;
@@ -70,6 +71,12 @@ public class PenroserGLView extends GLSurfaceView implements GLSurfaceView.Rende
         gl.glBlendFunc(GL10.GL_SRC_ALPHA, GL10.GL_ONE);*/
 
         gl.glEnable(GL11.GL_VERTEX_ARRAY);
+
+        if (gl instanceof GL11) {
+            GL11 gl11 = (GL11) gl;
+            FatHalfRhombus.onSurfaceCreated(gl11);
+            SkinnyHalfRhombus.onSurfaceCreated(gl11);
+        }
     }
 
     public void onSurfaceChanged(GL10 gl, int width, int height) {
@@ -82,10 +89,14 @@ public class PenroserGLView extends GLSurfaceView implements GLSurfaceView.Rende
     }
 
     public void onDrawFrame(GL10 gl) {
+        long start = System.nanoTime();
         if (gl instanceof GL11) {
             GL11 gl11 = (GL11)gl;
             left.draw(gl11, level);
             right.draw(gl11, level);
         }
+        long end = System.nanoTime();
+
+        Log.v("PenroserGLView", "Drawing took " + (end-start)/1000000000d + " seconds");
     }
 }

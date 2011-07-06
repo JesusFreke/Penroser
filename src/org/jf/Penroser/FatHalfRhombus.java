@@ -24,6 +24,9 @@ public class FatHalfRhombus extends HalfRhombus {
             0, EdgeLength.y(0, 2)*2
     };
 
+    private static int leftVbo;
+    private static int rightVbo;
+
     //light blue
     private static final int leftColor = 0x527DFF;
 
@@ -49,25 +52,25 @@ public class FatHalfRhombus extends HalfRhombus {
             gl.glScalef(this.scale, this.scale, 0);
             gl.glRotatef(getRotationInDegrees(), 0, 0, -1);
 
-            float[] vertices;
+            int vertexVbo;
             int color;
             if (side == LEFT) {
-                vertices = leftVertices;
+                vertexVbo = leftVbo;
                 color = leftColor;
             } else {
-                vertices = rightVertices;
+                vertexVbo = rightVbo;
                 color = rightColor;
             }
 
-            FloatBuffer vertexBuffer = ByteBuffer.allocateDirect(vertices.length * 4).order(ByteOrder.nativeOrder()).asFloatBuffer();
-            vertexBuffer.put(vertices).position(0);
-
-            gl.glVertexPointer(2, gl.GL_FLOAT, 0,  vertexBuffer);
-            gl.glEnableClientState(gl.GL_VERTEX_ARRAY);
+            gl.glBindBuffer(GL11.GL_ARRAY_BUFFER, vertexVbo);
+            gl.glVertexPointer(2, GL10.GL_FLOAT, 0, 0);
+            gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
 
             gl.glColor4ub((byte)((color >> 16) & 0xFF), (byte)((color >> 8) & 0xFF), (byte)(color & 0xFF), (byte)0xFF);
 
             gl.glDrawArrays(GL10.GL_TRIANGLES, 0, 3);
+
+            gl.glBindBuffer(GL11.GL_ARRAY_BUFFER, 0);
 
             gl.glPopMatrix();
         }
@@ -107,5 +110,22 @@ public class FatHalfRhombus extends HalfRhombus {
         }
 
         return children[i];
+    }
+
+    public static void onSurfaceCreated(GL11 gl) {
+        int[] vboref = new int[1];
+        gl.glGenBuffers(1, vboref, 0);
+        leftVbo = vboref[0];
+
+        gl.glBindBuffer(GL11.GL_ARRAY_BUFFER, leftVbo);
+        gl.glBufferData(GL11.GL_ARRAY_BUFFER, 6 * 4, FloatBuffer.wrap(leftVertices), GL11.GL_STATIC_DRAW);
+
+        gl.glGenBuffers(1, vboref, 0);
+        rightVbo = vboref[0];
+
+        gl.glBindBuffer(GL11.GL_ARRAY_BUFFER, rightVbo);
+        gl.glBufferData(GL11.GL_ARRAY_BUFFER, 6 * 4, FloatBuffer.wrap(rightVertices), GL11.GL_STATIC_DRAW);
+
+        gl.glBindBuffer(GL11.GL_ARRAY_BUFFER, 0);
     }
 }
