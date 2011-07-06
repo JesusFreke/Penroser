@@ -30,8 +30,6 @@ public class SkinnyHalfRhombus extends HalfRhombus {
     //dark green
     private static final int rightColor = 0x008900;
 
-    private HalfRhombus[] children = new HalfRhombus[NUM_CHILDREN];
-
     public SkinnyHalfRhombus(int level, int side, float x, float y, float scale, int rotation) {
         super(level, side, x, y, scale, rotation);
     }
@@ -75,34 +73,24 @@ public class SkinnyHalfRhombus extends HalfRhombus {
 
     @Override
     public HalfRhombus getChild(int i) {
-        if (i<0 || i>=NUM_CHILDREN) {
-            return null;
-        }
-
-        if (children[i] != null) {
-            return children[i];
-        }
-
         int sign = this.side==LEFT?1:-1;
-
-        float sideVerticeX = x + EdgeLength.x(level, rotation-(sign*4));
-        float sideVerticeY = y + EdgeLength.y(level, rotation-(sign*4));
-
-        float topVerticeX = sideVerticeX + EdgeLength.x(level, rotation+(sign*4));
-        float topVerticeY = sideVerticeY + EdgeLength.y(level, rotation+(sign*4));
 
         float newScale = scale / Constants.goldenRatio;
 
         switch (i) {
-            case SKINNY:
-                children[i] = new SkinnyHalfRhombus(level+1, side, topVerticeX, topVerticeY, newScale, rotation-(sign*6));
-                break;
-            case FAT:
-                children[i] = new FatHalfRhombus(level+1, side, sideVerticeX, sideVerticeY, newScale, rotation+(sign*6));
-                break;
+            case SKINNY: {
+                float topVerticeX = x + EdgeLength.x(level, rotation-(sign*4)) + EdgeLength.x(level, rotation+(sign*4));
+                float topVerticeY = y + EdgeLength.y(level, rotation-(sign*4)) + EdgeLength.y(level, rotation+(sign*4));
+                return new SkinnyHalfRhombus(level+1, side, topVerticeX, topVerticeY, newScale, rotation-(sign*6));
+            }
+            case FAT: {
+                float sideVerticeX = x + EdgeLength.x(level, rotation-(sign*4));
+                float sideVerticeY = y + EdgeLength.y(level, rotation-(sign*4));
+                return new FatHalfRhombus(level+1, side, sideVerticeX, sideVerticeY, newScale, rotation+(sign*6));
+            }
         }
 
-        return children[i];
+        return null;
     }
 
     public static void onSurfaceCreated(GL11 gl) {
