@@ -66,9 +66,7 @@ public class PenroserGLView extends GLSurfaceView implements GLSurfaceView.Rende
         gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
 		gl.glEnable(GL10.GL_LINE_SMOOTH);
-        gl.glHint(GL10.GL_LINE_SMOOTH_HINT, GL10.GL_FASTEST);
-        /*gl.glEnable(GL10.GL_BLEND);
-        gl.glBlendFunc(GL10.GL_SRC_ALPHA, GL10.GL_ONE);*/
+        gl.glHint(GL10.GL_LINE_SMOOTH_HINT, GL10.GL_NICEST);
 
         gl.glEnable(GL11.GL_VERTEX_ARRAY);
 

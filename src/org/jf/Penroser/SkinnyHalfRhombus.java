@@ -2,8 +2,6 @@ package org.jf.Penroser;
 
 import javax.microedition.khronos.opengles.GL10;
 import javax.microedition.khronos.opengles.GL11;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 
 public class SkinnyHalfRhombus extends HalfRhombus {
