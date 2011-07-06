@@ -10,6 +10,8 @@ public class Penroser extends Activity
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
+
+        PenroserGLView penroserGLView = new PenroserGLView(this);
+        setContentView(penroserGLView);
     }
 }
