@@ -15,17 +15,25 @@ public abstract class HalfRhombus {
     protected float x;
     protected float y;
     protected float scale;
-    protected float angle;
+    protected int rotation;
 
-    protected HalfRhombus(int level, int side, float x, float y, float scale, float angle) {
+    protected HalfRhombus(int level, int side, float x, float y, float scale, int rotation) {
         this.level = level;
         this.side = side;
         this.x = x;
         this.y = y;
         this.scale = scale;
-        this.angle = angle;
+        this.rotation = EdgeLength.mod20(rotation);
+    }
+
+    public float getRotationInDegrees() {
+        return rotation * 18;
     }
 
     public abstract void draw(GL11 gl, int maxLevel);
     public abstract HalfRhombus getChild(int i);
+
+    protected int oppositeSide() {
+        return side==RIGHT?LEFT:RIGHT;
+    }
 }

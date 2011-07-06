@@ -25,8 +25,8 @@ public class PenroserGLView extends GLSurfaceView implements GLSurfaceView.Rende
     }
 
     private void init() {
-        left = new FatHalfRhombus(0, HalfRhombus.LEFT, 0, 0, 100, 0);
-        right = new FatHalfRhombus(0, HalfRhombus.RIGHT, 0, 0, 100, 0);
+        left = new FatHalfRhombus(0, HalfRhombus.LEFT, 0, 0, 1, 0);
+        right = new FatHalfRhombus(0, HalfRhombus.RIGHT, 0, 0, 1, 0);
 
         this.setEGLConfigChooser(new EGLConfigChooser() {
             public EGLConfig chooseConfig(EGL10 egl10, EGLDisplay eglDisplay) {
@@ -66,7 +66,7 @@ public class PenroserGLView extends GLSurfaceView implements GLSurfaceView.Rende
     public void onSurfaceChanged(GL10 gl, int width, int height) {
         gl.glViewport(0, 0, width, height);
         gl.glLoadIdentity();
-        GLU.gluOrtho2D(gl, -width / 2, width / 2, height / 2, -height / 2);
+        GLU.gluOrtho2D(gl, -width / 200, width / 200, -height / 200, height / 200);
         gl.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
         gl.glMatrixMode(GL10.GL_MODELVIEW);
@@ -75,8 +75,8 @@ public class PenroserGLView extends GLSurfaceView implements GLSurfaceView.Rende
     public void onDrawFrame(GL10 gl) {
         if (gl instanceof GL11) {
             GL11 gl11 = (GL11)gl;
-            left.draw(gl11, 0);
-            right.draw(gl11, 0);
+            left.draw(gl11, 1);
+            right.draw(gl11, 1);
         }
     }
 }

@@ -33,8 +33,8 @@ public class EdgeLength {
 
         for (int i=startLevel; i<=level; i++) {
             for (int j=0; j<20; j++) {
-                newXlengths[i][j] = newXlengths[i-1][j] * Constants.goldenRatio;
-                newYlengths[i][j] = newYlengths[i-1][j] * Constants.goldenRatio;
+                newXlengths[i][j] = newXlengths[i-1][j] / Constants.goldenRatio;
+                newYlengths[i][j] = newYlengths[i-1][j] / Constants.goldenRatio;
             }
         }
 
@@ -42,7 +42,7 @@ public class EdgeLength {
         ylengths=newYlengths;
     }
 
-    private static int mod20(int num) {
+    public static int mod20(int num) {
         int result = num%20;
         if (result<0) {
             return result+20;
