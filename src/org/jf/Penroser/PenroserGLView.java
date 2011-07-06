@@ -4,6 +4,7 @@ import android.content.Context;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLU;
 import android.util.AttributeSet;
+import android.view.View;
 
 import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.egl.EGLConfig;
@@ -12,6 +13,7 @@ import javax.microedition.khronos.opengles.GL10;
 import javax.microedition.khronos.opengles.GL11;
 
 public class PenroserGLView extends GLSurfaceView implements GLSurfaceView.Renderer {
+    private int level = 0;
     private HalfRhombus left, right;
 
     public PenroserGLView(Context context) {
@@ -25,8 +27,15 @@ public class PenroserGLView extends GLSurfaceView implements GLSurfaceView.Rende
     }
 
     private void init() {
-        left = new FatHalfRhombus(0, HalfRhombus.LEFT, 0, 0, 1, 0);
-        right = new FatHalfRhombus(0, HalfRhombus.RIGHT, 0, 0, 1, 0);
+        this.setOnClickListener(new OnClickListener() {
+            public void onClick(View view) {
+                level++;
+                requestRender();
+            }
+        });
+
+        left = new SkinnyHalfRhombus(0, HalfRhombus.LEFT, 0, 0, 1, 0);
+        right = new SkinnyHalfRhombus(0, HalfRhombus.RIGHT, 0, 0, 1, 0);
 
         this.setEGLConfigChooser(new EGLConfigChooser() {
             public EGLConfig chooseConfig(EGL10 egl10, EGLDisplay eglDisplay) {
@@ -75,8 +84,8 @@ public class PenroserGLView extends GLSurfaceView implements GLSurfaceView.Rende
     public void onDrawFrame(GL10 gl) {
         if (gl instanceof GL11) {
             GL11 gl11 = (GL11)gl;
-            left.draw(gl11, 1);
-            right.draw(gl11, 1);
+            left.draw(gl11, level);
+            right.draw(gl11, level);
         }
     }
 }
