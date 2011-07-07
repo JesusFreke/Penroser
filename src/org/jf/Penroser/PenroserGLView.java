@@ -5,7 +5,10 @@ import android.opengl.GLSurfaceView;
 import android.opengl.GLU;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
+import org.metalev.multitouch.controller.MultiTouchController;
 
 import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.egl.EGLConfig;
@@ -13,9 +16,16 @@ import javax.microedition.khronos.egl.EGLDisplay;
 import javax.microedition.khronos.opengles.GL10;
 import javax.microedition.khronos.opengles.GL11;
 
-public class PenroserGLView extends GLSurfaceView implements GLSurfaceView.Renderer {
+public class PenroserGLView extends GLSurfaceView implements GLSurfaceView.Renderer, MultiTouchController.MultiTouchObjectCanvas<Object> {
     private int level = 0;
     private HalfRhombus left, right;
+
+    private MultiTouchController<Object> multiTouchController = new MultiTouchController<Object>(this);
+    private GestureDetector gestureDetector;
+
+    private float offsetX=0, offsetY=0;
+    private float scale=100;
+    private float angle=0;
 
     public PenroserGLView(Context context) {
         super(context);
@@ -28,10 +38,15 @@ public class PenroserGLView extends GLSurfaceView implements GLSurfaceView.Rende
     }
 
     private void init() {
-        this.setOnClickListener(new OnClickListener() {
-            public void onClick(View view) {
-                level++;
-                requestRender();
+        gestureDetector = new GestureDetector(getContext(), new GestureDetector.SimpleOnGestureListener() {
+            @Override
+            public boolean onSingleTapUp(MotionEvent e) {
+                if (e.getEventTime() - e.getDownTime() < 250) {
+                    level++;
+                    requestRender();
+                    return true;
+                }
+                return false;
             }
         });
 
@@ -80,7 +95,7 @@ public class PenroserGLView extends GLSurfaceView implements GLSurfaceView.Rende
     public void onSurfaceChanged(GL10 gl, int width, int height) {
         gl.glViewport(0, 0, width, height);
         gl.glLoadIdentity();
-        GLU.gluOrtho2D(gl, -width / 200, width / 200, -height / 200, height / 200);
+        GLU.gluOrtho2D(gl, -width / 2, width / 2, -height / 2, height / 2);
         gl.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
         gl.glMatrixMode(GL10.GL_MODELVIEW);
@@ -90,11 +105,50 @@ public class PenroserGLView extends GLSurfaceView implements GLSurfaceView.Rende
         long start = System.nanoTime();
         if (gl instanceof GL11) {
             GL11 gl11 = (GL11)gl;
+
+            gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
+
+            gl.glPushMatrix();
+
+            gl.glTranslatef(offsetX, -offsetY, 0);
+            gl.glRotatef((float)(angle * -180 / Math.PI), 0, 0, 1);
+            gl.glScalef(scale, scale, 0);
+
             left.draw(gl11, level);
             right.draw(gl11, level);
+
+            gl.glPopMatrix();
         }
         long end = System.nanoTime();
 
         Log.v("PenroserGLView", "Drawing took " + (end-start)/1000000000d + " seconds");
+    }
+
+    @Override
+	public boolean onTouchEvent(MotionEvent event) {
+        boolean res = multiTouchController.onTouchEvent(event);
+        res |=  gestureDetector.onTouchEvent(event);
+        return res;
+	}
+
+    public Object getDraggableObjectAtPoint(MultiTouchController.PointInfo touchPoint) {
+        return "";
+    }
+
+    public void getPositionAndScale(Object obj, MultiTouchController.PositionAndScale objPosAndScaleOut) {
+        objPosAndScaleOut.set(offsetX + getWidth()/2, offsetY + getHeight()/2, true, scale, false, 0, 0, true, angle);
+    }
+
+    public boolean setPositionAndScale(Object obj, MultiTouchController.PositionAndScale newObjPosAndScale, MultiTouchController.PointInfo touchPoint) {
+        offsetX = newObjPosAndScale.getXOff() - getWidth()/2;
+        offsetY = newObjPosAndScale.getYOff() - getHeight()/2;
+        scale = newObjPosAndScale.getScale();
+        angle = newObjPosAndScale.getAngle();
+
+        this.requestRender();
+        return true;
+    }
+
+    public void selectObject(Object obj, MultiTouchController.PointInfo touchPoint) {
     }
 }
