@@ -7,6 +7,9 @@ public abstract class HalfRhombus {
     public static final int LEFT=0;
     public static final int RIGHT=1;
 
+    /*This is the number of levels to use for the static vbo data*/
+    /*package*/ static final int VBO_LEVEL=8;
+
     /**
      * Number of level down the hierarchy. 0 is the top-most parent, 1 are the top-most parent's children, etc.
      */
@@ -34,6 +37,10 @@ public abstract class HalfRhombus {
     public abstract HalfRhombus getChild(int i);
 
     protected int oppositeSide() {
+        return side==RIGHT?LEFT:RIGHT;
+    }
+
+    protected static int oppositeSide(int side) {
         return side==RIGHT?LEFT:RIGHT;
     }
 }
