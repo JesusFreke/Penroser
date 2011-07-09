@@ -12,14 +12,14 @@ public class FatHalfRhombus extends HalfRhombus {
     private static final int NUM_CHILDREN = 3;
     private static final float[] leftVertices = new float[] {
             0.0f, 0.0f,
-            EdgeLength.x(0, -2), EdgeLength.y(0, -2),
-            0, EdgeLength.y(0, -2)*2
+            EdgeLength.getEdgeLength(0).x(-2), EdgeLength.getEdgeLength(0).y(-2),
+            0, EdgeLength.getEdgeLength(0).y(-2)*2
     };
 
     private static final float[] rightVertices = new float[] {
             0.0f, 0.0f,
-            EdgeLength.x(0, 2), EdgeLength.y(0, 2),
-            0, EdgeLength.y(0, 2)*2
+            EdgeLength.getEdgeLength(0).x(2), EdgeLength.getEdgeLength(0).y(2),
+            0, EdgeLength.getEdgeLength(0).y(2)*2
     };
 
     private static int leftVbo;
@@ -78,22 +78,24 @@ public class FatHalfRhombus extends HalfRhombus {
 
         float newScale = scale / Constants.goldenRatio;
 
+        EdgeLength edgeLength = EdgeLength.getEdgeLength(level);
+
         switch (i) {
             case TOP_FAT: {
-                float topVerticeX = x + EdgeLength.x(level, rotation-(sign*2)) + EdgeLength.x(level, rotation+(sign*2));
-                float topVerticeY = y + EdgeLength.y(level, rotation-(sign*2)) + EdgeLength.y(level, rotation+(sign*2));
+                float topVerticeX = x + edgeLength.x(rotation-(sign*2)) + edgeLength.x(rotation+(sign*2));
+                float topVerticeY = y + edgeLength.y(rotation-(sign*2)) + edgeLength.y(rotation+(sign*2));
 
                 //180 degree rotation - we don't care about sign
                 return new FatHalfRhombus(level+1, oppositeSide(), topVerticeX, topVerticeY, newScale, rotation+10);
             }
             case SKINNY: {
-                float sideVerticeX = x+EdgeLength.x(level, rotation-(sign*2));
-                float sideVerticeY = y+EdgeLength.y(level, rotation-(sign*2));
+                float sideVerticeX = x+edgeLength.x(rotation-(sign*2));
+                float sideVerticeY = y+edgeLength.y(rotation-(sign*2));
                 return new SkinnyHalfRhombus(level+1, oppositeSide(), sideVerticeX, sideVerticeY, newScale, rotation+(sign*2));
             }
             case BOTTOM_FAT: {
-                float sideVerticeX = x+EdgeLength.x(level, rotation-(sign*2));
-                float sideVerticeY = y+EdgeLength.y(level, rotation-(sign*2));
+                float sideVerticeX = x+edgeLength.x(rotation-(sign*2));
+                float sideVerticeY = y+edgeLength.y(rotation-(sign*2));
                 return new FatHalfRhombus(level+1, this.side, sideVerticeX, sideVerticeY, newScale, rotation+(sign*8));
             }
         }

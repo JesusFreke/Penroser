@@ -11,14 +11,14 @@ public class SkinnyHalfRhombus extends HalfRhombus {
     private static final int NUM_CHILDREN = 2;
     private static final float[] leftVertices = new float[] {
             0.0f, 0.0f,
-            EdgeLength.x(0, -4), EdgeLength.y(0, -4),
-            0, EdgeLength.y(0, -4)*2
+            EdgeLength.getEdgeLength(0).x(-4), EdgeLength.getEdgeLength(0).y(-4),
+            0, EdgeLength.getEdgeLength(0).y(-4)*2
     };
 
     private static final float[] rightVertices = new float[] {
             0.0f, 0.0f,
-            EdgeLength.x(0, 4), EdgeLength.y(0, 4),
-            0, EdgeLength.y(0, 4)*2
+            EdgeLength.getEdgeLength(0).x(4), EdgeLength.getEdgeLength(0).y(4),
+            0, EdgeLength.getEdgeLength(0).y(4)*2
     };
 
     private static int leftVbo;
@@ -77,15 +77,17 @@ public class SkinnyHalfRhombus extends HalfRhombus {
 
         float newScale = scale / Constants.goldenRatio;
 
+        EdgeLength edgeLength = EdgeLength.getEdgeLength(level);
+
         switch (i) {
             case SKINNY: {
-                float topVerticeX = x + EdgeLength.x(level, rotation-(sign*4)) + EdgeLength.x(level, rotation+(sign*4));
-                float topVerticeY = y + EdgeLength.y(level, rotation-(sign*4)) + EdgeLength.y(level, rotation+(sign*4));
+                float topVerticeX = x + edgeLength.x(rotation-(sign*4)) + edgeLength.x(rotation+(sign*4));
+                float topVerticeY = y + edgeLength.y(rotation-(sign*4)) + edgeLength.y(rotation+(sign*4));
                 return new SkinnyHalfRhombus(level+1, side, topVerticeX, topVerticeY, newScale, rotation-(sign*6));
             }
             case FAT: {
-                float sideVerticeX = x + EdgeLength.x(level, rotation-(sign*4));
-                float sideVerticeY = y + EdgeLength.y(level, rotation-(sign*4));
+                float sideVerticeX = x + edgeLength.x(rotation-(sign*4));
+                float sideVerticeY = y + edgeLength.y(rotation-(sign*4));
                 return new FatHalfRhombus(level+1, side, sideVerticeX, sideVerticeY, newScale, rotation+(sign*6));
             }
         }

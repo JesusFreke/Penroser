@@ -1,45 +1,34 @@
 package org.jf.Penroser;
 
-public class EdgeLength {
-    private static float[][] xlengths;
-    private static float[][] ylengths;
+import java.util.ArrayList;
+import java.util.List;
 
-    static {
-        initToLevel(0);
+public class EdgeLength {
+    private static List<EdgeLength> edgeLengths_pos = new ArrayList<EdgeLength>();
+    private static List<EdgeLength> edgeLengths_neg = new ArrayList<EdgeLength>();
+
+    private float[] xLengths;
+    private float[] yLengths;
+
+    private EdgeLength(float scale) {
+        xLengths = new float[20];
+        yLengths = new float[20];
+        for (int i=0; i<20; i++) {
+            xLengths[i] = (float)(scale * Math.sin(i*Math.PI/10));
+            yLengths[i] = (float)(scale * Math.cos(i*Math.PI/10));
+        }
     }
 
     private static void initToLevel(int level) {
-        int startLevel = 0;
-        float[][] newXlengths = new float[level+1][20];
-        float[][] newYlengths = new float[level+1][20];
-
-        if (xlengths != null) {
-            for (int i=0; i<xlengths.length; i++) {
-                for (int j=0; j<20; j++) {
-                    newXlengths[i][j] = xlengths[i][j];
-                    newYlengths[i][j] = ylengths[i][j];
-                }
+        if (level < 0) {
+            for (int i=edgeLengths_neg.size(); i<=-level; i++) {
+                edgeLengths_neg.add(new EdgeLength((float)Math.pow(Constants.goldenRatio, -i)));
             }
-
-            startLevel = xlengths.length;
         } else {
-            for (int i=0; i<20; i++) {
-                newXlengths[0][i] = (float)Math.sin(i*Math.PI/10);
-                newYlengths[0][i] = (float)Math.cos(i*Math.PI/10);
-            }
-
-            startLevel = 1;
-        }
-
-        for (int i=startLevel; i<=level; i++) {
-            for (int j=0; j<20; j++) {
-                newXlengths[i][j] = newXlengths[i-1][j] / Constants.goldenRatio;
-                newYlengths[i][j] = newYlengths[i-1][j] / Constants.goldenRatio;
+            for (int i=edgeLengths_pos.size(); i<=level; i++) {
+                edgeLengths_pos.add(new EdgeLength((float)Math.pow(Constants.goldenRatio, -i)));
             }
         }
-
-        xlengths=newXlengths;
-        ylengths=newYlengths;
     }
 
     public static int mod20(int num) {
@@ -50,17 +39,19 @@ public class EdgeLength {
         return result;
     }
 
-    public static float x(int level, int rotation) {
-        if (level >= xlengths.length) {
-            initToLevel(level);
+    public static EdgeLength getEdgeLength(int level) {
+        initToLevel(level);
+        if (level < 0) {
+            return edgeLengths_neg.get(-level);
         }
-        return xlengths[level][mod20(rotation)];
+        return edgeLengths_pos.get(level);
     }
 
-    public static float y(int level, int rotation) {
-        if (level >= ylengths.length) {
-            initToLevel(level);
-        }
-        return ylengths[level][mod20(rotation)];
+    public float x(int rotation) {
+        return xLengths[mod20(rotation)];
+    }
+
+    public float y(int rotation) {
+        return yLengths[mod20(rotation)];
     }
 }
