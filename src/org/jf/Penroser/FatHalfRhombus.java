@@ -1,5 +1,7 @@
 package org.jf.Penroser;
 
+import com.vividsolutions.jts.geom.*;
+
 import javax.microedition.khronos.opengles.GL10;
 import javax.microedition.khronos.opengles.GL11;
 import java.nio.FloatBuffer;
@@ -44,13 +46,47 @@ public class FatHalfRhombus extends HalfRhombus {
         super(level, side, x, y, scale, rotation);
     }
 
-@Override
-    public void draw(GL11 gl, int maxLevel) {
+    protected Geometry createGeometry() {
+        EdgeLength edgeLength = EdgeLength.getEdgeLength(level);
+        int sign = side==LEFT?1:-1;
+
+        float sideX = x + edgeLength.x(rotation-(sign*2));
+        float sideY = y + edgeLength.y(rotation-(sign*2));
+        float topX = sideX + edgeLength.x(rotation+(sign*2));
+        float topY = sideY + edgeLength.y(rotation+(sign*2));
+
+        LinearRing shell = Penroser.geometryFactory.createLinearRing(new Coordinate[] {
+           new Coordinate(x, y, 0),
+           new Coordinate(sideX, sideY, 0),
+           new Coordinate(topX, topY, 0),
+           new Coordinate(x, y, 0)
+        });
+
+        return Penroser.geometryFactory.createPolygon(shell, null);
+    }
+
+    @Override
+    public int draw(GL11 gl, Geometry viewport, int maxLevel) {
+        return draw(gl, viewport, maxLevel, true);
+    }
+
+    @Override
+    protected int draw(GL11 gl, Geometry viewport, int maxLevel, boolean checkIntersect) {
+        if (checkIntersect && !envelopeIntersects(viewport.getEnvelopeInternal())) {
+            return 0;
+        }
+
+        if (checkIntersect && envelopeCoveredBy(viewport.getEnvelopeInternal())) {
+            checkIntersect = false;
+        }
+
         if (this.level < maxLevel) {
+            int num=0;
             for (int i=0; i<NUM_CHILDREN; i++) {
                 HalfRhombus halfRhombus = getChild(i);
-                halfRhombus.draw(gl, maxLevel);
+                num += halfRhombus.draw(gl, viewport, maxLevel, checkIntersect);
             }
+            return num;
         } else {
             gl.glPushMatrix();
             gl.glTranslatef(this.x, this.y, 0);
@@ -83,6 +119,8 @@ public class FatHalfRhombus extends HalfRhombus {
             gl.glBindBuffer(GL11.GL_ARRAY_BUFFER, 0);
 
             gl.glPopMatrix();
+
+            return 1;
         }
     }
 
@@ -98,19 +136,17 @@ public class FatHalfRhombus extends HalfRhombus {
             case TOP_FAT: {
                 float topVerticeX = x + edgeLength.x(rotation-(sign*2)) + edgeLength.x(rotation+(sign*2));
                 float topVerticeY = y + edgeLength.y(rotation-(sign*2)) + edgeLength.y(rotation+(sign*2));
-
-                //180 degree rotation - we don't care about sign
                 return new FatHalfRhombus(level+1, oppositeSide(), topVerticeX, topVerticeY, newScale, rotation+10);
             }
             case SKINNY: {
-                float sideVerticeX = x+edgeLength.x(rotation-(sign*2));
-                float sideVerticeY = y+edgeLength.y(rotation-(sign*2));
+                float sideVerticeX = x + edgeLength.x(rotation-(sign*2));
+                float sideVerticeY = y + edgeLength.y(rotation-(sign*2));
                 return new SkinnyHalfRhombus(level+1, oppositeSide(), sideVerticeX, sideVerticeY, newScale, rotation+(sign*2));
             }
             case BOTTOM_FAT: {
-                float sideVerticeX = x+edgeLength.x(rotation-(sign*2));
-                float sideVerticeY = y+edgeLength.y(rotation-(sign*2));
-                return new FatHalfRhombus(level+1, this.side, sideVerticeX, sideVerticeY, newScale, rotation+(sign*8));
+                float sideVerticeX = x + edgeLength.x(rotation-(sign*2));
+                float sideVerticeY = y + edgeLength.y(rotation-(sign*2));
+                return new FatHalfRhombus(level+1, side, sideVerticeX, sideVerticeY, newScale, rotation+(sign*8));
             }
         }
 

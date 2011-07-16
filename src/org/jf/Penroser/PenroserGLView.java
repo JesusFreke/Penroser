@@ -1,13 +1,16 @@
 package org.jf.Penroser;
 
 import android.content.Context;
+import android.graphics.Matrix;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLU;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
-import android.view.View;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LinearRing;
 import org.metalev.multitouch.controller.MultiTouchController;
 
 import javax.microedition.khronos.egl.EGL10;
@@ -15,8 +18,19 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.egl.EGLDisplay;
 import javax.microedition.khronos.opengles.GL10;
 import javax.microedition.khronos.opengles.GL11;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
 
 public class PenroserGLView extends GLSurfaceView implements GLSurfaceView.Renderer, MultiTouchController.MultiTouchObjectCanvas<Object> {
+    private static final String TAG="PenroserGLView";
+
+    /**
+     * Setting this to true causes the drawing logic to change, so that the drawing surface is kept in the same
+     * position and a white box denoting the viewport is drawn and moved around instead
+     */
+    private static final boolean DRAW_VIEWPORT = false;
+
     private int level = 0;
     private HalfRhombus left, right;
 
@@ -43,6 +57,7 @@ public class PenroserGLView extends GLSurfaceView implements GLSurfaceView.Rende
             public boolean onSingleTapUp(MotionEvent e) {
                 if (e.getEventTime() - e.getDownTime() < 250) {
                     level++;
+                    Log.d(TAG, "Level " + level);
                     requestRender();
                     return true;
                 }
@@ -101,8 +116,39 @@ public class PenroserGLView extends GLSurfaceView implements GLSurfaceView.Rende
         gl.glMatrixMode(GL10.GL_MODELVIEW);
     }
 
+    private Geometry getViewport() {
+        Matrix m = new Matrix();
+        m.preTranslate(offsetX, -offsetY);
+        m.preRotate((float)(angle * -180 / Math.PI));
+        m.preScale(scale, scale);
+        if (!m.invert(m)) {
+            throw new RuntimeException("Could not invert transformation matrix");
+        }
+
+        float width = getWidth();
+        float height = getHeight();
+        float[] viewport = new float[] {
+                -width/2, height/2,
+                width/2, height/2,
+                width/2, -height/2,
+                -width/2, -height/2
+        };
+
+        m.mapPoints(viewport);
+        LinearRing shell = Penroser.geometryFactory.createLinearRing(new Coordinate[] {
+                new Coordinate(viewport[0], viewport[1]),
+                new Coordinate(viewport[2], viewport[3]),
+                new Coordinate(viewport[4], viewport[5]),
+                new Coordinate(viewport[6], viewport[7]),
+                new Coordinate(viewport[0], viewport[1]),
+        });
+
+        return Penroser.geometryFactory.createPolygon(shell, null);
+    }
+
     public void onDrawFrame(GL10 gl) {
         long start = System.nanoTime();
+        int num=0;
         if (gl instanceof GL11) {
             GL11 gl11 = (GL11)gl;
 
@@ -110,18 +156,54 @@ public class PenroserGLView extends GLSurfaceView implements GLSurfaceView.Rende
 
             gl.glPushMatrix();
 
-            gl.glTranslatef(offsetX, -offsetY, 0);
-            gl.glRotatef((float)(angle * -180 / Math.PI), 0, 0, 1);
-            gl.glScalef(scale, scale, 0);
+            if (DRAW_VIEWPORT) {
+                gl.glScalef(100, 100, 0);
+            } else {
+                gl.glTranslatef(offsetX, -offsetY, 0);
+                gl.glRotatef((float)(angle * -180 / Math.PI), 0, 0, 1);
+                gl.glScalef(scale, scale, 0);
+            }
 
-            left.draw(gl11, level);
-            right.draw(gl11, level);
+            Geometry viewport = getViewport();
+
+            num += left.draw(gl11, viewport, level);
+            num += right.draw(gl11, viewport, level);
+
+            if (DRAW_VIEWPORT) {
+                drawViewport(gl11, viewport);
+            }
 
             gl.glPopMatrix();
         }
         long end = System.nanoTime();
 
-        Log.v("PenroserGLView", "Drawing took " + (end-start)/1000000000d + " seconds");
+        Log.v("PenroserGLView", "Drawing took " + (end-start)/1E6d + " ms, with " + num + " leaf tiles drawn");
+    }
+
+    private void drawViewport(GL11 gl, Geometry viewport) {
+        Coordinate[] coordinates = viewport.getCoordinates();
+
+        float[] vertices = new float[] {
+                (float)coordinates[0].x, (float)coordinates[0].y,
+                (float)coordinates[1].x, (float)coordinates[1].y,
+                (float)coordinates[2].x, (float)coordinates[2].y,
+                (float)coordinates[0].x, (float)coordinates[0].y,
+                (float)coordinates[2].x, (float)coordinates[2].y,
+                (float)coordinates[3].x, (float)coordinates[3].y,
+        };
+
+        FloatBuffer vertexBuffer = ByteBuffer.allocateDirect(vertices.length * 4).order(ByteOrder.nativeOrder()).asFloatBuffer();
+        vertexBuffer.put(vertices).position(0);
+
+        gl.glVertexPointer(2, GL10.GL_FLOAT, 0, vertexBuffer);
+        gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
+
+        gl.glDisableClientState(GL10.GL_COLOR_ARRAY);
+        gl.glColor4ub((byte)255, (byte)255, (byte)255, (byte)128);
+
+        gl.glDrawArrays(GL10.GL_TRIANGLES, 0, vertices.length/2);
+
+        gl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
     }
 
     @Override
