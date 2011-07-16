@@ -16,14 +16,27 @@ public abstract class HalfRhombus {
     /*package*/ static final int VBO_LEVEL=6;
 
     /**
-     * Number of level down the hierarchy. 0 is the top-most parent, 1 are the top-most parent's children, etc.
+     * A relative level number. Children have a higher level, parents have a lower level. A negative level is allowed,
+     * for example, in the case of upwards generation
      */
     protected int level;
+
+    /** Whether this is the right or left side of a rhombus */
     protected int side;
+
+    /** The x coordinate of the bottom vertex */
     protected float x;
+
+    /** The y coordinate of the bottom vertex */
     protected float y;
+
+    /** The scale of the half rhombus */
     protected float scale;
+
+    /** The rotation of the half rhombus, in increments of 18 degrees */
     protected int rotation;
+
+    /** A Geometry object that represents this half rhombus */
     private Geometry geometry;
 
     protected HalfRhombus(int level, int side, float x, float y, float scale, int rotation) {
