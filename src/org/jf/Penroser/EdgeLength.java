@@ -22,7 +22,7 @@ public class EdgeLength {
     private static void initToLevel(int level) {
         if (level < 0) {
             for (int i=edgeLengths_neg.size(); i<=-level; i++) {
-                edgeLengths_neg.add(new EdgeLength((float)Math.pow(Constants.goldenRatio, -i)));
+                edgeLengths_neg.add(new EdgeLength((float)Math.pow(Constants.goldenRatio, i)));
             }
         } else {
             for (int i=edgeLengths_pos.size(); i<=level; i++) {
