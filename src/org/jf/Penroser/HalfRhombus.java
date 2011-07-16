@@ -24,7 +24,7 @@ public abstract class HalfRhombus {
     protected float y;
     protected float scale;
     protected int rotation;
-    protected Geometry geometry;
+    private Geometry geometry;
 
     protected HalfRhombus(int level, int side, float x, float y, float scale, int rotation) {
         this.level = level;
@@ -33,7 +33,6 @@ public abstract class HalfRhombus {
         this.y = y;
         this.scale = scale;
         this.rotation = EdgeLength.mod20(rotation);
-        this.geometry = createGeometry();
     }
 
     public float getRotationInDegrees() {
@@ -55,11 +54,18 @@ public abstract class HalfRhombus {
         return side==RIGHT?LEFT:RIGHT;
     }
 
+    public Geometry getGeometry() {
+        if (geometry == null) {
+            geometry = createGeometry();
+        }
+        return geometry;
+    }
+
     public boolean envelopeIntersects(Envelope viewportEnvelope) {
-        return geometry.getEnvelopeInternal().intersects(viewportEnvelope);
+        return getGeometry().getEnvelopeInternal().intersects(viewportEnvelope);
     }
 
     public boolean envelopeCoveredBy(Envelope viewportEnvelope) {
-        return viewportEnvelope.covers(geometry.getEnvelopeInternal());
+        return viewportEnvelope.covers(getGeometry().getEnvelopeInternal());
     }
 }
