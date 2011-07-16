@@ -32,7 +32,7 @@ public class PenroserGLView extends GLSurfaceView implements GLSurfaceView.Rende
     private static final boolean DRAW_VIEWPORT = false;
 
     private int level = 0;
-    private HalfRhombus left, right;
+    private HalfRhombus halfRhombus;
 
     private MultiTouchController<Object> multiTouchController = new MultiTouchController<Object>(this);
     private GestureDetector gestureDetector;
@@ -65,8 +65,7 @@ public class PenroserGLView extends GLSurfaceView implements GLSurfaceView.Rende
             }
         });
 
-        left = new SkinnyHalfRhombus(0, HalfRhombus.LEFT, 0, 0, 1, 0);
-        right = new SkinnyHalfRhombus(0, HalfRhombus.RIGHT, 0, 0, 1, 0);
+        halfRhombus = new FatHalfRhombus(0, HalfRhombus.LEFT, 0, 0, 1, 0);
 
         this.setEGLConfigChooser(new EGLConfigChooser() {
             public EGLConfig chooseConfig(EGL10 egl10, EGLDisplay eglDisplay) {
@@ -166,8 +165,7 @@ public class PenroserGLView extends GLSurfaceView implements GLSurfaceView.Rende
 
             Geometry viewport = getViewport();
 
-            num += left.draw(gl11, viewport, level);
-            num += right.draw(gl11, viewport, level);
+            num += halfRhombus.draw(gl11, viewport, level);
 
             if (DRAW_VIEWPORT) {
                 drawViewport(gl11, viewport);
