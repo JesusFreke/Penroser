@@ -67,7 +67,13 @@ public class PenroserGLView extends GLSurfaceView implements GLSurfaceView.Rende
             }
         });
 
-        halfRhombus = new FatHalfRhombus(0, HalfRhombus.LEFT, 0, 0, 1, 0);
+        int rhombusType = Penroser.random.nextInt(2);
+        int rhombusSide = Penroser.random.nextInt(2);
+        if (rhombusType == 0) {
+            halfRhombus = new FatHalfRhombus(0, rhombusSide, 0, 0, 1, 0);
+        } else {
+            halfRhombus = new SkinnyHalfRhombus(0, rhombusSide, 0, 0, 1, 0);
+        }
 
         this.setEGLConfigChooser(new EGLConfigChooser() {
             public EGLConfig chooseConfig(EGL10 egl10, EGLDisplay eglDisplay) {
