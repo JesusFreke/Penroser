@@ -153,6 +153,43 @@ public class FatHalfRhombus extends HalfRhombus {
         return null;
     }
 
+    @Override
+    public int getRandomParentType(int edge) {
+        if (edge == HalfRhombus.BOTTOM_EDGE) {
+            return BOTTOM_FAT;
+        }
+        return Penroser.random.nextInt(2);
+    }
+
+    @Override
+    public HalfRhombus getParent(int parentType) {
+        float newScale = scale * Constants.goldenRatio;
+        int sign = side==LEFT?1:-1;
+
+        EdgeLength edgeLength = EdgeLength.getEdgeLength(level-1);
+
+        switch (parentType) {
+            case TOP_FAT: {
+                float parentSideX = x + edgeLength.x(rotation-(sign*2));
+                float parentSideY = y + edgeLength.y(rotation-(sign*2));
+                float parentBottomX = parentSideX + edgeLength.x(rotation+(sign*2));
+                float parentBottomY = parentSideY + edgeLength.y(rotation+(sign*2));
+                return new FatHalfRhombus(level-1, oppositeSide(), parentBottomX, parentBottomY, newScale, rotation+10);
+            }
+            case SKINNY: {
+                float parentBottomX = x + edgeLength.x(rotation);
+                float parentBottomY = y + edgeLength.y(rotation);
+                return new SkinnyHalfRhombus(level-1, side, parentBottomX, parentBottomY, newScale, rotation-(sign*6));
+            }
+            case BOTTOM_FAT: {
+                float parentBottomX = x + edgeLength.x(rotation);
+                float parentBottomY = y + edgeLength.y(rotation);
+                return new FatHalfRhombus(level-1, side, parentBottomX, parentBottomY, newScale, rotation-(sign*8));
+            }
+        }
+        return null;
+    }
+
     public static void onSurfaceCreated(GL11 gl) {
         int[] vboref = new int[1];
 

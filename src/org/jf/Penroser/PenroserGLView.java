@@ -56,8 +56,10 @@ public class PenroserGLView extends GLSurfaceView implements GLSurfaceView.Rende
             @Override
             public boolean onSingleTapUp(MotionEvent e) {
                 if (e.getEventTime() - e.getDownTime() < 250) {
-                    level++;
-                    Log.d(TAG, "Level " + level);
+                    int edge = Penroser.random.nextInt(2);
+                    int parentType = halfRhombus.getRandomParentType(edge);
+                    halfRhombus = halfRhombus.getParent(parentType);
+                    Log.d(TAG, "Level " + halfRhombus.level);
                     requestRender();
                     return true;
                 }
