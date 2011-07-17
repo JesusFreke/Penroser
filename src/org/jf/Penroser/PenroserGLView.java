@@ -112,12 +112,14 @@ public class PenroserGLView extends GLSurfaceView implements GLSurfaceView.Rende
 
     private Geometry getViewport() {
         Matrix m = new Matrix();
+        Matrix invert = new Matrix();
         m.preTranslate(offsetX, -offsetY);
         m.preRotate((float)(angle * -180 / Math.PI));
         m.preScale(scale, scale);
-        if (!m.invert(m)) {
+        if (!m.invert(invert)) {
             throw new RuntimeException("Could not invert transformation matrix");
         }
+        m = invert;
 
         float width = getWidth();
         float height = getHeight();
