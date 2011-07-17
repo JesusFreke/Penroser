@@ -120,16 +120,17 @@ public class PenroserGLView extends GLSurfaceView implements GLSurfaceView.Rende
         gl.glMatrixMode(GL10.GL_MODELVIEW);
     }
 
+    private Matrix viewportMatrix = new Matrix();
+    private Matrix invertedMatrix = new Matrix();
     private void calculateViewport() {
-        Matrix m = new Matrix();
-        Matrix invert = new Matrix();
-        m.preTranslate(offsetX, -offsetY);
-        m.preRotate((float)(angle * -180 / Math.PI));
-        m.preScale(scale, scale);
-        if (!m.invert(invert)) {
+        viewportMatrix.reset();
+
+        viewportMatrix.preTranslate(offsetX, -offsetY);
+        viewportMatrix.preRotate((float)(angle * -180 / Math.PI));
+        viewportMatrix.preScale(scale, scale);
+        if (!viewportMatrix.invert(invertedMatrix)) {
             throw new RuntimeException("Could not invert transformation matrix");
         }
-        m = invert;
 
         float width = getWidth();
         float height = getHeight();
@@ -142,7 +143,7 @@ public class PenroserGLView extends GLSurfaceView implements GLSurfaceView.Rende
         viewport[6] = -width/2;
         viewport[7] = -height/2;
 
-        m.mapPoints(viewport);
+        invertedMatrix.mapPoints(viewport);
     }
 
     public void onDrawFrame(GL10 gl) {
