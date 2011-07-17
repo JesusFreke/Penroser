@@ -75,7 +75,13 @@ public class PenroserGLView extends GLSurfaceView implements GLSurfaceView.Rende
                 egl10.eglChooseConfig(eglDisplay, config, returnedConfig, 1, returnedConfigCount);
 
                 if (returnedConfigCount[0] == 0) {
-                    throw new RuntimeException("Multisample not supported");
+                    config = new int[] {
+                        EGL10.EGL_NONE
+                    };
+                    egl10.eglChooseConfig(eglDisplay, config, returnedConfig, 1, returnedConfigCount);
+                    if (returnedConfigCount[0] == 0) {
+                        throw new RuntimeException("Couldn't choose an opengl config");
+                    }
                 }
 
                 return returnedConfig[0];
