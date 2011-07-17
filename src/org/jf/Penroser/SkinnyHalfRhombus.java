@@ -41,6 +41,9 @@ public class SkinnyHalfRhombus extends HalfRhombus {
         rightColors = colors[0];
     }
 
+    public SkinnyHalfRhombus() {
+    }
+
     public SkinnyHalfRhombus(int level, int side, float x, float y, float scale, int rotation) {
         super(level, side, x, y, scale, rotation);
     }
@@ -136,12 +139,12 @@ public class SkinnyHalfRhombus extends HalfRhombus {
             case SKINNY: {
                 float topVerticeX = x + edgeLength.x(rotation-(sign*4)) + edgeLength.x(rotation+(sign*4));
                 float topVerticeY = y + edgeLength.y(rotation-(sign*4)) + edgeLength.y(rotation+(sign*4));
-                return new SkinnyHalfRhombus(level+1, side, topVerticeX, topVerticeY, newScale, rotation-(sign*6));
+                return Penroser.halfRhombusPool.getSkinnyHalfRhombus(level+1, side, topVerticeX, topVerticeY, newScale, rotation-(sign*6));
             }
             case FAT: {
                 float sideVerticeX = x + edgeLength.x(rotation-(sign*4));
                 float sideVerticeY = y + edgeLength.y(rotation-(sign*4));
-                return new FatHalfRhombus(level+1, side, sideVerticeX, sideVerticeY, newScale, rotation+(sign*6));
+                return Penroser.halfRhombusPool.getFatHalfRhombus(level+1, side, sideVerticeX, sideVerticeY, newScale, rotation+(sign*6));
             }
         }
 

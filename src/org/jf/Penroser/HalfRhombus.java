@@ -44,6 +44,9 @@ public abstract class HalfRhombus {
     /** A Geometry object that represents this half rhombus */
     private Geometry geometry;
 
+    protected HalfRhombus() {
+    }
+
     protected HalfRhombus(int level, int side, float x, float y, float scale, int rotation) {
         this.level = level;
         this.side = side;
@@ -51,6 +54,16 @@ public abstract class HalfRhombus {
         this.y = y;
         this.scale = scale;
         this.rotation = EdgeLength.mod20(rotation);
+    }
+
+    public void set(int level, int side, float x, float y, float scale, int rotation) {
+        this.level = level;
+        this.side = side;
+        this.x = x;
+        this.y = y;
+        this.scale = scale;
+        this.rotation = EdgeLength.mod20(rotation);
+        geometry = null;
     }
 
     public float getRotationInDegrees() {

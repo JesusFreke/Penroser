@@ -54,6 +54,8 @@ public class PenroserGLView extends GLSurfaceView implements GLSurfaceView.Rende
     }
 
     private void init() {
+        Penroser.halfRhombusPool.initToLevels(0, 0);
+
         int rhombusType = Penroser.random.nextInt(2);
         int rhombusSide = Penroser.random.nextInt(2);
         if (rhombusType == 0) {
@@ -191,6 +193,8 @@ public class PenroserGLView extends GLSurfaceView implements GLSurfaceView.Rende
 
                 intersectingEdges = halfRhombus.getIntersectingEdges(viewport);
             }
+
+            Penroser.halfRhombusPool.initToLevels(halfRhombus.level, 0);
 
             num += halfRhombus.draw(gl11, viewport, level);
 
