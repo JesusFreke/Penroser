@@ -49,6 +49,7 @@ public class FatHalfRhombus extends HalfRhombus {
         super(level, side, x, y, scale, rotation);
     }
 
+    @Override
     protected Geometry createGeometry() {
         EdgeLength edgeLength = EdgeLength.getEdgeLength(level);
         int sign = side==LEFT?1:-1;
