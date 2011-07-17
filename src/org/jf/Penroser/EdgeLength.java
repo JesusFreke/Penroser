@@ -31,14 +31,6 @@ public class EdgeLength {
         }
     }
 
-    public static int mod20(int num) {
-        int result = num%20;
-        if (result<0) {
-            return result+20;
-        }
-        return result;
-    }
-
     public static EdgeLength getEdgeLength(int level) {
         initToLevel(level);
         if (level < 0) {
@@ -48,10 +40,10 @@ public class EdgeLength {
     }
 
     public float x(int rotation) {
-        return xLengths[mod20(rotation)];
+        return xLengths[MathUtil.positiveMod(rotation, 20)];
     }
 
     public float y(int rotation) {
-        return yLengths[mod20(rotation)];
+        return yLengths[MathUtil.positiveMod(rotation, 20)];
     }
 }

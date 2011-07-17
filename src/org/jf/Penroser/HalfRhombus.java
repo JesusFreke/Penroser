@@ -58,7 +58,7 @@ public abstract class HalfRhombus {
         this.x = x;
         this.y = y;
         this.scale = scale;
-        this.rotation = EdgeLength.mod20(rotation);
+        this.rotation = MathUtil.positiveMod(rotation, 20);
     }
 
     public void set(int level, int side, float x, float y, float scale, int rotation) {
@@ -67,7 +67,7 @@ public abstract class HalfRhombus {
         this.x = x;
         this.y = y;
         this.scale = scale;
-        this.rotation = EdgeLength.mod20(rotation);
+        this.rotation = MathUtil.positiveMod(rotation, 20);
         geometry = null;
         envelopeValid = false;
     }
