@@ -155,8 +155,11 @@ public class FatHalfRhombus extends HalfRhombus {
 
     @Override
     public int getRandomParentType(int edge) {
-        if (edge == HalfRhombus.BOTTOM_EDGE) {
+        if (edge == HalfRhombus.LOWER_EDGE) {
             return BOTTOM_FAT;
+        }
+        if (edge == HalfRhombus.INNER_EDGE) {
+            return Penroser.random.nextInt(3);
         }
         return Penroser.random.nextInt(2);
     }

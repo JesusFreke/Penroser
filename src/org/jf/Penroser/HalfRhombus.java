@@ -9,8 +9,9 @@ public abstract class HalfRhombus {
     public static final int LEFT=0;
     public static final int RIGHT=1;
 
-    public static final int BOTTOM_EDGE=0;
-    public static final int TOP_EDGE=1;
+    public static final int LOWER_EDGE=0;
+    public static final int UPPER_EDGE=1;
+    public static final int INNER_EDGE=2;
 
     /*This is the number of levels to use for the static vbo data*/
     /*package*/ static final int VBO_LEVEL=6;

@@ -150,7 +150,7 @@ public class SkinnyHalfRhombus extends HalfRhombus {
 
     @Override
     public int getRandomParentType(int edge) {
-        if (edge == HalfRhombus.TOP_EDGE) {
+        if (edge == HalfRhombus.UPPER_EDGE) {
             return FAT;
         }
         return Penroser.random.nextInt(2);
