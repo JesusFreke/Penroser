@@ -6,7 +6,6 @@ import android.opengl.GLSurfaceView;
 import android.opengl.GLU;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.GestureDetector;
 import android.view.MotionEvent;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -35,7 +34,6 @@ public class PenroserGLView extends GLSurfaceView implements GLSurfaceView.Rende
     private HalfRhombus halfRhombus;
 
     private MultiTouchController<Object> multiTouchController = new MultiTouchController<Object>(this);
-    private GestureDetector gestureDetector;
 
     private float offsetX=0, offsetY=0;
     private float scale=100;
@@ -52,21 +50,6 @@ public class PenroserGLView extends GLSurfaceView implements GLSurfaceView.Rende
     }
 
     private void init() {
-        gestureDetector = new GestureDetector(getContext(), new GestureDetector.SimpleOnGestureListener() {
-            @Override
-            public boolean onSingleTapUp(MotionEvent e) {
-                if (e.getEventTime() - e.getDownTime() < 250) {
-                    int edge = Penroser.random.nextInt(2);
-                    int parentType = halfRhombus.getRandomParentType(edge);
-                    halfRhombus = halfRhombus.getParent(parentType);
-                    Log.d(TAG, "Level " + halfRhombus.level);
-                    requestRender();
-                    return true;
-                }
-                return false;
-            }
-        });
-
         int rhombusType = Penroser.random.nextInt(2);
         int rhombusSide = Penroser.random.nextInt(2);
         if (rhombusType == 0) {
@@ -215,7 +198,6 @@ public class PenroserGLView extends GLSurfaceView implements GLSurfaceView.Rende
     @Override
 	public boolean onTouchEvent(MotionEvent event) {
         boolean res = multiTouchController.onTouchEvent(event);
-        res |=  gestureDetector.onTouchEvent(event);
         return res;
 	}
 
