@@ -2,7 +2,6 @@ package org.jf.Penroser;
 
 import android.graphics.RectF;
 import com.vividsolutions.jts.geom.*;
-import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
 
 import javax.microedition.khronos.opengles.GL11;
 
@@ -46,8 +45,9 @@ public abstract class HalfRhombus {
     private RectF envelope = new RectF();
     private boolean envelopeValid = false;
 
-    /** A Geometry object that represents this half rhombus */
-    private Geometry geometry;
+    /** The vertices of this half rhombus */
+    private float[] vertices = new float[6];
+    private boolean verticesValid = false;
 
     protected HalfRhombus() {
     }
@@ -59,6 +59,8 @@ public abstract class HalfRhombus {
         this.y = y;
         this.scale = scale;
         this.rotation = MathUtil.positiveMod(rotation, 20);
+        envelopeValid = false;
+        verticesValid = false;
     }
 
     public void set(int level, int side, float x, float y, float scale, int rotation) {
@@ -68,8 +70,8 @@ public abstract class HalfRhombus {
         this.y = y;
         this.scale = scale;
         this.rotation = MathUtil.positiveMod(rotation, 20);
-        geometry = null;
         envelopeValid = false;
+        verticesValid = false;
     }
 
     public float getRotationInDegrees() {
@@ -79,7 +81,7 @@ public abstract class HalfRhombus {
     public abstract int draw(GL11 gl, RectF viewportEnvelope, int maxLevel);
     protected abstract int draw(GL11 gl, RectF viewportEnvelope, int maxLevel, boolean checkIntersect);
     public abstract HalfRhombus getChild(int i);
-    protected abstract Geometry createGeometry();
+    protected abstract void calculateVertices(float[] vertices);
     protected abstract void calculateEnvelope(RectF envelope);
     public abstract int getRandomParentType(int edge);
     public abstract HalfRhombus getParent(int parentType);
@@ -92,16 +94,19 @@ public abstract class HalfRhombus {
         return side==RIGHT?LEFT:RIGHT;
     }
 
-    public Geometry getGeometry() {
-        if (geometry == null) {
-            geometry = createGeometry();
+    public float[] getVertices() {
+        if (!verticesValid) {
+            calculateVertices(vertices);
+            verticesValid = true;
         }
-        return geometry;
+
+        return vertices;
     }
 
     public RectF getEnvelope() {
         if (!envelopeValid) {
             calculateEnvelope(envelope);
+            envelopeValid = true;
         }
 
         return envelope;
@@ -123,26 +128,11 @@ public abstract class HalfRhombus {
      * @return A bitmask indicating which edges intersect. The bitmask consists of the LOWER_EDGE_MASK, UPPER_EDGE_MASK
      * and INNER_EDGE_MASK values
      */
-    public int getIntersectingEdges(Geometry viewport) {
-        int edgeMask = 0;
+    public int getIntersectingEdges(float[] viewport) {
+        assert viewport.length == 8;
 
-        LineString exterior = ((Polygon)getGeometry()).getExteriorRing();
-
-        Coordinate[] coordinates = exterior.getCoordinates();
-
-        assert coordinates.length == 4;
-
-        for (int i=0; i<3; i++) {
-            Coordinate[] lineCoords = new Coordinate[] {
-                    coordinates[i], coordinates[i+1]
-            };
-
-            LineString line = new LineString(new CoordinateArraySequence(lineCoords), Penroser.geometryFactory);
-            if (line.intersects(viewport)) {
-                edgeMask |= (1<<i);
-            }
-        }
-
+        float[] triangle = getVertices();
+        int edgeMask = GeometryUtil.triangleRectIntersection(triangle, viewport);
         return edgeMask;
     }
 }

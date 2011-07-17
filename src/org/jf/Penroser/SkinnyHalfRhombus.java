@@ -50,7 +50,7 @@ public class SkinnyHalfRhombus extends HalfRhombus {
     }
 
     @Override
-    protected Geometry createGeometry() {
+    protected void calculateVertices(float[] vertices) {
         EdgeLength edgeLength = EdgeLength.getEdgeLength(level);
         int sign = side==LEFT?1:-1;
 
@@ -59,14 +59,12 @@ public class SkinnyHalfRhombus extends HalfRhombus {
         float topX = sideX + edgeLength.x(rotation+(sign*4));
         float topY = sideY + edgeLength.y(rotation+(sign*4));
 
-        LinearRing shell = Penroser.geometryFactory.createLinearRing(new Coordinate[] {
-           new Coordinate(x, y, 0),
-           new Coordinate(sideX, sideY, 0),
-           new Coordinate(topX, topY, 0),
-           new Coordinate(x, y, 0)
-        });
-
-        return Penroser.geometryFactory.createPolygon(shell, null);
+        vertices[0] = x;
+        vertices[1] = y;
+        vertices[2] = sideX;
+        vertices[3] = sideY;
+        vertices[4] = topX;
+        vertices[5] = topY;
     }
 
     @Override

@@ -8,9 +8,6 @@ import android.opengl.GLU;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.LinearRing;
 import org.metalev.multitouch.controller.MultiTouchController;
 
 import javax.microedition.khronos.egl.EGL10;
@@ -43,6 +40,9 @@ public class PenroserGLView extends GLSurfaceView implements GLSurfaceView.Rende
     private long lastDraw = 0;
     private float velocityX = 250;
     private float velocityY = 100;
+
+    private float[] viewport = new float[8];
+    private RectF viewportEnvelope = new RectF();
 
     public PenroserGLView(Context context) {
         super(context);
@@ -119,7 +119,7 @@ public class PenroserGLView extends GLSurfaceView implements GLSurfaceView.Rende
         gl.glMatrixMode(GL10.GL_MODELVIEW);
     }
 
-    private Geometry getViewport() {
+    private void calculateViewport() {
         Matrix m = new Matrix();
         Matrix invert = new Matrix();
         m.preTranslate(offsetX, -offsetY);
@@ -132,23 +132,16 @@ public class PenroserGLView extends GLSurfaceView implements GLSurfaceView.Rende
 
         float width = getWidth();
         float height = getHeight();
-        float[] viewport = new float[] {
-                -width/2, height/2,
-                width/2, height/2,
-                width/2, -height/2,
-                -width/2, -height/2
-        };
+        viewport[0] = -width/2;
+        viewport[1] = height/2;
+        viewport[2] = width/2;
+        viewport[3] = height/2;
+        viewport[4] = width/2;
+        viewport[5] = -height/2;
+        viewport[6] = -width/2;
+        viewport[7] = -height/2;
 
         m.mapPoints(viewport);
-        LinearRing shell = Penroser.geometryFactory.createLinearRing(new Coordinate[] {
-                new Coordinate(viewport[0], viewport[1]),
-                new Coordinate(viewport[2], viewport[3]),
-                new Coordinate(viewport[4], viewport[5]),
-                new Coordinate(viewport[6], viewport[7]),
-                new Coordinate(viewport[0], viewport[1]),
-        });
-
-        return Penroser.geometryFactory.createPolygon(shell, null);
     }
 
     public void onDrawFrame(GL10 gl) {
@@ -175,8 +168,7 @@ public class PenroserGLView extends GLSurfaceView implements GLSurfaceView.Rende
                 gl.glScalef(scale, scale, 0);
             }
 
-            Geometry viewport = getViewport();
-
+            calculateViewport();
 
             int intersectingEdges = halfRhombus.getIntersectingEdges(viewport);
             while (intersectingEdges != 0) {
@@ -197,11 +189,11 @@ public class PenroserGLView extends GLSurfaceView implements GLSurfaceView.Rende
 
             Penroser.halfRhombusPool.initToLevels(halfRhombus.level, 0);
 
-            RectF viewportEnvelope = new RectF();
-            viewportEnvelope.left = (float)viewport.getEnvelopeInternal().getMinX();
-            viewportEnvelope.top = (float)viewport.getEnvelopeInternal().getMinY();
-            viewportEnvelope.right = (float)viewport.getEnvelopeInternal().getMaxX();
-            viewportEnvelope.bottom = (float)viewport.getEnvelopeInternal().getMaxY();
+
+            viewportEnvelope.left = MathUtil.min(viewport[0], viewport[2], viewport[4], viewport[6]);
+            viewportEnvelope.top = MathUtil.min(viewport[1], viewport[3], viewport[5], viewport[7]);
+            viewportEnvelope.right = MathUtil.max(viewport[0], viewport[2], viewport[4], viewport[6]);
+            viewportEnvelope.bottom = MathUtil.max(viewport[1], viewport[3], viewport[5], viewport[7]);
             num += halfRhombus.draw(gl11, viewportEnvelope, level);
 
             if (DRAW_VIEWPORT) {
@@ -215,20 +207,9 @@ public class PenroserGLView extends GLSurfaceView implements GLSurfaceView.Rende
         Log.v("PenroserGLView", "Drawing took " + (end-start)/1E6d + " ms, with " + num + " leaf tiles drawn");
     }
 
-    private void drawViewport(GL11 gl, Geometry viewport) {
-        Coordinate[] coordinates = viewport.getCoordinates();
-
-        float[] vertices = new float[] {
-                (float)coordinates[0].x, (float)coordinates[0].y,
-                (float)coordinates[1].x, (float)coordinates[1].y,
-                (float)coordinates[2].x, (float)coordinates[2].y,
-                (float)coordinates[0].x, (float)coordinates[0].y,
-                (float)coordinates[2].x, (float)coordinates[2].y,
-                (float)coordinates[3].x, (float)coordinates[3].y,
-        };
-
-        FloatBuffer vertexBuffer = ByteBuffer.allocateDirect(vertices.length * 4).order(ByteOrder.nativeOrder()).asFloatBuffer();
-        vertexBuffer.put(vertices).position(0);
+    private void drawViewport(GL11 gl, float[] viewport) {
+        FloatBuffer vertexBuffer = ByteBuffer.allocateDirect(viewport.length * 4).order(ByteOrder.nativeOrder()).asFloatBuffer();
+        vertexBuffer.put(viewport).position(0);
 
         gl.glVertexPointer(2, GL10.GL_FLOAT, 0, vertexBuffer);
         gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
@@ -236,7 +217,7 @@ public class PenroserGLView extends GLSurfaceView implements GLSurfaceView.Rende
         gl.glDisableClientState(GL10.GL_COLOR_ARRAY);
         gl.glColor4ub((byte)255, (byte)255, (byte)255, (byte)128);
 
-        gl.glDrawArrays(GL10.GL_TRIANGLES, 0, vertices.length/2);
+        gl.glDrawArrays(GL10.GL_TRIANGLE_FAN, 0, viewport.length/2);
 
         gl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
     }
