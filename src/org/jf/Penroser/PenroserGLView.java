@@ -36,7 +36,7 @@ public class PenroserGLView extends GLSurfaceView implements GLSurfaceView.Rende
     private MultiTouchController<Object> multiTouchController = new MultiTouchController<Object>(this);
 
     private float offsetX=0, offsetY=0;
-    private float scale=100;
+    private float scale=500;
     private float angle=0;
 
     public PenroserGLView(Context context) {
