@@ -1,7 +1,7 @@
 package org.jf.Penroser;
 
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.*;
+import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
 
 import javax.microedition.khronos.opengles.GL11;
 
@@ -12,6 +12,10 @@ public abstract class HalfRhombus {
     public static final int LOWER_EDGE=0;
     public static final int UPPER_EDGE=1;
     public static final int INNER_EDGE=2;
+
+    public static final int LOWER_EDGE_MASK=1;
+    public static final int UPPER_EDGE_MASK=2;
+    public static final int INNER_EDGE_MASK=3;
 
     /*This is the number of levels to use for the static vbo data*/
     /*package*/ static final int VBO_LEVEL=6;
@@ -81,5 +85,36 @@ public abstract class HalfRhombus {
 
     public boolean envelopeCoveredBy(Envelope viewportEnvelope) {
         return viewportEnvelope.covers(getGeometry().getEnvelopeInternal());
+    }
+
+    /**
+     * Finds the edges of this half rhombus that intersect with the given viewport. This can be used to detect when the
+     * viewport has extended past one or more of the top-most half rhombus's edges
+
+     * @param viewport The viewport to check against
+     * @return A bitmask indicating which edges intersect. The bitmask consists of the LOWER_EDGE_MASK, UPPER_EDGE_MASK
+     * and INNER_EDGE_MASK values
+     */
+    public int getIntersectingEdges(Geometry viewport) {
+        int edgeMask = 0;
+
+        LineString exterior = ((Polygon)getGeometry()).getExteriorRing();
+
+        Coordinate[] coordinates = exterior.getCoordinates();
+
+        assert coordinates.length == 4;
+
+        for (int i=0; i<3; i++) {
+            Coordinate[] lineCoords = new Coordinate[] {
+                    coordinates[i], coordinates[i+1]
+            };
+
+            LineString line = new LineString(new CoordinateArraySequence(lineCoords), Penroser.geometryFactory);
+            if (line.intersects(viewport)) {
+                edgeMask |= (1<<i);
+            }
+        }
+
+        return edgeMask;
     }
 }

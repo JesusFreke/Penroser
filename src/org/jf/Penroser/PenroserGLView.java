@@ -156,6 +156,24 @@ public class PenroserGLView extends GLSurfaceView implements GLSurfaceView.Rende
 
             Geometry viewport = getViewport();
 
+
+            int intersectingEdges = halfRhombus.getIntersectingEdges(viewport);
+            while (intersectingEdges != 0) {
+                Log.v(TAG, "Generating parent..");
+                if ((intersectingEdges & 1) != 0) {
+                    int parentType = halfRhombus.getRandomParentType(0);
+                    halfRhombus = halfRhombus.getParent(parentType);
+                } else if ((intersectingEdges & 2) != 0) {
+                    int parentType = halfRhombus.getRandomParentType(1);
+                    halfRhombus = halfRhombus.getParent(parentType);
+                } else {
+                    int parentType = halfRhombus.getRandomParentType(2);
+                    halfRhombus = halfRhombus.getParent(parentType);
+                }
+
+                intersectingEdges = halfRhombus.getIntersectingEdges(viewport);
+            }
+
             num += halfRhombus.draw(gl11, viewport, level);
 
             if (DRAW_VIEWPORT) {
