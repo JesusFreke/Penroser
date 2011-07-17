@@ -1,7 +1,6 @@
 package org.jf.Penroser;
 
 import android.graphics.RectF;
-import com.vividsolutions.jts.geom.*;
 
 import javax.microedition.khronos.opengles.GL11;
 
