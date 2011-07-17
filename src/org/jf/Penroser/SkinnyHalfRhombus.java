@@ -1,5 +1,6 @@
 package org.jf.Penroser;
 
+import android.graphics.RectF;
 import com.vividsolutions.jts.geom.*;
 
 import javax.microedition.khronos.opengles.GL10;
@@ -69,17 +70,35 @@ public class SkinnyHalfRhombus extends HalfRhombus {
     }
 
     @Override
-    public int draw(GL11 gl, Geometry viewport, int maxLevel) {
-        return draw(gl, viewport, maxLevel, true);
+    protected void calculateEnvelope(RectF envelope) {
+        EdgeLength edgeLength = EdgeLength.getEdgeLength(level);
+        int sign = side==LEFT?1:-1;
+
+        float sideX = x + edgeLength.x(rotation-(sign*4));
+        float sideY = y + edgeLength.y(rotation-(sign*4));
+        float topX = sideX + edgeLength.x(rotation+(sign*4));
+        float topY = sideY + edgeLength.y(rotation+(sign*4));
+
+        float minX = Math.min(Math.min(x, sideX), topX);
+        float maxX = Math.max(Math.max(x, sideX), topX);
+        float minY = Math.min(Math.min(y, sideY), topY);
+        float maxY = Math.max(Math.max(y, sideY), topY);
+
+        envelope.set(minX, minY, maxX, maxY);
     }
 
     @Override
-    protected int draw(GL11 gl, Geometry viewport, int maxLevel, boolean checkIntersect) {
-        if (checkIntersect && !envelopeIntersects(viewport.getEnvelopeInternal())) {
+    public int draw(GL11 gl, RectF viewportEnvelope, int maxLevel) {
+        return draw(gl, viewportEnvelope, maxLevel, true);
+    }
+
+    @Override
+    protected int draw(GL11 gl, RectF viewportEnvelope, int maxLevel, boolean checkIntersect) {
+        if (checkIntersect && !envelopeIntersects(viewportEnvelope)) {
             return 0;
         }
 
-        if (checkIntersect && envelopeCoveredBy(viewport.getEnvelopeInternal())) {
+        if (checkIntersect && envelopeCoveredBy(viewportEnvelope)) {
             checkIntersect = false;
         }
 
@@ -87,7 +106,7 @@ public class SkinnyHalfRhombus extends HalfRhombus {
             int num=0;
             for (int i=0; i<NUM_CHILDREN; i++) {
                 HalfRhombus halfRhombus = getChild(i);
-                num += halfRhombus.draw(gl, viewport, maxLevel, checkIntersect);
+                num += halfRhombus.draw(gl, viewportEnvelope, maxLevel, checkIntersect);
             }
             return num;
         } else {

@@ -2,6 +2,7 @@ package org.jf.Penroser;
 
 import android.content.Context;
 import android.graphics.Matrix;
+import android.graphics.RectF;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLU;
 import android.util.AttributeSet;
@@ -196,7 +197,12 @@ public class PenroserGLView extends GLSurfaceView implements GLSurfaceView.Rende
 
             Penroser.halfRhombusPool.initToLevels(halfRhombus.level, 0);
 
-            num += halfRhombus.draw(gl11, viewport, level);
+            RectF viewportEnvelope = new RectF();
+            viewportEnvelope.left = (float)viewport.getEnvelopeInternal().getMinX();
+            viewportEnvelope.top = (float)viewport.getEnvelopeInternal().getMinY();
+            viewportEnvelope.right = (float)viewport.getEnvelopeInternal().getMaxX();
+            viewportEnvelope.bottom = (float)viewport.getEnvelopeInternal().getMaxY();
+            num += halfRhombus.draw(gl11, viewportEnvelope, level);
 
             if (DRAW_VIEWPORT) {
                 drawViewport(gl11, viewport);

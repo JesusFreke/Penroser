@@ -1,5 +1,6 @@
 package org.jf.Penroser;
 
+import android.graphics.RectF;
 import com.vividsolutions.jts.geom.*;
 import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
 
@@ -41,6 +42,10 @@ public abstract class HalfRhombus {
     /** The rotation of the half rhombus, in increments of 18 degrees */
     protected int rotation;
 
+    /** A rect object that represents the envelope of this half rhombus */
+    private RectF envelope = new RectF();
+    private boolean envelopeValid = false;
+
     /** A Geometry object that represents this half rhombus */
     private Geometry geometry;
 
@@ -64,16 +69,18 @@ public abstract class HalfRhombus {
         this.scale = scale;
         this.rotation = EdgeLength.mod20(rotation);
         geometry = null;
+        envelopeValid = false;
     }
 
     public float getRotationInDegrees() {
         return rotation * 18;
     }
 
-    public abstract int draw(GL11 gl, Geometry viewport, int maxLevel);
-    protected abstract int draw(GL11 gl, Geometry viewport, int maxLevel, boolean checkIntersect);
+    public abstract int draw(GL11 gl, RectF viewportEnvelope, int maxLevel);
+    protected abstract int draw(GL11 gl, RectF viewportEnvelope, int maxLevel, boolean checkIntersect);
     public abstract HalfRhombus getChild(int i);
     protected abstract Geometry createGeometry();
+    protected abstract void calculateEnvelope(RectF envelope);
     public abstract int getRandomParentType(int edge);
     public abstract HalfRhombus getParent(int parentType);
 
@@ -92,12 +99,20 @@ public abstract class HalfRhombus {
         return geometry;
     }
 
-    public boolean envelopeIntersects(Envelope viewportEnvelope) {
-        return getGeometry().getEnvelopeInternal().intersects(viewportEnvelope);
+    public RectF getEnvelope() {
+        if (!envelopeValid) {
+            calculateEnvelope(envelope);
+        }
+
+        return envelope;
     }
 
-    public boolean envelopeCoveredBy(Envelope viewportEnvelope) {
-        return viewportEnvelope.covers(getGeometry().getEnvelopeInternal());
+    public boolean envelopeIntersects(RectF viewportEnvelope) {
+        return RectF.intersects(getEnvelope(), viewportEnvelope);
+    }
+
+    public boolean envelopeCoveredBy(RectF viewportEnvelope) {
+        return viewportEnvelope.contains(getEnvelope());
     }
 
     /**
