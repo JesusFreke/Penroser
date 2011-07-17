@@ -39,6 +39,10 @@ public class PenroserGLView extends GLSurfaceView implements GLSurfaceView.Rende
     private float scale=500;
     private float angle=0;
 
+    private long lastDraw = 0;
+    private float velocityX = 250;
+    private float velocityY = 100;
+
     public PenroserGLView(Context context) {
         super(context);
         init();
@@ -79,7 +83,7 @@ public class PenroserGLView extends GLSurfaceView implements GLSurfaceView.Rende
         });
 
         this.setRenderer(this);
-        this.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
+        this.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
     }
 
     public void onSurfaceCreated(GL10 gl, EGLConfig eglConfig) {
@@ -145,6 +149,12 @@ public class PenroserGLView extends GLSurfaceView implements GLSurfaceView.Rende
             gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 
             gl.glPushMatrix();
+
+            if (lastDraw != 0) {
+                offsetX += (start-lastDraw)/1E9f * velocityX;
+                offsetY += (start-lastDraw)/1E9f * velocityY;
+            }
+            lastDraw = start;
 
             if (DRAW_VIEWPORT) {
                 gl.glScalef(100, 100, 0);
