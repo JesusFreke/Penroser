@@ -27,6 +27,7 @@ public class PenroserGLView extends GLSurfaceView implements GLSurfaceView.Rende
      * position and a white box denoting the viewport is drawn and moved around instead
      */
     private static final boolean DRAW_VIEWPORT = false;
+    private static final boolean LOG_DRAWTIMES = false;
 
     private int level = 0;
     private HalfRhombus halfRhombus;
@@ -202,9 +203,10 @@ public class PenroserGLView extends GLSurfaceView implements GLSurfaceView.Rende
 
             gl.glPopMatrix();
         }
-        long end = System.nanoTime();
-
-        Log.v("PenroserGLView", "Drawing took " + (end-start)/1E6d + " ms, with " + num + " leaf tiles drawn");
+        if (LOG_DRAWTIMES) {
+            long end = System.nanoTime();
+            Log.v("PenroserGLView", "Drawing took " + (end-start)/1E6d + " ms, with " + num + " leaf tiles drawn");
+        }
     }
 
     private void drawViewport(GL11 gl, float[] viewport) {
