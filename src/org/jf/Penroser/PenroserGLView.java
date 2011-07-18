@@ -174,7 +174,6 @@ public class PenroserGLView extends GLSurfaceView implements GLSurfaceView.Rende
 
             int intersectingEdges = halfRhombus.getIntersectingEdges(viewport);
             while (intersectingEdges != 0) {
-                Log.v(TAG, "Generating parent..");
                 if ((intersectingEdges & 1) != 0) {
                     int parentType = halfRhombus.getRandomParentType(0);
                     halfRhombus = halfRhombus.getParent(parentType);
@@ -187,6 +186,7 @@ public class PenroserGLView extends GLSurfaceView implements GLSurfaceView.Rende
                 }
 
                 intersectingEdges = halfRhombus.getIntersectingEdges(viewport);
+                Log.v(TAG, "Generated parent: level = " + halfRhombus.level);
             }
 
             Penroser.halfRhombusPool.initToLevels(halfRhombus.level, 0);
