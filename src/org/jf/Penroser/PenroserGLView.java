@@ -132,17 +132,12 @@ public class PenroserGLView extends GLSurfaceView implements GLSurfaceView.Rende
             throw new RuntimeException("Could not invert transformation matrix");
         }
 
-        float width = getWidth();
-        float height = getHeight();
-        viewport[0] = -width/2;
-        viewport[1] = height/2;
-        viewport[2] = width/2;
-        viewport[3] = height/2;
-        viewport[4] = width/2;
-        viewport[5] = -height/2;
-        viewport[6] = -width/2;
-        viewport[7] = -height/2;
-
+        float halfWidth = getWidth()/2;
+        float halfHeight = getHeight()/2;
+        viewport[0] = -halfWidth;       viewport[1] = halfHeight;
+        viewport[2] = halfWidth;        viewport[3] = halfHeight;
+        viewport[4] = halfWidth;        viewport[5] = -halfHeight;
+        viewport[6] = -halfWidth;       viewport[7] = -halfHeight;
         invertedMatrix.mapPoints(viewport);
     }
 
