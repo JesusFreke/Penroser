@@ -16,16 +16,9 @@
 
 package net.rbgrn.android.glwallpaperservice;
 
-import java.io.Writer;
-import java.util.ArrayList;
-
 import javax.microedition.khronos.egl.EGL10;
-import javax.microedition.khronos.egl.EGL11;
 import javax.microedition.khronos.egl.EGLConfig;
-import javax.microedition.khronos.egl.EGLContext;
 import javax.microedition.khronos.egl.EGLDisplay;
-import javax.microedition.khronos.egl.EGLSurface;
-import javax.microedition.khronos.opengles.GL;
 import javax.microedition.khronos.opengles.GL10;
 
 import net.rbgrn.android.glwallpaperservice.BaseConfigChooser.ComponentSizeChooser;
