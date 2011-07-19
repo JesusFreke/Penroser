@@ -358,6 +358,10 @@ public class MultiTouchController<T> {
 			; // If we could't set those params, do nothing currently
 	}
 
+	public void reanchor() {
+		anchorAtThisPositionAndScale();
+	}
+
 	/**
 	 * State-based controller for tracking switches between no-touch, single-touch and multi-touch situations. Includes logic for cleaning up the
 	 * event stream, as events around touch up/down are noisy at least on early Synaptics sensors.

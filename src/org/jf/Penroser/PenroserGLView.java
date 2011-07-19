@@ -243,14 +243,18 @@ public class PenroserGLView extends GLSurfaceView implements GLSurfaceView.Rende
     }
 
     public void getPositionAndScale(Object obj, MultiTouchController.PositionAndScale objPosAndScaleOut) {
-        objPosAndScaleOut.set(offsetX + getWidth()/2, offsetY + getHeight()/2, true, scale, false, 0, 0, true, angle);
+        //return the "default" values, so we get back the correct relative transformation values
+        objPosAndScaleOut.set(0, 0, true, 1, false, 0, 0, true, 0);
     }
 
     public boolean setPositionAndScale(Object obj, MultiTouchController.PositionAndScale newObjPosAndScale, MultiTouchController.PointInfo touchPoint) {
-        offsetX = newObjPosAndScale.getXOff() - getWidth()/2;
-        offsetY = newObjPosAndScale.getYOff() - getHeight()/2;
-        scale = newObjPosAndScale.getScale();
-        angle = newObjPosAndScale.getAngle();
+        offsetX += newObjPosAndScale.getXOff();
+        offsetY += newObjPosAndScale.getYOff();
+        scale *= newObjPosAndScale.getScale();
+        angle += newObjPosAndScale.getAngle();
+
+        //reanchor the multitouch controller, so we always get relative transformation values
+        multiTouchController.reanchor();
 
         this.requestRender();
         return true;
