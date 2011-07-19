@@ -221,7 +221,6 @@ class GLThread extends Thread {
 					 * rendered frame
 					 */
 					mEglHelper.swap();
-					Thread.sleep(10);
 				}
 			}
 		} finally {
