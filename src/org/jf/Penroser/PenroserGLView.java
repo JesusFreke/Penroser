@@ -29,15 +29,14 @@ public class PenroserGLView extends GLSurfaceView implements GLSurfaceView.Rende
     private static final boolean AUTO_SCROLL = true;
     private static final boolean DRAW_VIEWPORT = false;
     private static final boolean LOG_DRAWTIMES = false;
+    private static final float INITIAL_SCALE = 500;
 
     private int level = 0;
     private HalfRhombus halfRhombus;
 
     private MultiTouchController<Object> multiTouchController = new MultiTouchController<Object>(this);
 
-    private float offsetX=0, offsetY=0;
-    private float scale=500;
-    private float angle=0;
+    private Matrix currentTransform = new Matrix();
 
     private long lastDraw = 0;
     private float velocityX = 250;
@@ -58,6 +57,8 @@ public class PenroserGLView extends GLSurfaceView implements GLSurfaceView.Rende
 
     private void init() {
         Penroser.halfRhombusPool.initToLevels(0, 0);
+
+        currentTransform.postScale(INITIAL_SCALE, INITIAL_SCALE);
 
         int rhombusType = Penroser.random.nextInt(2);
         int rhombusSide = Penroser.random.nextInt(2);
@@ -117,7 +118,7 @@ public class PenroserGLView extends GLSurfaceView implements GLSurfaceView.Rende
 
         gl.glMatrixMode(GL10.GL_PROJECTION);
         gl.glLoadIdentity();
-        GLU.gluOrtho2D(gl, -width / 2, width / 2, -height / 2, height / 2);
+        GLU.gluOrtho2D(gl, -width / 2, width / 2, height / 2, -height / 2);
 
         gl.glMatrixMode(GL10.GL_MODELVIEW);
         gl.glLoadIdentity();
@@ -125,15 +126,9 @@ public class PenroserGLView extends GLSurfaceView implements GLSurfaceView.Rende
         gl.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     }
 
-    private Matrix viewportMatrix = new Matrix();
     private Matrix invertedMatrix = new Matrix();
     private void calculateViewport() {
-        viewportMatrix.reset();
-
-        viewportMatrix.preTranslate(offsetX, -offsetY);
-        viewportMatrix.preRotate((float)(angle * -180 / Math.PI));
-        viewportMatrix.preScale(scale, scale);
-        if (!viewportMatrix.invert(invertedMatrix)) {
+        if (!currentTransform.invert(invertedMatrix)) {
             throw new RuntimeException("Could not invert transformation matrix");
         }
 
@@ -151,6 +146,8 @@ public class PenroserGLView extends GLSurfaceView implements GLSurfaceView.Rende
         invertedMatrix.mapPoints(viewport);
     }
 
+    private float[] androidMatrixValues = new float[9];
+    private float[] glMatrixValues = new float[16];
     public void onDrawFrame(GL10 gl) {
         long start = System.nanoTime();
         int num=0;
@@ -163,8 +160,8 @@ public class PenroserGLView extends GLSurfaceView implements GLSurfaceView.Rende
 
             if (lastDraw != 0) {
                 if (AUTO_SCROLL) {
-                    offsetX += (start-lastDraw)/1E9f * velocityX;
-                    offsetY += (start-lastDraw)/1E9f * velocityY;
+                    float seconds = (start-lastDraw)/1E9f;
+                    currentTransform.postTranslate(seconds * velocityX, seconds*velocityY);
                 }
             }
             lastDraw = start;
@@ -172,9 +169,9 @@ public class PenroserGLView extends GLSurfaceView implements GLSurfaceView.Rende
             if (DRAW_VIEWPORT) {
                 gl.glScalef(100, 100, 0);
             } else {
-                gl.glTranslatef(offsetX, -offsetY, 0);
-                gl.glRotatef((float)(angle * -180 / Math.PI), 0, 0, 1);
-                gl.glScalef(scale, scale, 0);
+                currentTransform.getValues(androidMatrixValues);
+                MatrixUtil.convertMatrix(androidMatrixValues, glMatrixValues);
+                gl.glMultMatrixf(glMatrixValues, 0);
             }
 
             calculateViewport();
@@ -248,10 +245,9 @@ public class PenroserGLView extends GLSurfaceView implements GLSurfaceView.Rende
     }
 
     public boolean setPositionAndScale(Object obj, MultiTouchController.PositionAndScale newObjPosAndScale, MultiTouchController.PointInfo touchPoint) {
-        offsetX += newObjPosAndScale.getXOff();
-        offsetY += newObjPosAndScale.getYOff();
-        scale *= newObjPosAndScale.getScale();
-        angle += newObjPosAndScale.getAngle();
+        currentTransform.postTranslate(newObjPosAndScale.getXOff(), newObjPosAndScale.getYOff());
+        currentTransform.postScale(newObjPosAndScale.getScale(), newObjPosAndScale.getScale());
+        currentTransform.postRotate((float)(newObjPosAndScale.getAngle() * 180 / Math.PI));
 
         //reanchor the multitouch controller, so we always get relative transformation values
         multiTouchController.reanchor();
