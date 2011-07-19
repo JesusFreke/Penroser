@@ -114,11 +114,15 @@ public class PenroserGLView extends GLSurfaceView implements GLSurfaceView.Rende
 
     public void onSurfaceChanged(GL10 gl, int width, int height) {
         gl.glViewport(0, 0, width, height);
+
+        gl.glMatrixMode(GL10.GL_PROJECTION);
         gl.glLoadIdentity();
         GLU.gluOrtho2D(gl, -width / 2, width / 2, -height / 2, height / 2);
-        gl.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
         gl.glMatrixMode(GL10.GL_MODELVIEW);
+        gl.glLoadIdentity();
+
+        gl.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     }
 
     private Matrix viewportMatrix = new Matrix();
