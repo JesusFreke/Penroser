@@ -26,6 +26,7 @@ public class PenroserGLView extends GLSurfaceView implements GLSurfaceView.Rende
      * Setting this to true causes the drawing logic to change, so that the drawing surface is kept in the same
      * position and a white box denoting the viewport is drawn and moved around instead
      */
+    private static final boolean AUTO_SCROLL = true;
     private static final boolean DRAW_VIEWPORT = false;
     private static final boolean LOG_DRAWTIMES = false;
 
@@ -157,8 +158,10 @@ public class PenroserGLView extends GLSurfaceView implements GLSurfaceView.Rende
             gl.glPushMatrix();
 
             if (lastDraw != 0) {
-                offsetX += (start-lastDraw)/1E9f * velocityX;
-                offsetY += (start-lastDraw)/1E9f * velocityY;
+                if (AUTO_SCROLL) {
+                    offsetX += (start-lastDraw)/1E9f * velocityX;
+                    offsetY += (start-lastDraw)/1E9f * velocityY;
+                }
             }
             lastDraw = start;
 
