@@ -24,7 +24,6 @@ public class PenroserGLRenderer implements GLSurfaceView.Renderer, GLWallpaperSe
      * position and a white box denoting the viewport is drawn and moved around instead
      */
     private static final boolean DRAW_VIEWPORT = false;
-    private static final boolean AUTO_SCROLL = true;
     private static final boolean LOG_DRAWTIMES = false;
 
     private static final float INITIAL_SCALE = 500;
@@ -35,12 +34,11 @@ public class PenroserGLRenderer implements GLSurfaceView.Renderer, GLWallpaperSe
     private HalfRhombus halfRhombus;
 
     private MultiTouchController<Object> multiTouchController = new MultiTouchController<Object>(this);
+    private MomentumController momentumController = new MomentumController();
 
     private Matrix currentTransform = new Matrix();
 
     private long lastDraw = 0;
-    private float velocityX = 250;
-    private float velocityY = 100;
 
     private float[] viewport = new float[8];
     private RectF viewportEnvelope = new RectF();
@@ -122,11 +120,11 @@ public class PenroserGLRenderer implements GLSurfaceView.Renderer, GLWallpaperSe
 
             gl.glPushMatrix();
 
-            if (lastDraw != 0) {
-                if (AUTO_SCROLL) {
-                    float seconds = (start-lastDraw)/1E9f;
-                    currentTransform.postTranslate(seconds*velocityX, seconds*velocityY);
-                }
+            if (lastDraw != 0 && !momentumController.touchActive()) {
+                float seconds = (start-lastDraw)/1E9f;
+                float[] velocities = new float[2];
+                momentumController.getVelocities(velocities);
+                currentTransform.postTranslate(seconds*velocities[0], seconds*velocities[1]);
             }
             lastDraw = start;
 
@@ -207,6 +205,9 @@ public class PenroserGLRenderer implements GLSurfaceView.Renderer, GLWallpaperSe
         currentTransform.postScale(newObjPosAndScale.getScale(), newObjPosAndScale.getScale());
         currentTransform.postRotate((float)(newObjPosAndScale.getAngle() * 180 / Math.PI));
 
+        momentumController.addValues(touchPoint.getEventTime(), newObjPosAndScale.getXOff(),
+                newObjPosAndScale.getYOff(), newObjPosAndScale.getAngle(), newObjPosAndScale.getScale());
+
         //reanchor the multitouch controller, so we always get relative transformation values
         multiTouchController.reanchor();
 
@@ -218,6 +219,11 @@ public class PenroserGLRenderer implements GLSurfaceView.Renderer, GLWallpaperSe
     }
 
     public boolean onTouchEvent(MotionEvent event) {
+        if (event.getAction()==MotionEvent.ACTION_UP) {
+            momentumController.touchReleased();
+        } else if (event.getAction()==MotionEvent.ACTION_DOWN) {
+            momentumController.reset();
+        }
         return multiTouchController.onTouchEvent(event);
 	}
 
