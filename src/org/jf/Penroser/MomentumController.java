@@ -55,6 +55,9 @@ public class MomentumController {
         nextMovement = 0;
         releaseTime = -1;
         touchActive = false;
+        xVNorm = 0;
+        yVNorm = 0;
+        xyV = 0;
     }
 
     public boolean touchActive() {

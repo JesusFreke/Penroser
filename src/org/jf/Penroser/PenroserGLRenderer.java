@@ -49,7 +49,11 @@ public class PenroserGLRenderer implements GLSurfaceView.Renderer, GLWallpaperSe
         this.callbacks = callbacks;
 
         Penroser.halfRhombusPool.initToLevels(0, 0);
+        reset();
+    }
 
+    private void reset() {
+        currentTransform.reset();
         currentTransform.postScale(INITIAL_SCALE, INITIAL_SCALE);
 
         int rhombusType = Penroser.random.nextInt(2);
@@ -59,6 +63,8 @@ public class PenroserGLRenderer implements GLSurfaceView.Renderer, GLWallpaperSe
         } else {
             halfRhombus = new SkinnyHalfRhombus(0, rhombusSide, 0, 0, 1, 0);
         }
+
+        momentumController.reset();
     }
 
     private Matrix invertedMatrix = new Matrix();
@@ -163,6 +169,10 @@ public class PenroserGLRenderer implements GLSurfaceView.Renderer, GLWallpaperSe
             viewportEnvelope.right = MathUtil.max(viewport[0], viewport[2], viewport[4], viewport[6]);
             viewportEnvelope.bottom = MathUtil.max(viewport[1], viewport[3], viewport[5], viewport[7]);
             num += halfRhombus.draw(gl11, viewportEnvelope, level);
+            if (num == 0) {
+                Log.e(TAG, "Oops, the viewport somehow got out of the drawn region. Resetting viewport and tiling");
+                reset();
+            }
 
             if (DRAW_VIEWPORT) {
                 drawViewport(gl11, viewport);
