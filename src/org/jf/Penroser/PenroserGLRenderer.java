@@ -20,12 +20,13 @@ public class PenroserGLRenderer implements GLSurfaceView.Renderer, GLWallpaperSe
     private static final String TAG = "PenroserGLRenderer";
 
     /**
-     * Setting this to true causes the drawing logic to change, so that the drawing surface is kept in the same
+     * Setting this to true causes the drawing logic to change, so that the tiles are kept in the same
      * position and a white box denoting the viewport is drawn and moved around instead
      */
-    private static final boolean AUTO_SCROLL = true;
     private static final boolean DRAW_VIEWPORT = false;
+    private static final boolean AUTO_SCROLL = true;
     private static final boolean LOG_DRAWTIMES = false;
+
     private static final float INITIAL_SCALE = 500;
 
     private final Callbacks callbacks;
@@ -124,7 +125,7 @@ public class PenroserGLRenderer implements GLSurfaceView.Renderer, GLWallpaperSe
             if (lastDraw != 0) {
                 if (AUTO_SCROLL) {
                     float seconds = (start-lastDraw)/1E9f;
-                    currentTransform.postTranslate(seconds * velocityX, seconds*velocityY);
+                    currentTransform.postTranslate(seconds*velocityX, seconds*velocityY);
                 }
             }
             lastDraw = start;
