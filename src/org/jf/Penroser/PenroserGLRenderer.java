@@ -26,7 +26,7 @@ public class PenroserGLRenderer implements GLSurfaceView.Renderer, GLWallpaperSe
     private static final boolean DRAW_VIEWPORT = false;
     private static final boolean LOG_DRAWTIMES = false;
 
-    private static final float INITIAL_SCALE = 500;
+    private static final float INITIAL_SCALE = 2118;
 
     private final Callbacks callbacks;
 
