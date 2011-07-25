@@ -235,8 +235,8 @@ public class SkinnyHalfRhombus extends HalfRhombus {
         assert vertices != null && vertices.length > 0;
         assert colors != null && colors.length > 0;
 
-        int fat=1;
-        int skinny=0;
+        int fat=0;
+        int skinny=1;
 
         for (int i=0; i<level; i++) {
             fat = fat * 2 + skinny;
