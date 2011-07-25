@@ -24,10 +24,10 @@ public class FatHalfRhombus extends HalfRhombus {
     private static int rightColorVbo;
 
     //light blue (reverse RGB)
-    private static final int leftColor = 0xFF7D52;
+    private static final int leftColor = 0xd19672;
 
     //dark blue (reverse RGB)
-    private static final int rightColor = 0xDB3700;
+    private static final int rightColor = 0x000000;
 
     static {
         float[][] vertices = new float[1][];

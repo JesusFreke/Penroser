@@ -23,10 +23,11 @@ public class SkinnyHalfRhombus extends HalfRhombus {
     private static int rightColorVbo;
 
     //light green (reverse RGB)
-    private static final int leftColor = 0x9AFF9A;
+    private static final int leftColor = 0x000000;
 
     //dark green (reverse RGB)
-    private static final int rightColor = 0x008900;
+    private static final int rightColor = 0xd19672;
+
 
     static {
         float[][] vertices = new float[1][];
