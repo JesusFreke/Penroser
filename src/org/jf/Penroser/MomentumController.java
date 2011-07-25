@@ -97,7 +97,7 @@ public class MomentumController {
             oldestIndex = index;
         }
 
-        if (movements[oldestIndex].eventTime == -1) {
+        if (movements[oldestIndex].eventTime == -1 || movements[(oldestIndex+1)%NUM_TOUCHES].eventTime == -1) {
             return;
         }
 
