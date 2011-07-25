@@ -255,8 +255,10 @@ public class FatHalfRhombus extends HalfRhombus {
         int skinny=0;
 
         for (int i=0; i<level; i++) {
-            fat = fat * 2 + skinny;
-            skinny = fat+skinny;
+            int _fat = fat * 2 + skinny;
+            int _skinny = fat+skinny;
+            fat = _fat;
+            skinny = _skinny;
         }
 
         int count = fat+skinny;
