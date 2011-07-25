@@ -55,9 +55,13 @@ public class MomentumController {
         nextMovement = 0;
         releaseTime = -1;
         touchActive = false;
-        xVNorm = 0;
-        yVNorm = 0;
-        xyV = 0;
+
+        xVNorm = Penroser.random.nextFloat()-.5f;
+        yVNorm = Penroser.random.nextFloat()-.5f;
+        xyV = (float)Math.sqrt(xVNorm*xVNorm + yVNorm*yVNorm);
+        xVNorm = xVNorm/xyV;
+        yVNorm = yVNorm/xyV;
+        xyV = 50;
     }
 
     public boolean touchActive() {
