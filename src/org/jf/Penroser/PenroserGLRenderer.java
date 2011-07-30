@@ -116,6 +116,7 @@ public class PenroserGLRenderer implements GLSurfaceView.Renderer, GLWallpaperSe
 
     private float[] androidMatrixValues = new float[9];
     private float[] glMatrixValues = new float[16];
+    private float[] velocities = new float[2];
     public void onDrawFrame(GL10 gl) {
         long start = System.nanoTime();
         int num=0;
@@ -128,7 +129,6 @@ public class PenroserGLRenderer implements GLSurfaceView.Renderer, GLWallpaperSe
 
             if (lastDraw != 0 && !momentumController.touchActive()) {
                 float seconds = (start-lastDraw)/1E9f;
-                float[] velocities = new float[2];
                 momentumController.getVelocities(start, velocities);
                 currentTransform.postTranslate(seconds*velocities[0], seconds*velocities[1]);
             }
