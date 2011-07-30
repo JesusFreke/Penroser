@@ -76,7 +76,7 @@ public class MomentumController {
     }
 
     public void touchReleased() {
-        releaseTime= System.currentTimeMillis();
+        releaseTime = System.nanoTime();
         touchActive = false;
 
         int oldestIndex = nextMovement;
@@ -135,12 +135,11 @@ public class MomentumController {
         yVNorm = yVNorm / xyV;
     }
 
-    public void getVelocities(float[] velocities) {
+    public void getVelocities(long currentTime, float[] velocities) {
         assert velocities.length == 2;
-        long currentTime = System.currentTimeMillis();
         long delta = currentTime - releaseTime;
 
-        float xyVel = xyV * (float)Math.pow(xyVFactor, delta/1000f);
+        float xyVel = (float)(xyV * Math.pow(xyVFactor, delta/1000000000f));
         if (xyVel < targetXYVelocity)
             xyVel = targetXYVelocity;
 

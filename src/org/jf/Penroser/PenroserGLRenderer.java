@@ -129,7 +129,7 @@ public class PenroserGLRenderer implements GLSurfaceView.Renderer, GLWallpaperSe
             if (lastDraw != 0 && !momentumController.touchActive()) {
                 float seconds = (start-lastDraw)/1E9f;
                 float[] velocities = new float[2];
-                momentumController.getVelocities(velocities);
+                momentumController.getVelocities(start, velocities);
                 currentTransform.postTranslate(seconds*velocities[0], seconds*velocities[1]);
             }
             lastDraw = start;
