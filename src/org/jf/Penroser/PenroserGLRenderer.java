@@ -6,7 +6,6 @@ import android.opengl.GLSurfaceView;
 import android.opengl.GLU;
 import android.util.Log;
 import android.view.MotionEvent;
-import net.rbgrn.android.glwallpaperservice.GLWallpaperService;
 import org.metalev.multitouch.controller.MultiTouchController;
 
 import javax.microedition.khronos.egl.EGLConfig;
@@ -16,7 +15,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 
-public class PenroserGLRenderer implements GLSurfaceView.Renderer, GLWallpaperService.Renderer, MultiTouchController.MultiTouchObjectCanvas<Object> {
+public class PenroserGLRenderer implements GLSurfaceView.Renderer, MultiTouchController.MultiTouchObjectCanvas<Object> {
     private static final String TAG = "PenroserGLRenderer";
 
     /**

@@ -1,8 +1,8 @@
 package org.jf.Penroser;
 
+import android.opengl.GLSurfaceView;
 import android.view.MotionEvent;
-import android.view.SurfaceHolder;
-import net.rbgrn.android.glwallpaperservice.GLWallpaperService;
+import org.jf.GLWallpaper.GLWallpaperService;
 
 import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.egl.EGLConfig;
@@ -21,7 +21,7 @@ public class PenroserLiveWallpaper extends GLWallpaperService {
         public PenroserGLEngine() {
             super();
 
-            this.setEGLConfigChooser(new EGLConfigChooser() {
+            this.setEGLConfigChooser(new GLSurfaceView.EGLConfigChooser() {
                 public EGLConfig chooseConfig(EGL10 egl10, EGLDisplay eglDisplay) {
                     int[] config = new int[]{
                             EGL10.EGL_SAMPLE_BUFFERS, 1,
@@ -48,7 +48,7 @@ public class PenroserLiveWallpaper extends GLWallpaperService {
             });
 
             setRenderer(renderer);
-            setRenderMode(RENDERMODE_CONTINUOUSLY);
+            setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
         }
 
         @Override
