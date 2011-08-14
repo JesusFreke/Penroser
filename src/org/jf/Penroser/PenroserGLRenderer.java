@@ -25,7 +25,7 @@ public class PenroserGLRenderer implements GLSurfaceView.Renderer, MultiTouchCon
     private static final boolean DRAW_VIEWPORT = false;
     private static final boolean LOG_DRAWTIMES = false;
 
-    private static final float INITIAL_SCALE = 2118;
+    private static final float INITIAL_SCALE = (float)(500 * Math.pow((Math.sqrt(5)+1)/2, HalfRhombus.VBO_LEVEL-5));
 
     private final Callbacks callbacks;
 
