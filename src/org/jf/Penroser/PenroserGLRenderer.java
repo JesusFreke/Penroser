@@ -210,8 +210,15 @@ public class PenroserGLRenderer implements GLSurfaceView.Renderer, MultiTouchCon
     }
 
     public boolean setPositionAndScale(Object obj, MultiTouchController.PositionAndScale newObjPosAndScale, MultiTouchController.PointInfo touchPoint) {
+        float scale = newObjPosAndScale.getScale();
+
         currentTransform.postTranslate(newObjPosAndScale.getXOff(), newObjPosAndScale.getYOff());
-        currentTransform.postScale(newObjPosAndScale.getScale(), newObjPosAndScale.getScale());
+        if (scale != 1) {
+            float newScale = (MatrixUtil.getMatrixScale(currentTransform) * scale) / INITIAL_SCALE;
+            if (newScale >= .1 && newScale <= 25) {
+                currentTransform.postScale(scale, scale);
+            }
+        }
         currentTransform.postRotate((float)(newObjPosAndScale.getAngle() * 180 / Math.PI));
 
         momentumController.addValues(touchPoint.getEventTime(), newObjPosAndScale.getXOff(),
