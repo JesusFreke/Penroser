@@ -1,13 +1,12 @@
 package org.jf.Penroser;
 
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.*;
 
 public class PenroserActivity extends Activity
 {
-    private boolean fullScreen = false;
-
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -15,6 +14,10 @@ public class PenroserActivity extends Activity
         super.onCreate(savedInstanceState);
 
         requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+        if (getFullScreen()) {
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        }
 
         PenroserGLView penroserGLView = new PenroserGLView(this);
         setContentView(penroserGLView);
@@ -37,12 +40,23 @@ public class PenroserActivity extends Activity
         return false;
     }
 
+    private boolean getFullScreen() {
+        return getPreferences(MODE_PRIVATE).getBoolean("full_screen", false);
+    }
+
+    private void setFullScreen(boolean fullScreen) {
+        SharedPreferences.Editor editor = getPreferences(MODE_PRIVATE).edit();
+        editor.putBoolean("full_screen", fullScreen);
+        editor.commit();
+    }
+
     private void toggleFullScreen() {
+        boolean fullScreen = getFullScreen();
         if (fullScreen) {
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
         } else {
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
         }
-        fullScreen = !fullScreen;
+        setFullScreen(!fullScreen);
     }
 }
