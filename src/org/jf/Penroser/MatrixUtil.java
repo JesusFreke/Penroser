@@ -15,7 +15,7 @@ public class MatrixUtil {
 
     private static float[] scaleSrcPoints = new float[] {0f, 0f, 0f, 1f};
     private static float[] scaleDestPoints = new float[4];
-    private static float getMatrixScale(Matrix m) {
+    public static float getMatrixScale(Matrix m) {
         m.mapPoints(scaleDestPoints, scaleSrcPoints);
 
         return (float)Math.sqrt((Math.pow(scaleDestPoints[2] - scaleDestPoints[0], 2) +
