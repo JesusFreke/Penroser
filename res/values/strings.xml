@@ -3,4 +3,5 @@
     <string name="app_name">Penroser</string>
     <string name="author">JesusFreke</string>
     <string name="description">An infinitely scrolling penrose tiling</string>
+    <string name="full_screen">Toggle Full Screen</string>
 </resources>
