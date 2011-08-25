@@ -1,7 +1,5 @@
 package org.jf.Penroser;
 
-import android.text.method.MovementMethod;
-
 public class MomentumController {
     private static final int NUM_TOUCHES = 10;
     private static final int MAX_TOUCH_AGE_MS = 300;
