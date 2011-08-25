@@ -156,17 +156,17 @@ public class FatHalfRhombus extends HalfRhombus {
             case TOP_FAT: {
                 float topVerticeX = x + edgeLength.x(rotation-(sign*2)) + edgeLength.x(rotation+(sign*2));
                 float topVerticeY = y + edgeLength.y(rotation-(sign*2)) + edgeLength.y(rotation+(sign*2));
-                return Penroser.halfRhombusPool.getFatHalfRhombus(level+1, oppositeSide(), topVerticeX, topVerticeY, newScale, rotation+10);
+                return PenroserApp.halfRhombusPool.getFatHalfRhombus(level+1, oppositeSide(), topVerticeX, topVerticeY, newScale, rotation+10);
             }
             case SKINNY: {
                 float sideVerticeX = x + edgeLength.x(rotation-(sign*2));
                 float sideVerticeY = y + edgeLength.y(rotation-(sign*2));
-                return Penroser.halfRhombusPool.getSkinnyHalfRhombus(level + 1, oppositeSide(), sideVerticeX, sideVerticeY, newScale, rotation + (sign * 2));
+                return PenroserApp.halfRhombusPool.getSkinnyHalfRhombus(level + 1, oppositeSide(), sideVerticeX, sideVerticeY, newScale, rotation + (sign * 2));
             }
             case BOTTOM_FAT: {
                 float sideVerticeX = x + edgeLength.x(rotation-(sign*2));
                 float sideVerticeY = y + edgeLength.y(rotation-(sign*2));
-                return Penroser.halfRhombusPool.getFatHalfRhombus(level+1, side, sideVerticeX, sideVerticeY, newScale, rotation+(sign*8));
+                return PenroserApp.halfRhombusPool.getFatHalfRhombus(level+1, side, sideVerticeX, sideVerticeY, newScale, rotation+(sign*8));
             }
         }
 
@@ -179,9 +179,9 @@ public class FatHalfRhombus extends HalfRhombus {
             return BOTTOM_FAT;
         }
         if (edge == HalfRhombus.INNER_EDGE) {
-            return Penroser.random.nextInt(3);
+            return PenroserApp.random.nextInt(3);
         }
-        return Penroser.random.nextInt(2);
+        return PenroserApp.random.nextInt(2);
     }
 
     @Override

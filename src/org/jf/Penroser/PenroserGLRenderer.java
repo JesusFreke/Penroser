@@ -47,7 +47,7 @@ public class PenroserGLRenderer implements GLSurfaceView.Renderer, MultiTouchCon
     public PenroserGLRenderer(Callbacks callbacks) {
         this.callbacks = callbacks;
 
-        Penroser.halfRhombusPool.initToLevels(0, 0);
+        PenroserApp.halfRhombusPool.initToLevels(0, 0);
         reset();
     }
 
@@ -55,8 +55,8 @@ public class PenroserGLRenderer implements GLSurfaceView.Renderer, MultiTouchCon
         currentTransform.reset();
         currentTransform.postScale(INITIAL_SCALE, INITIAL_SCALE);
 
-        int rhombusType = Penroser.random.nextInt(2);
-        int rhombusSide = Penroser.random.nextInt(2);
+        int rhombusType = PenroserApp.random.nextInt(2);
+        int rhombusSide = PenroserApp.random.nextInt(2);
         if (rhombusType == 0) {
             halfRhombus = new FatHalfRhombus(0, rhombusSide, 0, 0, 1, 0);
         } else {
@@ -160,7 +160,7 @@ public class PenroserGLRenderer implements GLSurfaceView.Renderer, MultiTouchCon
                 Log.v(TAG, "Generated parent: level = " + halfRhombus.level);
             }
 
-            Penroser.halfRhombusPool.initToLevels(halfRhombus.level, 0);
+            PenroserApp.halfRhombusPool.initToLevels(halfRhombus.level, 0);
 
 
             viewportEnvelope.left = MathUtil.min(viewport[0], viewport[2], viewport[4], viewport[6]);

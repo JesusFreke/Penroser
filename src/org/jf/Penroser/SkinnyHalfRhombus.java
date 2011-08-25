@@ -156,12 +156,12 @@ public class SkinnyHalfRhombus extends HalfRhombus {
             case SKINNY: {
                 float topVerticeX = x + edgeLength.x(rotation-(sign*4)) + edgeLength.x(rotation+(sign*4));
                 float topVerticeY = y + edgeLength.y(rotation-(sign*4)) + edgeLength.y(rotation+(sign*4));
-                return Penroser.halfRhombusPool.getSkinnyHalfRhombus(level+1, side, topVerticeX, topVerticeY, newScale, rotation-(sign*6));
+                return PenroserApp.halfRhombusPool.getSkinnyHalfRhombus(level+1, side, topVerticeX, topVerticeY, newScale, rotation-(sign*6));
             }
             case FAT: {
                 float sideVerticeX = x + edgeLength.x(rotation-(sign*4));
                 float sideVerticeY = y + edgeLength.y(rotation-(sign*4));
-                return Penroser.halfRhombusPool.getFatHalfRhombus(level+1, side, sideVerticeX, sideVerticeY, newScale, rotation+(sign*6));
+                return PenroserApp.halfRhombusPool.getFatHalfRhombus(level+1, side, sideVerticeX, sideVerticeY, newScale, rotation+(sign*6));
             }
         }
 
@@ -173,7 +173,7 @@ public class SkinnyHalfRhombus extends HalfRhombus {
         if (edge == HalfRhombus.UPPER_EDGE) {
             return FAT;
         }
-        return Penroser.random.nextInt(2);
+        return PenroserApp.random.nextInt(2);
     }
 
     @Override

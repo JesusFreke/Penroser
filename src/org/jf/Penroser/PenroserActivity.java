@@ -4,14 +4,8 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.*;
 
-import java.util.Random;
-
-public class Penroser extends Activity
+public class PenroserActivity extends Activity
 {
-    public static final Random random = new Random();
-
-    public static final HalfRhombusPool halfRhombusPool = new HalfRhombusPool();
-
     private boolean fullScreen = false;
 
     /** Called when the activity is first created. */
