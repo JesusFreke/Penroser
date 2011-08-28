@@ -7,6 +7,7 @@ public class SkinnyHalfRhombusButton extends HalfRhombusButton {
 
     //The ratio of height/width of a skinny half rhombus
     private static final float aspectRatio = (float)(2*Math.sin(18 * 2 * Math.PI/360)/Math.cos(18 * 2 * Math.PI/360));
+    @Override
     protected float getAspectRatio() {
         return aspectRatio;
     }

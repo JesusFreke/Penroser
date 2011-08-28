@@ -7,6 +7,7 @@ public class FatHalfRhombusButton extends HalfRhombusButton {
 
     //The ratio of height/width of a fat half rhombus
     private static final float aspectRatio = (float)(2*Math.sin(54 * 2 * Math.PI/360)/Math.cos(54 * 2 * Math.PI/360));
+    @Override
     protected float getAspectRatio() {
         return aspectRatio;
     }
