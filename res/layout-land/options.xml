@@ -11,26 +11,30 @@
                   android:layout_height="fill_parent"
                   android:layout_width="wrap_content"
                   android:layout_margin="5dip">
-        <org.jf.Penroser.SkinnyHalfRhombusButton android:layout_width="fill_parent"
+        <org.jf.Penroser.SkinnyHalfRhombusButton android:id="@+id/left_skinny"
+                                                 android:layout_width="fill_parent"
                                                  android:layout_height="wrap_content"
                                                  android:layout_weight="2"
                                                  android:layout_gravity="center_horizontal"
                                                  jf:side="0"
                                                  jf:rotated="true"/>
-        <org.jf.Penroser.SkinnyHalfRhombusButton android:layout_width="fill_parent"
+        <org.jf.Penroser.SkinnyHalfRhombusButton android:id="@+id/right_skinny"
+                                                 android:layout_width="fill_parent"
                                                  android:layout_height="wrap_content"
                                                  android:layout_weight="2"
                                                  android:layout_gravity="center_horizontal"
                                                  jf:side="1"
                                                  jf:rotated="true"/>
-        <org.jf.Penroser.FatHalfRhombusButton android:layout_width="fill_parent"
+        <org.jf.Penroser.FatHalfRhombusButton android:id="@+id/left_fat"
+                                              android:layout_width="fill_parent"
                                               android:layout_height="wrap_content"
                                               android:layout_weight="1"
                                               android:layout_gravity="center_horizontal"
                                               android:layout_marginTop="4dip"
                                               jf:side="0"
                                               jf:rotated="true"/>
-        <org.jf.Penroser.FatHalfRhombusButton android:layout_width="fill_parent"
+        <org.jf.Penroser.FatHalfRhombusButton android:id="@+id/right_fat"
+                                              android:layout_width="fill_parent"
                                               android:layout_height="wrap_content"
                                               android:layout_weight="1"
                                               android:layout_gravity="center_horizontal"
@@ -38,7 +42,8 @@
                                               jf:rotated="true"/>
     </LinearLayout>
 
-    <org.jf.Penroser.PenroserGLView android:layout_width="fill_parent"
+    <org.jf.Penroser.PenroserGLView android:id="@+id/penroser_view"
+                                    android:layout_width="fill_parent"
                                     android:layout_height="fill_parent"/>
 
 </LinearLayout>
