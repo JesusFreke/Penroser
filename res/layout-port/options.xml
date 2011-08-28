@@ -5,15 +5,11 @@
               android:layout_width="fill_parent"
               android:layout_height="fill_parent"
               android:background="@android:color/black">
-    <TextView android:id="@+id/choose_colors"
-              android:layout_width="fill_parent"
-              android:layout_height="wrap_content"
-              android:text="@string/choose_colors"/>
     <LinearLayout android:id="@+id/rhombi"
                   android:orientation="horizontal"
                   android:layout_height="wrap_content"
                   android:layout_width="fill_parent"
-                  android:layout_below="@id/choose_colors">
+                  android:layout_margin="5dip">
         <org.jf.Penroser.SkinnyHalfRhombusButton android:layout_width="wrap_content"
                                                  android:layout_height="fill_parent"
                                                  android:layout_weight="2"
@@ -39,7 +35,6 @@
 
     <org.jf.Penroser.PenroserGLView android:layout_width="fill_parent"
                                     android:layout_height="fill_parent"
-                                    android:layout_below="@id/rhombi"
-                                    android:layout_marginTop="10dip"/>
+                                    android:layout_below="@id/rhombi"/>
 
 </RelativeLayout>
