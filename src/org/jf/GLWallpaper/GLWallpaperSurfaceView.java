@@ -5,14 +5,14 @@ import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
 import android.view.SurfaceHolder;
 
-public class LWPGLSurfaceView extends GLSurfaceView {
+public class GLWallpaperSurfaceView extends GLSurfaceView {
     private SurfaceHolderWrapper mSurfaceHolderWrapper = null;
 
-    public LWPGLSurfaceView(Context context) {
+    public GLWallpaperSurfaceView(Context context) {
         super(context);
     }
 
-    public LWPGLSurfaceView(Context context, AttributeSet attrs) {
+    public GLWallpaperSurfaceView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 

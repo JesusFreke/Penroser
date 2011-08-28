@@ -9,7 +9,7 @@ public abstract class GLWallpaperService extends WallpaperService {
         private GLSurfaceView mGLSurfaceView;
 
         public GLEngine() {
-            mGLSurfaceView = new LWPGLSurfaceView(GLWallpaperService.this);
+            mGLSurfaceView = new GLWallpaperSurfaceView(GLWallpaperService.this);
         }
 
         public void setGLWrapper(GLSurfaceView.GLWrapper glWrapper) {
