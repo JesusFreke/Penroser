@@ -20,6 +20,7 @@ public abstract class HalfRhombusButton extends Button {
 
     private final int side;
     private final boolean rotated;
+    private int color = Color.BLACK;
 
     public HalfRhombusButton(Context context, int side, boolean rotated) {
         super(context);
@@ -41,6 +42,11 @@ public abstract class HalfRhombusButton extends Button {
 
     //The ratio of height/width of this half rhombus
     protected abstract float getAspectRatio();
+
+    public void setColor(int color) {
+        this.color = color;
+        this.invalidate();
+    }
 
     private int getHeightGivenWidth(int width) {
         if (rotated) {
@@ -124,7 +130,8 @@ public abstract class HalfRhombusButton extends Button {
         }
 
         Paint fillPaint = new Paint();
-        fillPaint.setColor(Color.argb(255, 255, 0, 255));
+        fillPaint.setColor(color);
+        fillPaint.setAlpha(255);
         fillPaint.setStyle(Paint.Style.FILL);
 
         Paint outlinePaint = new Paint();
