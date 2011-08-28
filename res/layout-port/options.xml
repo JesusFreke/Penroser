@@ -3,7 +3,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 xmlns:jf="http://schemas.android.com/apk/res/org.jf.Penroser"
               android:layout_width="fill_parent"
-              android:layout_height="fill_parent">
+              android:layout_height="fill_parent"
+              android:background="@android:color/black">
     <TextView android:id="@+id/choose_colors"
               android:layout_width="fill_parent"
               android:layout_height="wrap_content"

@@ -4,7 +4,8 @@
               xmlns:jf="http://schemas.android.com/apk/res/org.jf.Penroser"
               android:layout_width="fill_parent"
               android:layout_height="fill_parent"
-              android:orientation="horizontal">
+              android:orientation="horizontal"
+              android:background="@android:color/black">
     <LinearLayout android:id="@+id/rhombi"
                   android:orientation="vertical"
                   android:layout_height="fill_parent"

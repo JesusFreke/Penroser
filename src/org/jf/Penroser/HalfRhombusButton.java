@@ -113,8 +113,8 @@ public abstract class HalfRhombusButton extends Button {
             if (rotated) {
                 //we're actually drawing the bottom element
                 path.moveTo(0+horizontalOffset, 0);
-                path.lineTo(horizontalOffset + (width/2), height);
-                path.lineTo(horizontalOffset+width, 0);
+                path.lineTo(horizontalOffset + (width / 2), height);
+                path.lineTo(horizontalOffset + width, 0);
                 path.close();
             } else {
                 path.moveTo(0, verticalOffset);
@@ -123,11 +123,18 @@ public abstract class HalfRhombusButton extends Button {
                 path.close();
             }
         }
-        Paint paint = new Paint();
-        paint.setColor(Color.argb(255, 255, 0, 255));
-        paint.setStyle(Paint.Style.FILL);
 
-        canvas.drawPath(path, paint);
+        Paint fillPaint = new Paint();
+        fillPaint.setColor(Color.argb(255, 255, 0, 255));
+        fillPaint.setStyle(Paint.Style.FILL);
+
+        Paint outlinePaint = new Paint();
+        outlinePaint.setColor(Color.argb(255, 128, 128, 128));
+        outlinePaint.setStrokeWidth(2);
+        outlinePaint.setStyle(Paint.Style.STROKE);
+
+        canvas.drawPath(path, fillPaint);
+        canvas.drawPath(path, outlinePaint);
     }
 
     @Override
