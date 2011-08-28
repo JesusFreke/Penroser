@@ -3,4 +3,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/full_screen"
           android:title="@string/full_screen"/>
+    <item android:id="@+id/options"
+          android:title="@string/options"/>
 </menu>

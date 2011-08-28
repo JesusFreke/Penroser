@@ -1,6 +1,8 @@
 package org.jf.Penroser;
 
 import android.app.Activity;
+import android.content.ComponentName;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.*;
@@ -35,6 +37,11 @@ public class PenroserActivity extends Activity
         switch (item.getItemId()) {
             case R.id.full_screen:
                 toggleFullScreen();
+                return true;
+            case R.id.options:
+                Intent intent = new Intent();
+                intent.setComponent(new ComponentName(this, PenroserOptions.class));
+                startActivity(intent);
                 return true;
         }
         return false;

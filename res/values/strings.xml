@@ -4,4 +4,6 @@
     <string name="author">JesusFreke</string>
     <string name="description">An infinitely scrolling penrose tiling</string>
     <string name="full_screen">Toggle Full Screen</string>
+    <string name="options">Options</string>
+    <string name="choose_colors">Choose Colors</string>
 </resources>

@@ -1,0 +1,6 @@
+<resources>
+    <declare-styleable name="HalfRhombusButton">
+        <attr name="side" format="integer"/>
+        <attr name="rotated" format="boolean"/>
+    </declare-styleable>
+</resources>

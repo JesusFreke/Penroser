@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:jf="http://schemas.android.com/apk/res/org.jf.Penroser"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent">
+    <TextView android:id="@+id/choose_colors"
+              android:layout_width="fill_parent"
+              android:layout_height="wrap_content"
+              android:text="@string/choose_colors"/>
+    <LinearLayout android:id="@+id/rhombi"
+                  android:orientation="horizontal"
+                  android:layout_height="wrap_content"
+                  android:layout_width="fill_parent"
+                  android:layout_below="@id/choose_colors">
+        <org.jf.Penroser.SkinnyHalfRhombusButton android:layout_width="wrap_content"
+                                                 android:layout_height="fill_parent"
+                                                 android:layout_weight="2"
+                                                 android:layout_gravity="center_vertical"
+                                                 jf:side="0"/>
+        <org.jf.Penroser.SkinnyHalfRhombusButton android:layout_width="wrap_content"
+                                                 android:layout_height="fill_parent"
+                                                 android:layout_weight="2"
+                                                 android:layout_gravity="center_vertical"
+                                                 jf:side="1"/>
+        <org.jf.Penroser.FatHalfRhombusButton android:layout_width="wrap_content"
+                                              android:layout_height="fill_parent"
+                                              android:layout_weight="1"
+                                              android:layout_gravity="center_vertical"
+                                              android:layout_marginLeft="4dip"
+                                              jf:side="0"/>
+        <org.jf.Penroser.FatHalfRhombusButton android:layout_width="wrap_content"
+                                              android:layout_height="fill_parent"
+                                              android:layout_weight="1"
+                                              android:layout_gravity="center_vertical"
+                                              jf:side="1"/>
+    </LinearLayout>
+
+    <org.jf.Penroser.PenroserGLView android:layout_width="fill_parent"
+                                    android:layout_height="fill_parent"
+                                    android:layout_below="@id/rhombi"
+                                    android:layout_marginTop="10dip"/>
+
+</RelativeLayout>

@@ -17,6 +17,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".PenroserOptions"/>
         <service android:name=".PenroserLiveWallpaper"
                  android:label="Penroser"
                  android:permission="android.permission.BIND_WALLPAPER">
