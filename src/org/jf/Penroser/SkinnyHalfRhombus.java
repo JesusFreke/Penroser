@@ -29,6 +29,10 @@
 package org.jf.Penroser;
 
 import android.graphics.RectF;
+import static org.jf.Penroser.HalfRhombusType.LEFT;
+import static org.jf.Penroser.HalfRhombusType.RIGHT;
+import static org.jf.Penroser.HalfRhombusType.FAT;
+import static org.jf.Penroser.HalfRhombusType.SKINNY;
 
 import javax.microedition.khronos.opengles.GL10;
 import javax.microedition.khronos.opengles.GL11;
@@ -36,8 +40,8 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
 public class SkinnyHalfRhombus extends HalfRhombus {
-    private static final int SKINNY = 0;
-    private static final int FAT = 1;
+    private static final int SKINNY_CHILD = 0;
+    private static final int FAT_CHILD = 1;
 
     private static final int NUM_CHILDREN = 2;
     private static final float[] leftVertices;
@@ -74,13 +78,17 @@ public class SkinnyHalfRhombus extends HalfRhombus {
     }
 
     public SkinnyHalfRhombus(int level, int side, float x, float y, float scale, int rotation) {
-        super(level, side, x, y, scale, rotation);
+        super(level, HalfRhombusType.getType(side, SKINNY), x, y, scale, rotation);
+    }
+
+    public void set(int level, int side, float x, float y, float scale, int rotation) {
+        set(level, HalfRhombusType.getType(side, SKINNY), x, y, scale, rotation);
     }
 
     @Override
     protected void calculateVertices(float[] vertices) {
         EdgeLength edgeLength = EdgeLength.getEdgeLength(level);
-        int sign = side==LEFT?1:-1;
+        int sign = type.side==LEFT?1:-1;
 
         float sideX = x + edgeLength.x(rotation-(sign*4));
         float sideY = y + edgeLength.y(rotation-(sign*4));
@@ -98,7 +106,7 @@ public class SkinnyHalfRhombus extends HalfRhombus {
     @Override
     protected void calculateEnvelope(RectF envelope) {
         EdgeLength edgeLength = EdgeLength.getEdgeLength(level);
-        int sign = side==LEFT?1:-1;
+        int sign = type.side==LEFT?1:-1;
 
         float sideX = x + edgeLength.x(rotation-(sign*4));
         float sideY = y + edgeLength.y(rotation-(sign*4));
@@ -144,7 +152,7 @@ public class SkinnyHalfRhombus extends HalfRhombus {
             int vertexVbo;
             int colorVbo;
             int length;
-            if (side == LEFT) {
+            if (type.side == LEFT) {
                 vertexVbo = leftVertexVbo;
                 colorVbo = leftColorVbo;
                 length = leftColors.length;
@@ -174,22 +182,22 @@ public class SkinnyHalfRhombus extends HalfRhombus {
 
     @Override
     public HalfRhombus getChild(int i) {
-        int sign = this.side==LEFT?1:-1;
+        int sign = type.side==LEFT?1:-1;
 
         float newScale = scale / Constants.goldenRatio;
 
         EdgeLength edgeLength = EdgeLength.getEdgeLength(level);
 
         switch (i) {
-            case SKINNY: {
+            case SKINNY_CHILD: {
                 float topVerticeX = x + edgeLength.x(rotation-(sign*4)) + edgeLength.x(rotation+(sign*4));
                 float topVerticeY = y + edgeLength.y(rotation-(sign*4)) + edgeLength.y(rotation+(sign*4));
-                return PenroserApp.halfRhombusPool.getSkinnyHalfRhombus(level+1, side, topVerticeX, topVerticeY, newScale, rotation-(sign*6));
+                return PenroserApp.halfRhombusPool.getSkinnyHalfRhombus(level+1, type.side, topVerticeX, topVerticeY, newScale, rotation-(sign*6));
             }
-            case FAT: {
+            case FAT_CHILD: {
                 float sideVerticeX = x + edgeLength.x(rotation-(sign*4));
                 float sideVerticeY = y + edgeLength.y(rotation-(sign*4));
-                return PenroserApp.halfRhombusPool.getFatHalfRhombus(level+1, side, sideVerticeX, sideVerticeY, newScale, rotation+(sign*6));
+                return PenroserApp.halfRhombusPool.getFatHalfRhombus(level+1, type.side, sideVerticeX, sideVerticeY, newScale, rotation+(sign*6));
             }
         }
 
@@ -199,7 +207,7 @@ public class SkinnyHalfRhombus extends HalfRhombus {
     @Override
     public int getRandomParentType(int edge) {
         if (edge == HalfRhombus.UPPER_EDGE) {
-            return FAT;
+            return FAT_CHILD;
         }
         return PenroserApp.random.nextInt(2);
     }
@@ -207,16 +215,16 @@ public class SkinnyHalfRhombus extends HalfRhombus {
     @Override
     public HalfRhombus getParent(int parentType) {
         float newScale = scale * Constants.goldenRatio;
-        int sign = side==LEFT?1:-1;
+        int sign = type.side==LEFT?1:-1;
 
         switch (parentType) {
-            case SKINNY: {
+            case SKINNY_CHILD: {
                 EdgeLength edgeLength = EdgeLength.getEdgeLength(level);
                 float parentBottomX = x + edgeLength.x(rotation-(sign*4));
                 float parentBottomY = y + edgeLength.y(rotation-(sign*4));
-                return new SkinnyHalfRhombus(level-1, side, parentBottomX, parentBottomY, newScale, rotation+(sign*6));
+                return new SkinnyHalfRhombus(level-1, type.side, parentBottomX, parentBottomY, newScale, rotation+(sign*6));
             }
-            case FAT: {
+            case FAT_CHILD: {
                 EdgeLength edgeLength = EdgeLength.getEdgeLength(level-1);
                 float parentBottomX = x + edgeLength.x(rotation-(sign*6));
                 float parentBottomY = y + edgeLength.y(rotation-(sign*6));

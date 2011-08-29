@@ -29,13 +29,14 @@
 package org.jf.Penroser;
 
 import android.graphics.RectF;
+import static org.jf.Penroser.HalfRhombusType.LEFT;
+import static org.jf.Penroser.HalfRhombusType.RIGHT;
+import static org.jf.Penroser.HalfRhombusType.FAT;
+import static org.jf.Penroser.HalfRhombusType.SKINNY;
 
 import javax.microedition.khronos.opengles.GL11;
 
 public abstract class HalfRhombus {
-    public static final int LEFT=0;
-    public static final int RIGHT=1;
-
     public static final int LOWER_EDGE=0;
     public static final int UPPER_EDGE=1;
     public static final int INNER_EDGE=2;
@@ -53,8 +54,8 @@ public abstract class HalfRhombus {
      */
     protected int level;
 
-    /** Whether this is the right or left side of a rhombus */
-    protected int side;
+    /** Whether this is the right or left side of a rhombus, and whether it is a fat or skinny rhombus */
+    protected HalfRhombusType type;
 
     /** The x coordinate of the bottom vertex */
     protected float x;
@@ -79,9 +80,9 @@ public abstract class HalfRhombus {
     protected HalfRhombus() {
     }
 
-    protected HalfRhombus(int level, int side, float x, float y, float scale, int rotation) {
+    protected HalfRhombus(int level, HalfRhombusType type, float x, float y, float scale, int rotation) {
         this.level = level;
-        this.side = side;
+        this.type = type;
         this.x = x;
         this.y = y;
         this.scale = scale;
@@ -90,9 +91,9 @@ public abstract class HalfRhombus {
         verticesValid = false;
     }
 
-    public void set(int level, int side, float x, float y, float scale, int rotation) {
+    public void set(int level, HalfRhombusType type, float x, float y, float scale, int rotation) {
         this.level = level;
-        this.side = side;
+        this.type = type;
         this.x = x;
         this.y = y;
         this.scale = scale;
@@ -114,7 +115,7 @@ public abstract class HalfRhombus {
     public abstract HalfRhombus getParent(int parentType);
 
     protected int oppositeSide() {
-        return side==RIGHT?LEFT:RIGHT;
+        return type.side==RIGHT?LEFT:RIGHT;
     }
 
     protected static int oppositeSide(int side) {
