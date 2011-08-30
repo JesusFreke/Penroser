@@ -50,39 +50,27 @@ public class PenroserOptions extends Activity {
 
 
         final SharedPreferences preferences = getPreferences(MODE_PRIVATE);
-        leftSkinny.setColor(getLeftSkinnyColor(preferences));
-        rightSkinny.setColor(getRightSkinnyColor(preferences));
-        leftFat.setColor(getLeftFatColor(preferences));
-        rightFat.setColor(getRightFatColor(preferences));
+        leftSkinny.setColor(getColor(preferences, HalfRhombusType.LEFT_SKINNY));
+        rightSkinny.setColor(getColor(preferences, HalfRhombusType.RIGHT_SKINNY));
+        leftFat.setColor(getColor(preferences, HalfRhombusType.LEFT_FAT));
+        rightFat.setColor(getColor(preferences, HalfRhombusType.RIGHT_FAT));
 
         preferences.registerOnSharedPreferenceChangeListener(new SharedPreferences.OnSharedPreferenceChangeListener() {
             public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
                 if (key.equals("left_skinny_color")) {
-                    leftSkinny.setColor(getLeftSkinnyColor(preferences));
+                    leftSkinny.setColor(getColor(preferences, HalfRhombusType.LEFT_SKINNY));
                 } else if (key.equals("right_skinny_color")) {
-                    rightSkinny.setColor(getRightSkinnyColor(preferences));
+                    rightSkinny.setColor(getColor(preferences, HalfRhombusType.RIGHT_SKINNY));
                 } else if (key.equals("left_fat_color")) {
-                    leftFat.setColor(getLeftFatColor(preferences));
+                    leftFat.setColor(getColor(preferences, HalfRhombusType.LEFT_FAT));
                 } else if (key.equals("right_fat_color")) {
-                    rightFat.setColor(getRightFatColor(preferences));
+                    rightFat.setColor(getColor(preferences, HalfRhombusType.RIGHT_FAT));
                 }
             }
         });
     }
 
-    private int getLeftSkinnyColor(SharedPreferences preferences) {
-        return preferences.getInt("left_skinny_color", ColorUtil.glToAndroid(0x000000));
-    }
-
-    private int getRightSkinnyColor(SharedPreferences preferences) {
-        return preferences.getInt("right_skinny_color", ColorUtil.glToAndroid(0xd19672));
-    }
-
-    private int getLeftFatColor(SharedPreferences preferences) {
-        return preferences.getInt("right_fat_color", ColorUtil.glToAndroid(0xd19672));
-    }
-
-    private int getRightFatColor(SharedPreferences preferences) {
-        return preferences.getInt("left_fat_color", ColorUtil.glToAndroid(0x000000));
+    private int getColor(SharedPreferences preferences, HalfRhombusType rhombusType) {
+        return preferences.getInt(rhombusType.colorKey, rhombusType.defaultColor);
     }
 }

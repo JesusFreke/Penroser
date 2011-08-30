@@ -78,10 +78,10 @@ public class PenroserGLRenderer implements GLSurfaceView.Renderer, MultiTouchCon
         this.callbacks = callbacks;
 
         int[] rhombusColors = new int[] {
-            callbacks.getColor(0),
-            callbacks.getColor(1),
-            callbacks.getColor(2),
-            callbacks.getColor(3)
+            ColorUtil.swapOrder(callbacks.getColor(HalfRhombusType.LEFT_SKINNY)),
+            ColorUtil.swapOrder(callbacks.getColor(HalfRhombusType.RIGHT_SKINNY)),
+            ColorUtil.swapOrder(callbacks.getColor(HalfRhombusType.LEFT_FAT)),
+            ColorUtil.swapOrder(callbacks.getColor(HalfRhombusType.RIGHT_FAT))
         };
 
         glContext = new GLContext(rhombusColors);
@@ -282,6 +282,6 @@ public class PenroserGLRenderer implements GLSurfaceView.Renderer, MultiTouchCon
 
     public interface Callbacks {
         void requestRender();
-        int getColor(int rhombusType);
+        int getColor(HalfRhombusType rhombusType);
     }
 }

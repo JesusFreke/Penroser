@@ -92,7 +92,7 @@ public class PenroserLiveWallpaper extends GLWallpaperService {
             renderer.onTouchEvent(event);
         }
 
-        public int getColor(int rhombusType) {
+        public int getColor(HalfRhombusType rhombusType) {
             return PenroserApp.getColorForRhombusType(preferences, rhombusType);
         }
     }

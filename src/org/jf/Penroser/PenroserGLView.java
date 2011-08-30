@@ -41,7 +41,7 @@ import javax.microedition.khronos.egl.EGLDisplay;
 public class PenroserGLView extends GLSurfaceView implements PenroserGLRenderer.Callbacks {
     private static final String TAG="PenroserGLView";
 
-    private PenroserGLRenderer renderer = new PenroserGLRenderer(this);
+    private PenroserGLRenderer renderer;
     private final SharedPreferences preferences;
 
     public PenroserGLView(Context context) {
@@ -83,6 +83,7 @@ public class PenroserGLView extends GLSurfaceView implements PenroserGLRenderer.
             }
         });
 
+        renderer = new PenroserGLRenderer(this);
         this.setRenderer(renderer);
         this.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
     }
@@ -92,7 +93,7 @@ public class PenroserGLView extends GLSurfaceView implements PenroserGLRenderer.
         return renderer.onTouchEvent(event);
 	}
 
-    public int getColor(int rhombusType) {
+    public int getColor(HalfRhombusType rhombusType) {
         return PenroserApp.getColorForRhombusType(preferences, rhombusType);
     }
 }

@@ -29,10 +29,10 @@
 package org.jf.Penroser;
 
 public enum HalfRhombusType {
-    LEFT_SKINNY(0, 0),
-    RIGHT_SKINNY(1, 0),
-    LEFT_FAT(0, 1),
-    RIGHT_FAT(1, 1);
+    LEFT_SKINNY(0, 0, 0, "left_skinny_color"),
+    RIGHT_SKINNY(1, 0, 0x7296d1, "right_skinny_color"),
+    LEFT_FAT(0, 1, 0x7296d1, "left_fat_color"),
+    RIGHT_FAT(1, 1, 0, "right_fat_color");
 
     private static final HalfRhombusType[] types = new HalfRhombusType[] {LEFT_SKINNY, RIGHT_SKINNY, LEFT_FAT, RIGHT_FAT};
 
@@ -45,14 +45,19 @@ public enum HalfRhombusType {
     public final int side;
     public final int type;
     public final int index;
+    //The key into a SharedPreferences object to get the color for this HalfRhombusType
+    public final int defaultColor;
+    public final String colorKey;
 
-    private HalfRhombusType(int side, int type) {
+    private HalfRhombusType(int side, int type, int defaultColor, String colorKey) {
         assert side==LEFT || side==RIGHT;
         assert type==SKINNY || type == FAT;
 
         this.side = side;
         this.type = type;
         this.index = side | (type<<1);
+        this.defaultColor = defaultColor;
+        this.colorKey = colorKey;
     }
 
     public static HalfRhombusType getType(int side, int type) {
