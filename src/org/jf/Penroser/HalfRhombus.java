@@ -77,10 +77,13 @@ public abstract class HalfRhombus {
     private float[] vertices = new float[6];
     private boolean verticesValid = false;
 
+    protected GLContext glContext;
+
     protected HalfRhombus() {
     }
 
-    protected HalfRhombus(int level, HalfRhombusType type, float x, float y, float scale, int rotation) {
+    protected HalfRhombus(GLContext glContext, int level, HalfRhombusType type, float x, float y, float scale, int rotation) {
+		this.glContext = glContext;
         this.level = level;
         this.type = type;
         this.x = x;
@@ -91,7 +94,8 @@ public abstract class HalfRhombus {
         verticesValid = false;
     }
 
-    public void set(int level, HalfRhombusType type, float x, float y, float scale, int rotation) {
+    public void set(GLContext glContext, int level, HalfRhombusType type, float x, float y, float scale, int rotation) {
+		this.glContext = glContext;
         this.level = level;
         this.type = type;
         this.x = x;
@@ -100,6 +104,18 @@ public abstract class HalfRhombus {
         this.rotation = MathUtil.positiveMod(rotation, 20);
         envelopeValid = false;
         verticesValid = false;
+    }
+
+    public static int getLeftRight(int rhombusType) {
+        return rhombusType & 1;
+    }
+
+    public static int getSkinnyFat(int rhombusType) {
+        return (rhombusType & 2) >>> 1;
+    }
+
+    public static int makeRhombusType(int side, int type) {
+        return side | (type << 1);
     }
 
     public float getRotationInDegrees() {

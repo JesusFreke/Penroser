@@ -29,10 +29,35 @@
 package org.jf.Penroser;
 
 import android.app.Application;
+import android.content.SharedPreferences;
 
 import java.util.Random;
 
 public class PenroserApp extends Application {
+    //TODO: need to move this to GLContext
     public static final HalfRhombusPool halfRhombusPool = new HalfRhombusPool();
     public static final Random random = new Random();
+
+    public static int getColorForRhombusType(SharedPreferences preferences, int rhombusType) {
+        String key = null;
+        int defaultColor = 0;
+        switch (rhombusType) {
+            case 0:
+                key = "left_skinny_color";
+                break;
+            case 1:
+                key = "right_skinny_color";
+                defaultColor = 0xd19672;
+                break;
+            case 2:
+                key = "left_fat_color";
+                defaultColor = 0xd19672;
+                break;
+            case 3:
+                key = "right_fat_color";
+                break;
+        }
+
+        return defaultColor;
+    }
 }

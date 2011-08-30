@@ -72,6 +72,8 @@ public class PenroserGLRenderer implements GLSurfaceView.Renderer, MultiTouchCon
 
     private int width, height;
 
+    private GLContext glContext = new GLContext();
+
     public PenroserGLRenderer(Callbacks callbacks) {
         this.callbacks = callbacks;
 
@@ -86,9 +88,9 @@ public class PenroserGLRenderer implements GLSurfaceView.Renderer, MultiTouchCon
         int rhombusType = PenroserApp.random.nextInt(2);
         int rhombusSide = PenroserApp.random.nextInt(2);
         if (rhombusType == 0) {
-            halfRhombus = new FatHalfRhombus(0, rhombusSide, 0, 0, 1, 0);
+            halfRhombus = new FatHalfRhombus(glContext, 0, rhombusSide, 0, 0, 1, 0);
         } else {
-            halfRhombus = new SkinnyHalfRhombus(0, rhombusSide, 0, 0, 1, 0);
+            halfRhombus = new SkinnyHalfRhombus(glContext, 0, rhombusSide, 0, 0, 1, 0);
         }
 
         momentumController.reset();
@@ -120,8 +122,17 @@ public class PenroserGLRenderer implements GLSurfaceView.Renderer, MultiTouchCon
 
         if (gl instanceof GL11) {
             GL11 gl11 = (GL11) gl;
-            FatHalfRhombus.onSurfaceCreated(gl11);
-            SkinnyHalfRhombus.onSurfaceCreated(gl11);
+
+            int[] replacementColors = new int[] {
+                callbacks.getColor(0),
+                callbacks.getColor(1),
+                callbacks.getColor(2),
+                callbacks.getColor(3)
+            };
+
+            SkinnyHalfRhombus.onSurfaceCreated(gl11, glContext, replacementColors);
+
+            FatHalfRhombus.onSurfaceCreated(gl11, glContext, replacementColors);
         }
     }
 
@@ -273,5 +284,6 @@ public class PenroserGLRenderer implements GLSurfaceView.Renderer, MultiTouchCon
 
     public interface Callbacks {
         void requestRender();
+        int getColor(int rhombusType);
     }
 }

@@ -36,8 +36,6 @@ import static org.jf.Penroser.HalfRhombusType.SKINNY;
 
 import javax.microedition.khronos.opengles.GL10;
 import javax.microedition.khronos.opengles.GL11;
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
 
 public class SkinnyHalfRhombus extends HalfRhombus {
     private static final int SKINNY_CHILD = 0;
@@ -49,17 +47,12 @@ public class SkinnyHalfRhombus extends HalfRhombus {
     private static final float[] rightVertices;
     private static final int[] rightColors;
 
-    private static int leftVertexVbo;
-    private static int leftColorVbo;
-    private static int rightVertexVbo;
-    private static int rightColorVbo;
-
-    //light green (reverse RGB)
-    private static final int leftColor = 0x000000;
-
-    //dark green (reverse RGB)
-    private static final int rightColor = 0xd19672;
-
+    /**
+     * we just use a color placeholder when pre-generating the vertices. They will be replaced with actual colors
+     * when we actually create the vbo
+     */
+    private static final int leftColor = 0;
+    private static final int rightColor = 1;
 
     static {
         float[][] vertices = new float[1][];
@@ -77,12 +70,12 @@ public class SkinnyHalfRhombus extends HalfRhombus {
     public SkinnyHalfRhombus() {
     }
 
-    public SkinnyHalfRhombus(int level, int side, float x, float y, float scale, int rotation) {
-        super(level, HalfRhombusType.getType(side, SKINNY), x, y, scale, rotation);
+    public SkinnyHalfRhombus(GLContext glContext, int level, int side, float x, float y, float scale, int rotation) {
+        super(glContext, level, HalfRhombusType.getType(side, SKINNY), x, y, scale, rotation);
     }
 
-    public void set(int level, int side, float x, float y, float scale, int rotation) {
-        set(level, HalfRhombusType.getType(side, SKINNY), x, y, scale, rotation);
+    public void set(GLContext glContext, int level, int side, float x, float y, float scale, int rotation) {
+        set(glContext, level, HalfRhombusType.getType(side, SKINNY), x, y, scale, rotation);
     }
 
     @Override
@@ -152,15 +145,10 @@ public class SkinnyHalfRhombus extends HalfRhombus {
             int vertexVbo;
             int colorVbo;
             int length;
-            if (type.side == LEFT) {
-                vertexVbo = leftVertexVbo;
-                colorVbo = leftColorVbo;
-                length = leftColors.length;
-            } else {
-                vertexVbo = rightVertexVbo;
-                colorVbo = rightColorVbo;
-                length = rightColors.length;
-            }
+
+            vertexVbo = glContext.getVertexVbo(type);
+            colorVbo = glContext.getColorVbo(type);
+            length = leftColors.length;
 
             gl.glBindBuffer(GL11.GL_ARRAY_BUFFER, vertexVbo);
             gl.glVertexPointer(2, GL10.GL_FLOAT, 0, 0);
@@ -192,12 +180,12 @@ public class SkinnyHalfRhombus extends HalfRhombus {
             case SKINNY_CHILD: {
                 float topVerticeX = x + edgeLength.x(rotation-(sign*4)) + edgeLength.x(rotation+(sign*4));
                 float topVerticeY = y + edgeLength.y(rotation-(sign*4)) + edgeLength.y(rotation+(sign*4));
-                return PenroserApp.halfRhombusPool.getSkinnyHalfRhombus(level+1, type.side, topVerticeX, topVerticeY, newScale, rotation-(sign*6));
+                return PenroserApp.halfRhombusPool.getSkinnyHalfRhombus(glContext, level+1, type.side, topVerticeX, topVerticeY, newScale, rotation-(sign*6));
             }
             case FAT_CHILD: {
                 float sideVerticeX = x + edgeLength.x(rotation-(sign*4));
                 float sideVerticeY = y + edgeLength.y(rotation-(sign*4));
-                return PenroserApp.halfRhombusPool.getFatHalfRhombus(level+1, type.side, sideVerticeX, sideVerticeY, newScale, rotation+(sign*6));
+                return PenroserApp.halfRhombusPool.getFatHalfRhombus(glContext, level+1, type.side, sideVerticeX, sideVerticeY, newScale, rotation+(sign*6));
             }
         }
 
@@ -222,50 +210,24 @@ public class SkinnyHalfRhombus extends HalfRhombus {
                 EdgeLength edgeLength = EdgeLength.getEdgeLength(level);
                 float parentBottomX = x + edgeLength.x(rotation-(sign*4));
                 float parentBottomY = y + edgeLength.y(rotation-(sign*4));
-                return new SkinnyHalfRhombus(level-1, type.side, parentBottomX, parentBottomY, newScale, rotation+(sign*6));
+                return new SkinnyHalfRhombus(glContext, level-1, type.side, parentBottomX, parentBottomY, newScale, rotation+(sign*6));
             }
             case FAT_CHILD: {
                 EdgeLength edgeLength = EdgeLength.getEdgeLength(level-1);
                 float parentBottomX = x + edgeLength.x(rotation-(sign*6));
                 float parentBottomY = y + edgeLength.y(rotation-(sign*6));
-                return new FatHalfRhombus(level-1, oppositeSide(), parentBottomX, parentBottomY, newScale, rotation+(sign*2));
+                return new FatHalfRhombus(glContext, level-1, oppositeSide(), parentBottomX, parentBottomY, newScale, rotation+(sign*2));
             }
         }
         return null;
     }
 
-    public static void onSurfaceCreated(GL11 gl) {
-        int[] vboref = new int[1];
+    public static void onSurfaceCreated(GL11 gl, GLContext glContext, int[] replacementColors) {
+        glContext.generateVertexVbo(gl, makeRhombusType(LEFT, SKINNY), leftVertices);
+        glContext.generateVertexVbo(gl, makeRhombusType(RIGHT, SKINNY), rightVertices);
 
-        //left vertex vbo
-        gl.glGenBuffers(1, vboref, 0);
-        leftVertexVbo = vboref[0];
-
-        gl.glBindBuffer(GL11.GL_ARRAY_BUFFER, leftVertexVbo);
-        gl.glBufferData(GL11.GL_ARRAY_BUFFER, leftVertices.length * 4, FloatBuffer.wrap(leftVertices), GL11.GL_STATIC_DRAW);
-
-        //left color vbo
-        gl.glGenBuffers(1, vboref, 0);
-        leftColorVbo = vboref[0];
-
-        gl.glBindBuffer(GL11.GL_ARRAY_BUFFER, leftColorVbo);
-        gl.glBufferData(GL11.GL_ARRAY_BUFFER, leftColors.length * 4, IntBuffer.wrap(leftColors), GL11.GL_STATIC_DRAW);
-
-        //right vertex vbo
-        gl.glGenBuffers(1, vboref, 0);
-        rightVertexVbo = vboref[0];
-
-        gl.glBindBuffer(GL11.GL_ARRAY_BUFFER, rightVertexVbo);
-        gl.glBufferData(GL11.GL_ARRAY_BUFFER, rightVertices.length * 4, FloatBuffer.wrap(rightVertices), GL11.GL_STATIC_DRAW);
-
-        //right color vbo
-        gl.glGenBuffers(1, vboref, 0);
-        rightColorVbo = vboref[0];
-
-        gl.glBindBuffer(GL11.GL_ARRAY_BUFFER, rightColorVbo);
-        gl.glBufferData(GL11.GL_ARRAY_BUFFER, rightColors.length * 4, IntBuffer.wrap(rightColors), GL11.GL_STATIC_DRAW);
-
-        gl.glBindBuffer(GL11.GL_ARRAY_BUFFER, 0);
+        glContext.generateColorVbo(gl, makeRhombusType(LEFT, SKINNY), GLContext.replaceColors(leftColors, replacementColors));
+        glContext.generateColorVbo(gl, makeRhombusType(RIGHT, SKINNY), GLContext.replaceColors(rightColors, replacementColors));
     }
 
     public static void generateVertices(int level, int side, float[][] vertices, int[][] colors) {

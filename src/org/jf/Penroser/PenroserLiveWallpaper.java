@@ -28,6 +28,7 @@
 
 package org.jf.Penroser;
 
+import android.content.SharedPreferences;
 import android.opengl.GLSurfaceView;
 import android.view.MotionEvent;
 import org.jf.GLWallpaper.GLWallpaperService;
@@ -38,8 +39,15 @@ import javax.microedition.khronos.egl.EGLDisplay;
 
 public class PenroserLiveWallpaper extends GLWallpaperService {
 
+    private SharedPreferences preferences;
+
+    public PenroserLiveWallpaper() {
+        super();
+    }
+
     @Override
     public Engine onCreateEngine() {
+        preferences = getSharedPreferences("penroser_liveWallpaper_prefs", 0);
         return new PenroserGLEngine();
     }
 
@@ -82,6 +90,10 @@ public class PenroserLiveWallpaper extends GLWallpaperService {
         @Override
         public void onTouchEvent(MotionEvent event) {
             renderer.onTouchEvent(event);
+        }
+
+        public int getColor(int rhombusType) {
+            return PenroserApp.getColorForRhombusType(preferences, rhombusType);
         }
     }
 }

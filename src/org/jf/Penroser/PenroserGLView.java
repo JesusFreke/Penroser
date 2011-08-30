@@ -29,6 +29,7 @@
 package org.jf.Penroser;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -41,15 +42,17 @@ public class PenroserGLView extends GLSurfaceView implements PenroserGLRenderer.
     private static final String TAG="PenroserGLView";
 
     private PenroserGLRenderer renderer = new PenroserGLRenderer(this);
-
+    private final SharedPreferences preferences;
 
     public PenroserGLView(Context context) {
         super(context);
+        preferences = context.getSharedPreferences("penroser_activity_prefs", 0);
         init();
     }
 
     public PenroserGLView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        preferences = context.getSharedPreferences("penroser_activity_prefs", 0);
         init();
     }
 
@@ -88,4 +91,8 @@ public class PenroserGLView extends GLSurfaceView implements PenroserGLRenderer.
 	public boolean onTouchEvent(MotionEvent event) {
         return renderer.onTouchEvent(event);
 	}
+
+    public int getColor(int rhombusType) {
+        return PenroserApp.getColorForRhombusType(preferences, rhombusType);
+    }
 }
