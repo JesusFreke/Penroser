@@ -43,10 +43,6 @@ public class FatHalfRhombus extends HalfRhombus {
     private static final int BOTTOM_FAT_CHILD = 2;
 
     private static final int NUM_CHILDREN = 3;
-    private static final float[] leftVertices;
-    private static final int[] leftColors;
-    private static final float[] rightVertices;
-    private static final int[] rightColors;
 
     /**
      * we just use a color placeholder when pre-generating the vertices. They will be replaced with actual colors
@@ -54,19 +50,6 @@ public class FatHalfRhombus extends HalfRhombus {
      */
     private static final int leftColor = 2;
     private static final int rightColor = 3;
-
-    static {
-        float[][] vertices = new float[1][];
-        int [][] colors = new int[1][];
-
-        generateVertices(VBO_LEVEL, LEFT, vertices, colors);
-        leftVertices = vertices[0];
-        leftColors = colors[0];
-
-        generateVertices(VBO_LEVEL, RIGHT, vertices, colors);
-        rightVertices = vertices[0];
-        rightColors = colors[0];
-    }
 
     public FatHalfRhombus() {
     }
@@ -148,8 +131,8 @@ public class FatHalfRhombus extends HalfRhombus {
             int length;
 
             vertexVbo = glContext.getVertexVbo(type);
-            colorVbo = glContext.getColorVbo(type);
-            length = leftColors.length;
+            colorVbo = glContext.getColorVbo(gl, type);
+            length = glContext.getColorVboLength(type);
 
             gl.glBindBuffer(GL11.GL_ARRAY_BUFFER, vertexVbo);
             gl.glVertexPointer(2, GL10.GL_FLOAT, 0, 0);
@@ -236,14 +219,6 @@ public class FatHalfRhombus extends HalfRhombus {
             }
         }
         return null;
-    }
-
-    public static void onSurfaceCreated(GL11 gl, GLContext glContext, int[] replacementColors) {
-        glContext.generateVertexVbo(gl, makeRhombusType(LEFT, FAT), leftVertices);
-        glContext.generateVertexVbo(gl, makeRhombusType(RIGHT, FAT), rightVertices);
-
-        glContext.generateColorVbo(gl, makeRhombusType(LEFT, FAT), GLContext.replaceColors(leftColors, replacementColors));
-        glContext.generateColorVbo(gl, makeRhombusType(RIGHT, FAT), GLContext.replaceColors(rightColors, replacementColors));
     }
 
     public static void generateVertices(int level, int side, float[][] vertices, int[][] colors) {

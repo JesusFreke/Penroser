@@ -53,7 +53,7 @@ public class PenroserGLRenderer implements GLSurfaceView.Renderer, MultiTouchCon
     private static final boolean DRAW_VIEWPORT = false;
     private static final boolean LOG_DRAWTIMES = false;
 
-    private static final float INITIAL_SCALE = (float)(500 * Math.pow((Math.sqrt(5)+1)/2, HalfRhombus.VBO_LEVEL-5));
+    private static final float INITIAL_SCALE = (float)(500 * Math.pow((Math.sqrt(5)+1)/2, GLContext.VBO_LEVEL-5));
 
     private final Callbacks callbacks;
 
@@ -72,10 +72,19 @@ public class PenroserGLRenderer implements GLSurfaceView.Renderer, MultiTouchCon
 
     private int width, height;
 
-    private GLContext glContext = new GLContext();
+    private GLContext glContext;
 
     public PenroserGLRenderer(Callbacks callbacks) {
         this.callbacks = callbacks;
+
+        int[] rhombusColors = new int[] {
+            callbacks.getColor(0),
+            callbacks.getColor(1),
+            callbacks.getColor(2),
+            callbacks.getColor(3)
+        };
+
+        glContext = new GLContext(rhombusColors);
 
         PenroserApp.halfRhombusPool.initToLevels(0, 0);
         reset();
@@ -118,21 +127,10 @@ public class PenroserGLRenderer implements GLSurfaceView.Renderer, MultiTouchCon
 		gl.glEnable(GL10.GL_LINE_SMOOTH);
         gl.glHint(GL10.GL_LINE_SMOOTH_HINT, GL10.GL_NICEST);
 
-        gl.glEnable(GL11.GL_VERTEX_ARRAY);
-
         if (gl instanceof GL11) {
-            GL11 gl11 = (GL11) gl;
+            gl.glEnable(GL11.GL_VERTEX_ARRAY);
 
-            int[] replacementColors = new int[] {
-                callbacks.getColor(0),
-                callbacks.getColor(1),
-                callbacks.getColor(2),
-                callbacks.getColor(3)
-            };
-
-            SkinnyHalfRhombus.onSurfaceCreated(gl11, glContext, replacementColors);
-
-            FatHalfRhombus.onSurfaceCreated(gl11, glContext, replacementColors);
+            glContext.onSurfaceCreated((GL11)gl);
         }
     }
 

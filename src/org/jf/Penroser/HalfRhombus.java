@@ -45,9 +45,6 @@ public abstract class HalfRhombus {
     public static final int UPPER_EDGE_MASK=2;
     public static final int INNER_EDGE_MASK=3;
 
-    /*This is the number of levels to use for the static vbo data*/
-    /*package*/ static final int VBO_LEVEL=5;
-
     /**
      * A relative level number. Children have a higher level, parents have a lower level. A negative level is allowed,
      * for example, in the case of upwards generation
