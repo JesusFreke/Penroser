@@ -53,7 +53,7 @@ public class PenroserGLRenderer implements GLSurfaceView.Renderer, MultiTouchCon
     private static final boolean DRAW_VIEWPORT = false;
     private static final boolean LOG_DRAWTIMES = false;
 
-    private static final float INITIAL_SCALE = (float)(500 * Math.pow((Math.sqrt(5)+1)/2, GLContext.VBO_LEVEL-5));
+    private static final float INITIAL_SCALE = (float)(500 * Math.pow((Math.sqrt(5)+1)/2, PenroserContext.VBO_LEVEL-5));
 
     private final Callbacks callbacks;
 
@@ -72,7 +72,7 @@ public class PenroserGLRenderer implements GLSurfaceView.Renderer, MultiTouchCon
 
     private int width, height;
 
-    private GLContext glContext;
+    private PenroserContext penroserContext;
 
     public PenroserGLRenderer(Callbacks callbacks) {
         this.callbacks = callbacks;
@@ -84,7 +84,7 @@ public class PenroserGLRenderer implements GLSurfaceView.Renderer, MultiTouchCon
             ColorUtil.swapOrder(callbacks.getColor(HalfRhombusType.RIGHT_FAT))
         };
 
-        glContext = new GLContext(rhombusColors);
+        penroserContext = new PenroserContext(rhombusColors);
 
         PenroserApp.halfRhombusPool.initToLevels(0, 0);
         reset();
@@ -97,9 +97,9 @@ public class PenroserGLRenderer implements GLSurfaceView.Renderer, MultiTouchCon
         int rhombusType = PenroserApp.random.nextInt(2);
         int rhombusSide = PenroserApp.random.nextInt(2);
         if (rhombusType == 0) {
-            halfRhombus = new FatHalfRhombus(glContext, 0, rhombusSide, 0, 0, 1, 0);
+            halfRhombus = new FatHalfRhombus(penroserContext, 0, rhombusSide, 0, 0, 1, 0);
         } else {
-            halfRhombus = new SkinnyHalfRhombus(glContext, 0, rhombusSide, 0, 0, 1, 0);
+            halfRhombus = new SkinnyHalfRhombus(penroserContext, 0, rhombusSide, 0, 0, 1, 0);
         }
 
         momentumController.reset();
@@ -121,7 +121,7 @@ public class PenroserGLRenderer implements GLSurfaceView.Renderer, MultiTouchCon
     }
 
     public void setColor(HalfRhombusType halfRhombusType, int color) {
-        glContext.setRhombusColor(halfRhombusType, ColorUtil.swapOrder(color));
+        penroserContext.setRhombusColor(halfRhombusType, ColorUtil.swapOrder(color));
     }
 
     public void updateColors() {
@@ -132,7 +132,7 @@ public class PenroserGLRenderer implements GLSurfaceView.Renderer, MultiTouchCon
             ColorUtil.swapOrder(callbacks.getColor(HalfRhombusType.RIGHT_FAT))
         };
 
-        glContext.setRhombusColors(rhombusColors);
+        penroserContext.setRhombusColors(rhombusColors);
     }
 
     public void onSurfaceCreated(GL10 gl, EGLConfig eglConfig) {
@@ -144,7 +144,7 @@ public class PenroserGLRenderer implements GLSurfaceView.Renderer, MultiTouchCon
         if (gl instanceof GL11) {
             gl.glEnable(GL11.GL_VERTEX_ARRAY);
 
-            glContext.onSurfaceCreated((GL11)gl);
+            penroserContext.onSurfaceCreated((GL11)gl);
         }
     }
 

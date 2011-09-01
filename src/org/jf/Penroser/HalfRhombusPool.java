@@ -55,25 +55,25 @@ public class HalfRhombusPool {
         }
     }
 
-    public FatHalfRhombus getFatHalfRhombus(GLContext glContext, int level, int side, float x, float y, float scale, int rotation) {
+    public FatHalfRhombus getFatHalfRhombus(PenroserContext penroserContext, int level, int side, float x, float y, float scale, int rotation) {
         FatHalfRhombus rhombus;
         if (level < 0) {
             rhombus = negFatHalfRhombi.get(-level);
         } else {
             rhombus = posFatHalfRhombi.get(level);
         }
-        rhombus.set(glContext, level, side, x, y, scale, rotation);
+        rhombus.set(penroserContext, level, side, x, y, scale, rotation);
         return rhombus;
     }
 
-    public SkinnyHalfRhombus getSkinnyHalfRhombus(GLContext glContext, int level, int side, float x, float y, float scale, int rotation) {
+    public SkinnyHalfRhombus getSkinnyHalfRhombus(PenroserContext penroserContext, int level, int side, float x, float y, float scale, int rotation) {
         SkinnyHalfRhombus rhombus;
         if (level < 0) {
             rhombus = negSkinnyHalfRhombi.get(-level);
         } else {
             rhombus = posSkinnyHalfRhombi.get(level);
         }
-        rhombus.set(glContext, level, side, x, y, scale, rotation);
+        rhombus.set(penroserContext, level, side, x, y, scale, rotation);
         return rhombus;
     }
 }

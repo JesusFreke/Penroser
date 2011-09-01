@@ -54,12 +54,12 @@ public class FatHalfRhombus extends HalfRhombus {
     public FatHalfRhombus() {
     }
 
-    public FatHalfRhombus(GLContext glContext, int level, int side, float x, float y, float scale, int rotation) {
-        super(glContext, level, HalfRhombusType.getType(side, FAT), x, y, scale, rotation);
+    public FatHalfRhombus(PenroserContext penroserContext, int level, int side, float x, float y, float scale, int rotation) {
+        super(penroserContext, level, HalfRhombusType.getType(side, FAT), x, y, scale, rotation);
     }
 
-    public void set(GLContext glContext, int level, int side, float x, float y, float scale, int rotation) {
-        set(glContext, level, HalfRhombusType.getType(side, FAT), x, y, scale, rotation);
+    public void set(PenroserContext penroserContext, int level, int side, float x, float y, float scale, int rotation) {
+        set(penroserContext, level, HalfRhombusType.getType(side, FAT), x, y, scale, rotation);
     }
 
     @Override
@@ -130,9 +130,9 @@ public class FatHalfRhombus extends HalfRhombus {
             int colorVbo;
             int length;
 
-            vertexVbo = glContext.getVertexVbo(type);
-            colorVbo = glContext.getColorVbo(gl, type);
-            length = glContext.getColorVboLength(type);
+            vertexVbo = penroserContext.getVertexVbo(type);
+            colorVbo = penroserContext.getColorVbo(gl, type);
+            length = penroserContext.getColorVboLength(type);
 
             gl.glBindBuffer(GL11.GL_ARRAY_BUFFER, vertexVbo);
             gl.glVertexPointer(2, GL10.GL_FLOAT, 0, 0);
@@ -164,17 +164,17 @@ public class FatHalfRhombus extends HalfRhombus {
             case TOP_FAT_CHILD: {
                 float topVerticeX = x + edgeLength.x(rotation-(sign*2)) + edgeLength.x(rotation+(sign*2));
                 float topVerticeY = y + edgeLength.y(rotation-(sign*2)) + edgeLength.y(rotation+(sign*2));
-                return PenroserApp.halfRhombusPool.getFatHalfRhombus(glContext, level+1, oppositeSide(), topVerticeX, topVerticeY, newScale, rotation+10);
+                return PenroserApp.halfRhombusPool.getFatHalfRhombus(penroserContext, level+1, oppositeSide(), topVerticeX, topVerticeY, newScale, rotation+10);
             }
             case SKINNY_CHILD: {
                 float sideVerticeX = x + edgeLength.x(rotation-(sign*2));
                 float sideVerticeY = y + edgeLength.y(rotation-(sign*2));
-                return PenroserApp.halfRhombusPool.getSkinnyHalfRhombus(glContext, level + 1, oppositeSide(), sideVerticeX, sideVerticeY, newScale, rotation + (sign * 2));
+                return PenroserApp.halfRhombusPool.getSkinnyHalfRhombus(penroserContext, level + 1, oppositeSide(), sideVerticeX, sideVerticeY, newScale, rotation + (sign * 2));
             }
             case BOTTOM_FAT_CHILD: {
                 float sideVerticeX = x + edgeLength.x(rotation-(sign*2));
                 float sideVerticeY = y + edgeLength.y(rotation-(sign*2));
-                return PenroserApp.halfRhombusPool.getFatHalfRhombus(glContext, level+1, type.side, sideVerticeX, sideVerticeY, newScale, rotation+(sign*8));
+                return PenroserApp.halfRhombusPool.getFatHalfRhombus(penroserContext, level+1, type.side, sideVerticeX, sideVerticeY, newScale, rotation+(sign*8));
             }
         }
 
@@ -205,17 +205,17 @@ public class FatHalfRhombus extends HalfRhombus {
                 float parentSideY = y + edgeLength.y(rotation-(sign*2));
                 float parentBottomX = parentSideX + edgeLength.x(rotation+(sign*2));
                 float parentBottomY = parentSideY + edgeLength.y(rotation+(sign*2));
-                return new FatHalfRhombus(glContext, level-1, oppositeSide(), parentBottomX, parentBottomY, newScale, rotation+10);
+                return new FatHalfRhombus(penroserContext, level-1, oppositeSide(), parentBottomX, parentBottomY, newScale, rotation+10);
             }
             case SKINNY_CHILD: {
                 float parentBottomX = x + edgeLength.x(rotation);
                 float parentBottomY = y + edgeLength.y(rotation);
-                return new SkinnyHalfRhombus(glContext, level-1, type.side, parentBottomX, parentBottomY, newScale, rotation-(sign*6));
+                return new SkinnyHalfRhombus(penroserContext, level-1, type.side, parentBottomX, parentBottomY, newScale, rotation-(sign*6));
             }
             case BOTTOM_FAT_CHILD: {
                 float parentBottomX = x + edgeLength.x(rotation);
                 float parentBottomY = y + edgeLength.y(rotation);
-                return new FatHalfRhombus(glContext, level-1, type.side, parentBottomX, parentBottomY, newScale, rotation-(sign*8));
+                return new FatHalfRhombus(penroserContext, level-1, type.side, parentBottomX, parentBottomY, newScale, rotation-(sign*8));
             }
         }
         return null;

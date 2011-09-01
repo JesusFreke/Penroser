@@ -74,13 +74,13 @@ public abstract class HalfRhombus {
     private float[] vertices = new float[6];
     private boolean verticesValid = false;
 
-    protected GLContext glContext;
+    protected PenroserContext penroserContext;
 
     protected HalfRhombus() {
     }
 
-    protected HalfRhombus(GLContext glContext, int level, HalfRhombusType type, float x, float y, float scale, int rotation) {
-		this.glContext = glContext;
+    protected HalfRhombus(PenroserContext penroserContext, int level, HalfRhombusType type, float x, float y, float scale, int rotation) {
+		this.penroserContext = penroserContext;
         this.level = level;
         this.type = type;
         this.x = x;
@@ -91,8 +91,8 @@ public abstract class HalfRhombus {
         verticesValid = false;
     }
 
-    public void set(GLContext glContext, int level, HalfRhombusType type, float x, float y, float scale, int rotation) {
-		this.glContext = glContext;
+    public void set(PenroserContext penroserContext, int level, HalfRhombusType type, float x, float y, float scale, int rotation) {
+		this.penroserContext = penroserContext;
         this.level = level;
         this.type = type;
         this.x = x;

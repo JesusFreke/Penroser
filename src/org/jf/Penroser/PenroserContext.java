@@ -36,7 +36,7 @@ import static org.jf.Penroser.HalfRhombusType.RIGHT;
 import static org.jf.Penroser.HalfRhombusType.FAT;
 import static org.jf.Penroser.HalfRhombusType.SKINNY;
 
-class GLContext {
+class PenroserContext {
     /*This is the number of levels to use for the static vbo data*/
     /*package*/ static final int VBO_LEVEL=5;
 
@@ -51,7 +51,7 @@ class GLContext {
     //This is set when the colors are dynamically changed, so that the vbos will be regenerated with the new colors
     private boolean recreateColorVbos = false;
 
-    public GLContext(int[] rhombusColors) {
+    public PenroserContext(int[] rhombusColors) {
         float[][] vertices = new float[1][];
         int[][] colors = new int[1][];
 
