@@ -76,6 +76,22 @@ public class PenroserColorPicker extends PenroserBaseActivity {
     }
 
     @Override
+    protected void onResume() {
+        if (penroserView != null) {
+            penroserView.onResume();
+        }
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        if (penroserView != null) {
+            penroserView.onPause();
+        }
+        super.onPause();
+    }
+
+    @Override
     public String getSharedPreferenceName() {
         return sharedPrefName;
     }

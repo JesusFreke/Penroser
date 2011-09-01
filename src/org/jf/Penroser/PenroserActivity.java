@@ -60,6 +60,22 @@ public class PenroserActivity extends PenroserBaseActivity
     }
 
     @Override
+    protected void onResume() {
+        if (penroserView != null) {
+            penroserView.onResume();
+        }
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        if (penroserView != null) {
+            penroserView.onPause();
+        }
+        super.onPause();
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu, menu);

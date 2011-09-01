@@ -28,12 +28,11 @@
 
 package org.jf.Penroser;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
-import android.widget.Button;
 
 public class PenroserOptions extends PenroserBaseActivity {
     private HalfRhombusButton leftSkinny = null;
@@ -41,6 +40,8 @@ public class PenroserOptions extends PenroserBaseActivity {
     private HalfRhombusButton leftFat = null;
     private HalfRhombusButton rightFat = null;
     private PenroserGLView penroserView = null;
+
+    private Handler handler = new Handler();
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,6 +59,7 @@ public class PenroserOptions extends PenroserBaseActivity {
         rightFat.setOnClickListener(rhombusClickListener);
 
         penroserView = (PenroserGLView)findViewById(R.id.penroser_view);
+        penroserView.onPause();
 
         leftSkinny.setColor(penroserView.penroserContext.getRhombusColor(HalfRhombusType.LEFT_SKINNY));
         rightSkinny.setColor(penroserView.penroserContext.getRhombusColor(HalfRhombusType.RIGHT_SKINNY));
@@ -80,6 +82,28 @@ public class PenroserOptions extends PenroserBaseActivity {
             HalfRhombusButton button = (HalfRhombusButton)findViewById(rhombusId);
             button.setColor(color);
         }
+    }
+
+    @Override
+    protected void onResume() {
+        if (penroserView != null) {
+            //work-around on 2.1. Needed because the wallpaper's visibility isn't changed until after we are displayed,
+            //and we hang on start up because the wallpaper already has the gl context... I think
+            handler.postDelayed(new Runnable() {
+                public void run() {
+                    penroserView.onResume();
+                }
+            }, 1000);
+        }
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        if (penroserView != null) {
+            penroserView.onPause();
+        }
+        super.onPause();
     }
 
     private final View.OnClickListener rhombusClickListener = new View.OnClickListener() {
