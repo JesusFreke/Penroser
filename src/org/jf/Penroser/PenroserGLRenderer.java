@@ -28,6 +28,7 @@
 
 package org.jf.Penroser;
 
+import android.content.SharedPreferences;
 import android.graphics.Matrix;
 import android.graphics.RectF;
 import android.opengl.GLSurfaceView;
@@ -74,17 +75,9 @@ public class PenroserGLRenderer implements GLSurfaceView.Renderer, MultiTouchCon
 
     private PenroserContext penroserContext;
 
-    public PenroserGLRenderer(Callbacks callbacks) {
+    public PenroserGLRenderer(PenroserContext penroserContext, Callbacks callbacks) {
         this.callbacks = callbacks;
-
-        int[] rhombusColors = new int[] {
-            ColorUtil.swapOrder(callbacks.getColor(HalfRhombusType.LEFT_SKINNY)),
-            ColorUtil.swapOrder(callbacks.getColor(HalfRhombusType.RIGHT_SKINNY)),
-            ColorUtil.swapOrder(callbacks.getColor(HalfRhombusType.LEFT_FAT)),
-            ColorUtil.swapOrder(callbacks.getColor(HalfRhombusType.RIGHT_FAT))
-        };
-
-        penroserContext = new PenroserContext(rhombusColors);
+        this.penroserContext = penroserContext;
 
         PenroserApp.halfRhombusPool.initToLevels(0, 0);
         reset();
@@ -120,19 +113,8 @@ public class PenroserGLRenderer implements GLSurfaceView.Renderer, MultiTouchCon
         invertedMatrix.mapPoints(viewport);
     }
 
-    public void setColor(HalfRhombusType halfRhombusType, int color) {
-        penroserContext.setRhombusColor(halfRhombusType, ColorUtil.swapOrder(color));
-    }
-
-    public void updateColors() {
-        int[] rhombusColors = new int[] {
-            ColorUtil.swapOrder(callbacks.getColor(HalfRhombusType.LEFT_SKINNY)),
-            ColorUtil.swapOrder(callbacks.getColor(HalfRhombusType.RIGHT_SKINNY)),
-            ColorUtil.swapOrder(callbacks.getColor(HalfRhombusType.LEFT_FAT)),
-            ColorUtil.swapOrder(callbacks.getColor(HalfRhombusType.RIGHT_FAT))
-        };
-
-        penroserContext.setRhombusColors(rhombusColors);
+    public void reloadColors() {
+        penroserContext.reloadRhombusColors();
     }
 
     public void onSurfaceCreated(GL10 gl, EGLConfig eglConfig) {
@@ -296,6 +278,5 @@ public class PenroserGLRenderer implements GLSurfaceView.Renderer, MultiTouchCon
 
     public interface Callbacks {
         void requestRender();
-        int getColor(HalfRhombusType rhombusType);
     }
 }

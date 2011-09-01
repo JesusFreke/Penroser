@@ -42,24 +42,15 @@ public class PenroserOptions extends Activity {
     private HalfRhombusButton rightFat = null;
     private PenroserGLView penroserView = null;
 
-    private SharedPreferences preferences = null;
-
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.options);
 
-        preferences = getSharedPreferences("penroser_activity_prefs", 0);
-
         leftSkinny = (HalfRhombusButton)findViewById(R.id.left_skinny);
         rightSkinny = (HalfRhombusButton)findViewById(R.id.right_skinny);
         leftFat = (HalfRhombusButton)findViewById(R.id.left_fat);
         rightFat = (HalfRhombusButton)findViewById(R.id.right_fat);
-
-        leftSkinny.setColor(getColor(preferences, HalfRhombusType.LEFT_SKINNY));
-        rightSkinny.setColor(getColor(preferences, HalfRhombusType.RIGHT_SKINNY));
-        leftFat.setColor(getColor(preferences, HalfRhombusType.LEFT_FAT));
-        rightFat.setColor(getColor(preferences, HalfRhombusType.RIGHT_FAT));
 
         leftSkinny.setOnClickListener(rhombusClickListener);
         rightSkinny.setOnClickListener(rhombusClickListener);
@@ -67,6 +58,12 @@ public class PenroserOptions extends Activity {
         rightFat.setOnClickListener(rhombusClickListener);
 
         penroserView = (PenroserGLView)findViewById(R.id.penroser_view);
+
+        leftSkinny.setColor(penroserView.penroserContext.getRhombusColor(HalfRhombusType.LEFT_SKINNY));
+        rightSkinny.setColor(penroserView.penroserContext.getRhombusColor(HalfRhombusType.RIGHT_SKINNY));
+        leftFat.setColor(penroserView.penroserContext.getRhombusColor(HalfRhombusType.LEFT_FAT));
+        rightFat.setColor(penroserView.penroserContext.getRhombusColor(HalfRhombusType.RIGHT_FAT));
+
     }
 
     @Override
@@ -77,13 +74,11 @@ public class PenroserOptions extends Activity {
 
             HalfRhombusType rhombusType = PenroserApp.mapRhombusIdToRhombusType(rhombusId);
 
-            SharedPreferences.Editor editor = preferences.edit();
-            editor.putInt(rhombusType.colorKey, color);
-            editor.commit();
+            penroserView.penroserContext.setRhombusColor(rhombusType, color);
+            penroserView.penroserContext.storeRhombusColors();
 
             HalfRhombusButton button = (HalfRhombusButton)findViewById(rhombusId);
             button.setColor(color);
-            penroserView.setColor(rhombusType, color);
         }
     }
 

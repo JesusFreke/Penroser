@@ -38,10 +38,6 @@ public class PenroserApp extends Application {
     public static final HalfRhombusPool halfRhombusPool = new HalfRhombusPool();
     public static final Random random = new Random();
 
-    public static int getColorForRhombusType(SharedPreferences preferences, HalfRhombusType halfRhombusType) {
-        return preferences.getInt(halfRhombusType.colorKey, halfRhombusType.defaultColor);
-    }
-
     public static HalfRhombusType mapRhombusIdToRhombusType(int rhombusId) {
         switch (rhombusId) {
             case R.id.left_skinny:

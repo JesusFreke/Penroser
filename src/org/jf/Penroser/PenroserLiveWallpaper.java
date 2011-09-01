@@ -39,7 +39,7 @@ import javax.microedition.khronos.egl.EGLDisplay;
 
 public class PenroserLiveWallpaper extends GLWallpaperService {
 
-    private SharedPreferences preferences;
+    private PenroserContext penroserContext;
 
     public PenroserLiveWallpaper() {
         super();
@@ -47,12 +47,12 @@ public class PenroserLiveWallpaper extends GLWallpaperService {
 
     @Override
     public Engine onCreateEngine() {
-        preferences = getSharedPreferences("penroser_liveWallpaper_prefs", 0);
+        penroserContext = new PenroserContext(getSharedPreferences("penroser_live_wallpaper_prefs", 0));
         return new PenroserGLEngine();
     }
 
     class PenroserGLEngine extends GLEngine implements PenroserGLRenderer.Callbacks {
-        PenroserGLRenderer renderer = new PenroserGLRenderer(this);
+        PenroserGLRenderer renderer = new PenroserGLRenderer(penroserContext, this);
 
         public PenroserGLEngine() {
             super();
@@ -90,10 +90,6 @@ public class PenroserLiveWallpaper extends GLWallpaperService {
         @Override
         public void onTouchEvent(MotionEvent event) {
             renderer.onTouchEvent(event);
-        }
-
-        public int getColor(HalfRhombusType rhombusType) {
-            return PenroserApp.getColorForRhombusType(preferences, rhombusType);
         }
     }
 }

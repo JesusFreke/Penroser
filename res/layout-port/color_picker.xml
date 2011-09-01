@@ -29,6 +29,7 @@
   -->
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:jf="http://schemas.android.com/apk/res/org.jf.Penroser"
               android:layout_width="fill_parent"
               android:layout_height="fill_parent"
               android:orientation="vertical">
@@ -38,7 +39,8 @@
     <org.jf.Penroser.PenroserGLView android:id="@+id/penroser_view"
                                     android:layout_height="fill_parent"
                                     android:layout_width="fill_parent"
-                                    android:layout_below="@+id/color_picker"/>
+                                    android:layout_below="@+id/color_picker"
+                                    jf:shared_pref_name="penroser_activity_prefs"/>
     <Button android:id="@+id/ok"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

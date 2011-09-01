@@ -55,7 +55,7 @@ public class PenroserActivity extends Activity
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
         }
 
-        penroserView = new PenroserGLView(this);
+        penroserView = new PenroserGLView(this, "penroser_activity_prefs");
         setContentView(penroserView);
     }
 
@@ -83,7 +83,7 @@ public class PenroserActivity extends Activity
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        penroserView.updateColors();
+        penroserView.reloadColors();
     }
 
     private boolean getFullScreen() {

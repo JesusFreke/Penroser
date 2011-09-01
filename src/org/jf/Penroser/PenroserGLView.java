@@ -29,7 +29,7 @@
 package org.jf.Penroser;
 
 import android.content.Context;
-import android.content.SharedPreferences;
+import android.content.res.TypedArray;
 import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -42,17 +42,21 @@ public class PenroserGLView extends GLSurfaceView implements PenroserGLRenderer.
     private static final String TAG="PenroserGLView";
 
     private PenroserGLRenderer renderer;
-    private final SharedPreferences preferences;
+    public final PenroserContext penroserContext;
 
-    public PenroserGLView(Context context) {
+    public PenroserGLView(Context context, String sharedPrefName) {
         super(context);
-        preferences = context.getSharedPreferences("penroser_activity_prefs", 0);
+        penroserContext = new PenroserContext(context.getSharedPreferences(sharedPrefName, 0));
         init();
     }
 
     public PenroserGLView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        preferences = context.getSharedPreferences("penroser_activity_prefs", 0);
+
+        TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.PenroserGLView);
+        String sharedPrefName = typedArray.getString(R.styleable.PenroserGLView_shared_pref_name);
+
+        penroserContext = new PenroserContext(context.getSharedPreferences(sharedPrefName, 0));
         init();
     }
 
@@ -83,7 +87,7 @@ public class PenroserGLView extends GLSurfaceView implements PenroserGLRenderer.
             }
         });
 
-        renderer = new PenroserGLRenderer(this);
+        renderer = new PenroserGLRenderer(penroserContext, this);
         this.setRenderer(renderer);
         this.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
     }
@@ -93,15 +97,11 @@ public class PenroserGLView extends GLSurfaceView implements PenroserGLRenderer.
         return renderer.onTouchEvent(event);
 	}
 
-    public int getColor(HalfRhombusType rhombusType) {
-        return PenroserApp.getColorForRhombusType(preferences, rhombusType);
-    }
-
     public void setColor(HalfRhombusType rhombusType, int color) {
-        renderer.setColor(rhombusType, color);
+        penroserContext.setRhombusColor(rhombusType, color);
     }
 
-    public void updateColors() {
-        renderer.updateColors();
+    public void reloadColors() {
+        renderer.reloadColors();
     }
 }

@@ -3,4 +3,8 @@
         <attr name="side" format="integer"/>
         <attr name="rotated" format="boolean"/>
     </declare-styleable>
+
+    <declare-styleable name="PenroserGLView">
+        <attr name="shared_pref_name" format="string"/>
+    </declare-styleable>
 </resources>
