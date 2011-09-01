@@ -41,7 +41,7 @@ import android.widget.Button;
 public abstract class HalfRhombusButton extends Button {
     private static final String TAG = "HalfRhombusButton";
 
-    private static final boolean DEBUG_MEASURE = true;
+    private static final boolean DEBUG_MEASURE = false;
 
     public static final int LEFT = 0;
     public static final int RIGHT = 1;
