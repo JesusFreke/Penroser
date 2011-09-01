@@ -20,6 +20,8 @@
         <activity android:name=".PenroserOptions"
                   android:label="@string/choose_colors"/>
         <activity android:name=".PenroserColorPicker"/>
+        <activity android:name=".PenroserWallpaperOptions"
+                  android:exported="true"/>
         <service android:name=".PenroserLiveWallpaper"
                  android:label="Penroser"
                  android:permission="android.permission.BIND_WALLPAPER">

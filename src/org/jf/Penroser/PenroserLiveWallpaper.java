@@ -88,6 +88,14 @@ public class PenroserLiveWallpaper extends GLWallpaperService {
         }
 
         @Override
+        public void onVisibilityChanged(boolean visible) {
+            if (visible) {
+                renderer.reloadColors();
+            }
+            super.onVisibilityChanged(visible);
+        }
+
+        @Override
         public void onTouchEvent(MotionEvent event) {
             renderer.onTouchEvent(event);
         }

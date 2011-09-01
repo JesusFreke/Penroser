@@ -88,6 +88,7 @@ public class PenroserOptions extends PenroserBaseActivity {
             intent.setClass(PenroserOptions.this, PenroserColorPicker.class);
             intent.putExtra("rhombus", v.getId());
             intent.putExtra("color", ((HalfRhombusButton)v).getColor());
+            intent.putExtra("sharedPrefName", getSharedPreferenceName());
             startActivityForResult(intent, v.getId());
         }
     };
