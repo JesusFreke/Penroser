@@ -35,7 +35,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
-public class PenroserOptions extends Activity {
+public class PenroserOptions extends PenroserBaseActivity {
     private HalfRhombusButton leftSkinny = null;
     private HalfRhombusButton rightSkinny = null;
     private HalfRhombusButton leftFat = null;

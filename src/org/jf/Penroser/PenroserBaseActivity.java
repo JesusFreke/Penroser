@@ -28,46 +28,10 @@
 
 package org.jf.Penroser;
 
-import afzkl.development.mColorPicker.views.ColorPickerView;
 import android.app.Activity;
-import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
 
-public class PenroserColorPicker extends PenroserBaseActivity {
-    private ColorPickerView colorPicker;
-    private PenroserGLView penroserView;
-
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        setContentView(R.layout.color_picker);
-
-        colorPicker = (ColorPickerView)findViewById(R.id.color_picker);
-        penroserView = (PenroserGLView)findViewById(R.id.penroser_view);
-
-        final int rhombusId = getIntent().getExtras().getInt("rhombus");
-        final int color = getIntent().getExtras().getInt("color");
-
-        colorPicker.setColor(color);
-
-        colorPicker.setOnColorChangedListener(new ColorPickerView.OnColorChangedListener() {
-            public void onColorChanged(int color) {
-                HalfRhombusType rhombusType = PenroserApp.mapRhombusIdToRhombusType(rhombusId);
-
-                penroserView.setColor(rhombusType, color);
-            }
-        });
-
-        Button okButton = (Button)findViewById(R.id.ok);
-
-        setResult(-1);
-
-        okButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                setResult(colorPicker.getColor());
-                finish();
-            }
-        });
+public abstract class PenroserBaseActivity extends Activity implements PenroserAndroidContext {
+    public String getSharedPreferenceName() {
+        return "penroser_activity_prefs";
     }
 }

@@ -35,7 +35,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.*;
 
-public class PenroserActivity extends Activity
+public class PenroserActivity extends PenroserBaseActivity
 {
     private SharedPreferences preferences = null;
 
@@ -55,7 +55,7 @@ public class PenroserActivity extends Activity
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
         }
 
-        penroserView = new PenroserGLView(this, "penroser_activity_prefs");
+        penroserView = new PenroserGLView(this);
         setContentView(penroserView);
     }
 

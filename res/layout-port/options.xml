@@ -40,7 +40,6 @@
     <org.jf.Penroser.PenroserGLView android:id="@+id/penroser_view"
                                     android:layout_width="fill_parent"
                                     android:layout_height="fill_parent"
-                                    android:layout_below="@id/rhombi"
-                                    jf:shared_pref_name="penroser_activity_prefs"/>
+                                    android:layout_below="@id/rhombi"/>
 
 </RelativeLayout>

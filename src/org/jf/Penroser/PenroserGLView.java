@@ -44,8 +44,15 @@ public class PenroserGLView extends GLSurfaceView implements PenroserGLRenderer.
     private PenroserGLRenderer renderer;
     public final PenroserContext penroserContext;
 
-    public PenroserGLView(Context context, String sharedPrefName) {
+    public PenroserGLView(Context context) {
         super(context);
+
+        if (!(context instanceof PenroserAndroidContext)) {
+            throw new RuntimeException("The Activity hosting a PenroserGLView must implement the PenroserAndroidContext interface");
+        }
+
+        String sharedPrefName = ((PenroserAndroidContext)context).getSharedPreferenceName();
+
         penroserContext = new PenroserContext(context.getSharedPreferences(sharedPrefName, 0));
         init();
     }
@@ -53,11 +60,11 @@ public class PenroserGLView extends GLSurfaceView implements PenroserGLRenderer.
     public PenroserGLView(Context context, AttributeSet attrs) {
         super(context, attrs);
 
-        TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.PenroserGLView);
-        String sharedPrefName = typedArray.getString(R.styleable.PenroserGLView_shared_pref_name);
-        if (sharedPrefName == null) {
-            throw new RuntimeException("You must specify the shared_pref_name attribute for PenroserGLView");
+        if (!(context instanceof PenroserAndroidContext)) {
+            throw new RuntimeException("The context (Activity/Service) hosting a PenroserGLView must implement the PenroserAndroidContext interface");
         }
+
+        String sharedPrefName = ((PenroserAndroidContext)context).getSharedPreferenceName();
 
         penroserContext = new PenroserContext(context.getSharedPreferences(sharedPrefName, 0));
         init();
