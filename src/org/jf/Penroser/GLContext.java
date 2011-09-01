@@ -108,6 +108,11 @@ class GLContext {
         this.recreateColorVbos = true;
     }
 
+    public void setRhombusColor(HalfRhombusType rhombusType, int color) {
+        rhombusColors[rhombusType.index] = color;
+        this.recreateColorVbos = true;
+    }
+
     public void onSurfaceCreated(GL11 gl) {
         for (int i=0; i<4; i++) {
             vertexVbos[i] = generateVertexVbo(gl, i, vertices[i]);

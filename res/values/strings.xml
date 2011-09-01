@@ -6,4 +6,5 @@
     <string name="full_screen">Toggle Full Screen</string>
     <string name="options">Options</string>
     <string name="choose_colors">Choose Colors</string>
+    <string name="ok">OK</string>
 </resources>

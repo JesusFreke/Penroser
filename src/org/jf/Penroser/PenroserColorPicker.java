@@ -28,31 +28,46 @@
 
 package org.jf.Penroser;
 
-import android.app.Application;
-import android.content.SharedPreferences;
+import afzkl.development.mColorPicker.views.ColorPickerView;
+import android.app.Activity;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 
-import java.util.Random;
+public class PenroserColorPicker extends Activity {
+    private ColorPickerView colorPicker;
+    private PenroserGLView penroserView;
 
-public class PenroserApp extends Application {
-    //TODO: need to move this to GLContext
-    public static final HalfRhombusPool halfRhombusPool = new HalfRhombusPool();
-    public static final Random random = new Random();
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
-    public static int getColorForRhombusType(SharedPreferences preferences, HalfRhombusType halfRhombusType) {
-        return preferences.getInt(halfRhombusType.colorKey, halfRhombusType.defaultColor);
-    }
+        setContentView(R.layout.color_picker);
 
-    public static HalfRhombusType mapRhombusIdToRhombusType(int rhombusId) {
-        switch (rhombusId) {
-            case R.id.left_skinny:
-                return HalfRhombusType.LEFT_SKINNY;
-            case R.id.right_skinny:
-                return HalfRhombusType.RIGHT_SKINNY;
-            case R.id.left_fat:
-                return HalfRhombusType.LEFT_FAT;
-            case R.id.right_fat:
-                return HalfRhombusType.RIGHT_FAT;
-        }
-        return null;
+        colorPicker = (ColorPickerView)findViewById(R.id.color_picker);
+        penroserView = (PenroserGLView)findViewById(R.id.penroser_view);
+
+        final int rhombusId = getIntent().getExtras().getInt("rhombus");
+        final int color = getIntent().getExtras().getInt("color");
+
+        colorPicker.setColor(color);
+
+        colorPicker.setOnColorChangedListener(new ColorPickerView.OnColorChangedListener() {
+            public void onColorChanged(int color) {
+                HalfRhombusType rhombusType = PenroserApp.mapRhombusIdToRhombusType(rhombusId);
+
+                penroserView.setColor(rhombusType, color);
+            }
+        });
+
+        Button okButton = (Button)findViewById(R.id.ok);
+
+        setResult(-1);
+
+        okButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                setResult(colorPicker.getColor());
+                finish();
+            }
+        });
     }
 }

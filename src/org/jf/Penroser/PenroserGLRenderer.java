@@ -120,6 +120,20 @@ public class PenroserGLRenderer implements GLSurfaceView.Renderer, MultiTouchCon
         invertedMatrix.mapPoints(viewport);
     }
 
+    public void setColor(HalfRhombusType halfRhombusType, int color) {
+        glContext.setRhombusColor(halfRhombusType, ColorUtil.swapOrder(color));
+    }
+
+    public void updateColors() {
+        int[] rhombusColors = new int[] {
+            ColorUtil.swapOrder(callbacks.getColor(HalfRhombusType.LEFT_SKINNY)),
+            ColorUtil.swapOrder(callbacks.getColor(HalfRhombusType.RIGHT_SKINNY)),
+            ColorUtil.swapOrder(callbacks.getColor(HalfRhombusType.LEFT_FAT)),
+            ColorUtil.swapOrder(callbacks.getColor(HalfRhombusType.RIGHT_FAT))
+        };
+
+        glContext.setRhombusColors(rhombusColors);
+    }
 
     public void onSurfaceCreated(GL10 gl, EGLConfig eglConfig) {
         gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);

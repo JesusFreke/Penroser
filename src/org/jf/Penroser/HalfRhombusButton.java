@@ -76,6 +76,10 @@ public abstract class HalfRhombusButton extends Button {
         this.invalidate();
     }
 
+    public int getColor() {
+        return color;
+    }
+
     private int getHeightGivenWidth(int width) {
         if (rotated) {
             return (int)Math.ceil(width/getAspectRatio());

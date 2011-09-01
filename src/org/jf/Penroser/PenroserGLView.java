@@ -96,4 +96,12 @@ public class PenroserGLView extends GLSurfaceView implements PenroserGLRenderer.
     public int getColor(HalfRhombusType rhombusType) {
         return PenroserApp.getColorForRhombusType(preferences, rhombusType);
     }
+
+    public void setColor(HalfRhombusType rhombusType, int color) {
+        renderer.setColor(rhombusType, color);
+    }
+
+    public void updateColors() {
+        renderer.updateColors();
+    }
 }
