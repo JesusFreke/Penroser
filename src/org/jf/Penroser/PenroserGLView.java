@@ -55,6 +55,9 @@ public class PenroserGLView extends GLSurfaceView implements PenroserGLRenderer.
 
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.PenroserGLView);
         String sharedPrefName = typedArray.getString(R.styleable.PenroserGLView_shared_pref_name);
+        if (sharedPrefName == null) {
+            throw new RuntimeException("You must specify the shared_pref_name attribute for PenroserGLView");
+        }
 
         penroserContext = new PenroserContext(context.getSharedPreferences(sharedPrefName, 0));
         init();
