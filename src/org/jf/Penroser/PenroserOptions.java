@@ -88,12 +88,12 @@ public class PenroserOptions extends PenroserBaseActivity {
     protected void onResume() {
         if (penroserView != null) {
             //work-around on 2.1. Needed because the wallpaper's visibility isn't changed until after we are displayed,
-            //and we hang on start up because the wallpaper already has the gl context... I think
-            handler.postDelayed(new Runnable() {
+            //and we hang on start up because the wallpaper still has the gl context... I think
+            handler.post(new Runnable() {
                 public void run() {
                     penroserView.onResume();
                 }
-            }, 1000);
+            });
         }
         super.onResume();
     }
