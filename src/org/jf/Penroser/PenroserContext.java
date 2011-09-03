@@ -43,7 +43,7 @@ class PenroserContext {
     /*package*/ static final int VBO_LEVEL=5;
 
     private final float[][] vertices = new float[4][];
-    private final int[][] colors = new int[4][];
+    private final HalfRhombusType[][] rhombusTypes = new HalfRhombusType[4][];
 
     private int[] rhombusColors = new int[4];
 
@@ -57,25 +57,25 @@ class PenroserContext {
 
     public PenroserContext(SharedPreferences preferences) {
         float[][] vertices = new float[1][];
-        int[][] colors = new int[1][];
+        HalfRhombusType[][] rhombusTypes = new HalfRhombusType[1][];
 
         this.preferences = preferences;
 
-        SkinnyHalfRhombus.generateVertices(VBO_LEVEL, LEFT, vertices, colors);
+        SkinnyHalfRhombus.generateVertices(VBO_LEVEL, LEFT, vertices, rhombusTypes);
         this.vertices[0] = vertices[0];
-        this.colors[0] = colors[0];
+        this.rhombusTypes[0] = rhombusTypes[0];
 
-        SkinnyHalfRhombus.generateVertices(VBO_LEVEL, RIGHT, vertices, colors);
+        SkinnyHalfRhombus.generateVertices(VBO_LEVEL, RIGHT, vertices, rhombusTypes);
         this.vertices[1] = vertices[0];
-        this.colors[1] = colors[0];
+        this.rhombusTypes[1] = rhombusTypes[0];
 
-        FatHalfRhombus.generateVertices(VBO_LEVEL, LEFT, vertices, colors);
+        FatHalfRhombus.generateVertices(VBO_LEVEL, LEFT, vertices, rhombusTypes);
         this.vertices[2] = vertices[0];
-        this.colors[2] = colors[0];
+        this.rhombusTypes[2] = rhombusTypes[0];
 
-        FatHalfRhombus.generateVertices(VBO_LEVEL, RIGHT, vertices, colors);
-        this.colors[3] = colors[0];
+        FatHalfRhombus.generateVertices(VBO_LEVEL, RIGHT, vertices, rhombusTypes);
         this.vertices[3] = vertices[0];
+        this.rhombusTypes[3] = rhombusTypes[0];
 
         this.rhombusColors = new int[4];
         reloadRhombusColors();
@@ -142,7 +142,7 @@ class PenroserContext {
     public void onSurfaceCreated(GL11 gl) {
         for (int i=0; i<4; i++) {
             vertexVbos[i] = generateVertexVbo(gl, i, vertices[i]);
-            colorVbos[i] = generateColorVbo(gl, replaceColors(colors[i], rhombusColors));
+            colorVbos[i] = generateColorVbo(gl, generateGLColorArray(rhombusTypes[i]));
         }
         recreateColorVbos = false;
     }
@@ -155,7 +155,7 @@ class PenroserContext {
         if (recreateColorVbos) {
             gl.glDeleteBuffers(4, colorVbos, 0);
             for (int i=0; i<4; i++) {
-                colorVbos[i] = generateColorVbo(gl, replaceColors(colors[i], rhombusColors));
+                colorVbos[i] = generateColorVbo(gl, generateGLColorArray(rhombusTypes[i]));
             }
             recreateColorVbos = false;
         }
@@ -163,20 +163,23 @@ class PenroserContext {
     }
 
     public int getColorVboLength(HalfRhombusType rhombusType) {
-        return colors[rhombusType.index].length;
+        return rhombusTypes[rhombusType.index].length*3;
     }
 
     /**
-     * Create a new array where the values in colors are an index into rhombusColors for the color to use at that
-     * position
+     * Create a new array where each element is the current color of the corresponding rhombus type in rhombusTypes.
+     * The colors in the array are also swapped so that they can be bound directly to a GL color buffer
      */
-    private static int[] replaceColors(int[] colors, int[] rhombusColors) {
-        int[] newColors = new int[colors.length];
+    private int[] generateGLColorArray(HalfRhombusType[] rhombusTypes) {
+        int[] colors = new int[rhombusTypes.length*3];
 
-        for (int i=0; i<colors.length; i++) {
-            newColors[i] = rhombusColors[colors[i]];
+        for (int i=0; i<rhombusTypes.length; i++) {
+            int colorIndex = i*3;
+            int color = ColorUtil.swapOrder(this.getRhombusColor(rhombusTypes[i]));
+
+            colors[colorIndex] = colors[colorIndex+1] = colors[colorIndex+2] = color;
         }
 
-        return newColors;
+        return colors;
     }
 }

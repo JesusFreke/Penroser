@@ -44,13 +44,6 @@ public class FatHalfRhombus extends HalfRhombus {
 
     private static final int NUM_CHILDREN = 3;
 
-    /**
-     * we just use a color placeholder when pre-generating the vertices. They will be replaced with actual colors
-     * when we actually create the vbo
-     */
-    private static final int leftColor = 2;
-    private static final int rightColor = 3;
-
     public FatHalfRhombus() {
     }
 
@@ -221,9 +214,9 @@ public class FatHalfRhombus extends HalfRhombus {
         return null;
     }
 
-    public static void generateVertices(int level, int side, float[][] vertices, int[][] colors) {
+    public static void generateVertices(int level, int side, float[][] vertices, HalfRhombusType[][] rhombusTypes) {
         assert vertices != null && vertices.length > 0;
-        assert colors != null && colors.length > 0;
+        assert rhombusTypes != null && rhombusTypes.length > 0;
 
         int fat=1;
         int skinny=0;
@@ -237,13 +230,13 @@ public class FatHalfRhombus extends HalfRhombus {
 
         int count = fat+skinny;
         vertices[0] = new float[count*3*2];
-        colors[0] = new int[count*3];
+        rhombusTypes[0] = new HalfRhombusType[count];
 
-        generateVertices(vertices[0], colors[0], 0, 0, level, 0, side, 0, 0);
+        generateVertices(vertices[0], rhombusTypes[0], 0, 0, level, 0, side, 0, 0);
     }
 
     //TODO: I'm curious whether using final for these args will cause javac to optimize the many instances of level+1, rotation+n, etc.
-    protected static int generateVertices(final float[] vertices, final int[] colors, int index, final int level, final int maxLevel, final int rotation, final int side, final float x, final float y) {
+    protected static int generateVertices(final float[] vertices, final HalfRhombusType[] rhombusTypes, int index, final int level, final int maxLevel, final int rotation, final int side, final float x, final float y) {
         //x,y are the coordinates of the bottom vertex of the rhombus
 
         EdgeLength edgeLength = EdgeLength.getEdgeLength(level);
@@ -261,27 +254,23 @@ public class FatHalfRhombus extends HalfRhombus {
 
         if (level < maxLevel) {
             //top fat rhombus
-            index = FatHalfRhombus.generateVertices(vertices, colors, index, level+1, maxLevel, rotation+10, oppositeSide(side), topVertexX, topVertexY);
+            index = FatHalfRhombus.generateVertices(vertices, rhombusTypes, index, level+1, maxLevel, rotation+10, oppositeSide(side), topVertexX, topVertexY);
 
             //left skinny rhombus
-            index = SkinnyHalfRhombus.generateVertices(vertices, colors, index, level+1, maxLevel, rotation+(sign*2), oppositeSide(side), sideVertexX, sideVertexY);
+            index = SkinnyHalfRhombus.generateVertices(vertices, rhombusTypes, index, level+1, maxLevel, rotation+(sign*2), oppositeSide(side), sideVertexX, sideVertexY);
 
             //left fat rhombus
-            return FatHalfRhombus.generateVertices(vertices, colors, index, level+1, maxLevel, rotation+(sign*8), side, sideVertexX, sideVertexY);
+            return FatHalfRhombus.generateVertices(vertices, rhombusTypes, index, level+1, maxLevel, rotation+(sign*8), side, sideVertexX, sideVertexY);
         } else {
-            int color = side==LEFT?leftColor:rightColor;
+            HalfRhombusType type = side==LEFT?HalfRhombusType.LEFT_FAT:HalfRhombusType.RIGHT_FAT;
 
-            colors[index>>1] = color;
+            rhombusTypes[index/6] = type;
 
             vertices[index++] = x;
             vertices[index++] = y;
 
-            colors[index>>1] = color;
-
             vertices[index++] = sideVertexX;
             vertices[index++] = sideVertexY;
-
-            colors[index>>1] = color;
 
             vertices[index++] = topVertexX;
             vertices[index++] = topVertexY;
