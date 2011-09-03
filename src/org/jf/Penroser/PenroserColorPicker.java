@@ -50,15 +50,13 @@ public class PenroserColorPicker extends PenroserBaseActivity {
         colorPicker = (ColorPickerView)findViewById(R.id.color_picker);
         penroserView = (PenroserGLView)findViewById(R.id.penroser_view);
 
-        final int rhombusId = getIntent().getExtras().getInt("rhombus");
+        final HalfRhombusType rhombusType = (HalfRhombusType)getIntent().getExtras().getSerializable("rhombus");
         final int color = getIntent().getExtras().getInt("color");
 
         colorPicker.setColor(color);
 
         colorPicker.setOnColorChangedListener(new ColorPickerView.OnColorChangedListener() {
             public void onColorChanged(int color) {
-                HalfRhombusType rhombusType = PenroserApp.mapRhombusIdToRhombusType(rhombusId);
-
                 penroserView.setColor(rhombusType, color);
             }
         });

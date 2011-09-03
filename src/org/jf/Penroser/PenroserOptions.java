@@ -35,10 +35,7 @@ import android.os.Handler;
 import android.view.View;
 
 public class PenroserOptions extends PenroserBaseActivity {
-    private HalfRhombusButton leftSkinny = null;
-    private HalfRhombusButton rightSkinny = null;
-    private HalfRhombusButton leftFat = null;
-    private HalfRhombusButton rightFat = null;
+    private HalfRhombusButton halfRhombusButtons[] = new HalfRhombusButton[4];
     private PenroserGLView penroserView = null;
 
     private Handler handler = new Handler();
@@ -48,38 +45,30 @@ public class PenroserOptions extends PenroserBaseActivity {
 
         setContentView(R.layout.options);
 
-        leftSkinny = (HalfRhombusButton)findViewById(R.id.left_skinny);
-        rightSkinny = (HalfRhombusButton)findViewById(R.id.right_skinny);
-        leftFat = (HalfRhombusButton)findViewById(R.id.left_fat);
-        rightFat = (HalfRhombusButton)findViewById(R.id.right_fat);
-
-        leftSkinny.setOnClickListener(rhombusClickListener);
-        rightSkinny.setOnClickListener(rhombusClickListener);
-        leftFat.setOnClickListener(rhombusClickListener);
-        rightFat.setOnClickListener(rhombusClickListener);
-
         penroserView = (PenroserGLView)findViewById(R.id.penroser_view);
         penroserView.onPause();
 
-        leftSkinny.setColor(penroserView.penroserContext.getRhombusColor(HalfRhombusType.LEFT_SKINNY));
-        rightSkinny.setColor(penroserView.penroserContext.getRhombusColor(HalfRhombusType.RIGHT_SKINNY));
-        leftFat.setColor(penroserView.penroserContext.getRhombusColor(HalfRhombusType.LEFT_FAT));
-        rightFat.setColor(penroserView.penroserContext.getRhombusColor(HalfRhombusType.RIGHT_FAT));
+        for (HalfRhombusType rhombusType: HalfRhombusType.values()) {
+            HalfRhombusButton button = (HalfRhombusButton)findViewById(rhombusType.viewId);
+            button.setOnClickListener(rhombusClickListener);
+            button.setColor(penroserView.penroserContext.getRhombusColor(rhombusType));
 
+            halfRhombusButtons[rhombusType.index] = button;
+        }
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode != -1) {
-            int rhombusId = requestCode;
+            int rhombusIndex = requestCode;
             int color = resultCode;
 
-            HalfRhombusType rhombusType = PenroserApp.mapRhombusIdToRhombusType(rhombusId);
+            HalfRhombusType rhombusType = HalfRhombusType.fromIndex(rhombusIndex);
 
             penroserView.penroserContext.setRhombusColor(rhombusType, color);
             penroserView.penroserContext.storeRhombusColors();
 
-            HalfRhombusButton button = (HalfRhombusButton)findViewById(rhombusId);
+            HalfRhombusButton button = halfRhombusButtons[rhombusIndex];
             button.setColor(color);
         }
     }
@@ -110,10 +99,10 @@ public class PenroserOptions extends PenroserBaseActivity {
         public void onClick(View v) {
             Intent intent = new Intent();
             intent.setClass(PenroserOptions.this, PenroserColorPicker.class);
-            intent.putExtra("rhombus", v.getId());
+            intent.putExtra("rhombus", ((HalfRhombusButton)v).getRhombusType());
             intent.putExtra("color", ((HalfRhombusButton)v).getColor());
             intent.putExtra("sharedPrefName", getSharedPreferenceName());
-            startActivityForResult(intent, v.getId());
+            startActivityForResult(intent, ((HalfRhombusButton)v).getRhombusType().index);
         }
     };
 

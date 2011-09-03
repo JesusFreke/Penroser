@@ -29,10 +29,10 @@
 package org.jf.Penroser;
 
 public enum HalfRhombusType {
-    LEFT_SKINNY(0, 0, 0, "left_skinny_color"),
-    RIGHT_SKINNY(1, 0, 0x7296d1, "right_skinny_color"),
-    LEFT_FAT(0, 1, 0x7296d1, "left_fat_color"),
-    RIGHT_FAT(1, 1, 0, "right_fat_color");
+    LEFT_SKINNY(0, 0, 0, "left_skinny_color", R.id.left_skinny),
+    RIGHT_SKINNY(1, 0, 0x7296d1, "right_skinny_color", R.id.right_skinny),
+    LEFT_FAT(0, 1, 0x7296d1, "left_fat_color", R.id.left_fat),
+    RIGHT_FAT(1, 1, 0, "right_fat_color", R.id.right_fat);
 
     //allocate a static array of all types so we can avoid calling the values() method on the enum (which does an array allocation)
     private static final HalfRhombusType[] types = new HalfRhombusType[] {LEFT_SKINNY, RIGHT_SKINNY, LEFT_FAT, RIGHT_FAT};
@@ -49,8 +49,9 @@ public enum HalfRhombusType {
     public final int defaultColor;
     public final String colorKey;
     public final float aspectRatio;
+    public final int viewId;
 
-    private HalfRhombusType(int side, int type, int defaultColor, String colorKey) {
+    private HalfRhombusType(int side, int type, int defaultColor, String colorKey, int viewId) {
         assert side==LEFT || side==RIGHT;
         assert type==SKINNY || type == FAT;
 
@@ -60,6 +61,7 @@ public enum HalfRhombusType {
         this.defaultColor = defaultColor;
         this.colorKey = colorKey;
         this.aspectRatio = getAspectRatio(type);
+        this.viewId = viewId;
     }
 
     private static float getAspectRatio(int type) {

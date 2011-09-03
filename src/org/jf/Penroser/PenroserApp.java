@@ -37,18 +37,4 @@ public class PenroserApp extends Application {
     //TODO: need to move this to GLContext
     public static final HalfRhombusPool halfRhombusPool = new HalfRhombusPool();
     public static final Random random = new Random();
-
-    public static HalfRhombusType mapRhombusIdToRhombusType(int rhombusId) {
-        switch (rhombusId) {
-            case R.id.left_skinny:
-                return HalfRhombusType.LEFT_SKINNY;
-            case R.id.right_skinny:
-                return HalfRhombusType.RIGHT_SKINNY;
-            case R.id.left_fat:
-                return HalfRhombusType.LEFT_FAT;
-            case R.id.right_fat:
-                return HalfRhombusType.RIGHT_FAT;
-        }
-        return null;
-    }
 }
