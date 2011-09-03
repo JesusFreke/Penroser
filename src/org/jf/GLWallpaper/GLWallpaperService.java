@@ -297,8 +297,6 @@ public abstract class GLWallpaperService extends WallpaperService {
                 if (mGLSurfaceView != null) {
                     mGLSurfaceView.surfaceDestroyed(holder);
                 }
-                mGLSurfaceView = null;
-                pendingOperations.clear();
             }
         }
     }
