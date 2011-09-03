@@ -57,6 +57,8 @@ public class PenroserLiveWallpaper extends GLWallpaperService {
         public PenroserGLEngine() {
             super();
 
+            this.setTouchEventsEnabled(true);
+
             this.setEGLConfigChooser(new GLSurfaceView.EGLConfigChooser() {
                 public EGLConfig chooseConfig(EGL10 egl10, EGLDisplay eglDisplay) {
                     int[] config = new int[]{
