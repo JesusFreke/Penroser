@@ -34,6 +34,7 @@ public enum HalfRhombusType {
     LEFT_FAT(0, 1, 0x7296d1, "left_fat_color"),
     RIGHT_FAT(1, 1, 0, "right_fat_color");
 
+    //allocate a static array of all types so we can avoid calling the values() method on the enum (which does an array allocation)
     private static final HalfRhombusType[] types = new HalfRhombusType[] {LEFT_SKINNY, RIGHT_SKINNY, LEFT_FAT, RIGHT_FAT};
 
     public static final int LEFT = 0;
@@ -45,9 +46,9 @@ public enum HalfRhombusType {
     public final int side;
     public final int type;
     public final int index;
-    //The key into a SharedPreferences object to get the color for this HalfRhombusType
     public final int defaultColor;
     public final String colorKey;
+    public final float aspectRatio;
 
     private HalfRhombusType(int side, int type, int defaultColor, String colorKey) {
         assert side==LEFT || side==RIGHT;
@@ -58,9 +59,22 @@ public enum HalfRhombusType {
         this.index = side | (type<<1);
         this.defaultColor = defaultColor;
         this.colorKey = colorKey;
+        this.aspectRatio = getAspectRatio(type);
     }
 
-    public static HalfRhombusType getType(int side, int type) {
+    private static float getAspectRatio(int type) {
+        if (type == SKINNY) {
+            return (float)(2*Math.sin(18 * 2 * Math.PI/360)/Math.cos(18 * 2 * Math.PI/360));
+        } else {
+            return (float)(2*Math.sin(54 * 2 * Math.PI/360)/Math.cos(54 * 2 * Math.PI/360));
+        }
+    }
+
+    public static HalfRhombusType fromTypeAndSide(int type, int side) {
         return types[side | (type<<1)];
+    }
+
+    public static HalfRhombusType fromIndex(int index) {
+        return types[index];
     }
 }

@@ -37,22 +37,23 @@ import android.graphics.Path;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.widget.Button;
+import static org.jf.Penroser.HalfRhombusType.LEFT;
+import static org.jf.Penroser.HalfRhombusType.RIGHT;
+import static org.jf.Penroser.HalfRhombusType.FAT;
+import static org.jf.Penroser.HalfRhombusType.SKINNY;
 
-public abstract class HalfRhombusButton extends Button {
+public class HalfRhombusButton extends Button {
     private static final String TAG = "HalfRhombusButton";
 
     private static final boolean DEBUG_MEASURE = false;
 
-    public static final int LEFT = 0;
-    public static final int RIGHT = 1;
-
-    private final int side;
+    private final HalfRhombusType rhombusType;
     private final boolean rotated;
     private int color = Color.BLACK;
 
-    public HalfRhombusButton(Context context, int side, boolean rotated) {
+    public HalfRhombusButton(Context context, HalfRhombusType rhombusType, boolean rotated) {
         super(context);
-        this.side = side;
+        this.rhombusType = rhombusType;
         this.rotated = rotated;
     }
 
@@ -64,12 +65,13 @@ public abstract class HalfRhombusButton extends Button {
         super(context, attrs, defStyle);
 
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.HalfRhombusButton);
-        side = typedArray.getInt(R.styleable.HalfRhombusButton_side, 0);
+        rhombusType = HalfRhombusType.fromIndex(typedArray.getInt(R.styleable.HalfRhombusButton_type, 0));
         rotated = typedArray.getBoolean(R.styleable.HalfRhombusButton_rotated, false);
     }
 
-    //The ratio of height/width of this half rhombus
-    protected abstract float getAspectRatio();
+    public HalfRhombusType getRhombusType() {
+        return rhombusType;
+    }
 
     public void setColor(int color) {
         this.color = color;
@@ -82,16 +84,16 @@ public abstract class HalfRhombusButton extends Button {
 
     private int getHeightGivenWidth(int width) {
         if (rotated) {
-            return (int)Math.ceil(width/getAspectRatio());
+            return (int)Math.ceil(width/rhombusType.aspectRatio);
         }
-        return (int)Math.ceil(width*getAspectRatio());
+        return (int)Math.ceil(width*rhombusType.aspectRatio);
     }
 
     private int getWidthGivenHeight(int height) {
         if (rotated) {
-            return (int)Math.ceil(height*getAspectRatio());
+            return (int)Math.ceil(height*rhombusType.aspectRatio);
         }
-        return (int)Math.ceil(height/getAspectRatio());
+        return (int)Math.ceil(height/rhombusType.aspectRatio);
     }
 
     @Override
@@ -107,7 +109,7 @@ public abstract class HalfRhombusButton extends Button {
         int height, width;
         int horizontalOffset, verticalOffset;
 
-        if ((viewRatio < getAspectRatio()) ^ rotated) {
+        if ((viewRatio < rhombusType.aspectRatio) ^ rotated) {
             //we are constrained by the height of the view
             height = getHeight();
             width = getWidthGivenHeight(height);
@@ -133,7 +135,7 @@ public abstract class HalfRhombusButton extends Button {
 
         Path path = new Path();
 
-        if (side == LEFT) {
+        if (rhombusType.side == LEFT) {
             if (rotated) {
                 //we're actually drawing the top element
                 path.moveTo(0+horizontalOffset, verticalOffset + height);

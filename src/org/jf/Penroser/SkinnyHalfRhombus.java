@@ -47,11 +47,11 @@ public class SkinnyHalfRhombus extends HalfRhombus {
     }
 
     public SkinnyHalfRhombus(PenroserContext penroserContext, int level, int side, float x, float y, float scale, int rotation) {
-        super(penroserContext, level, HalfRhombusType.getType(side, SKINNY), x, y, scale, rotation);
+        super(penroserContext, level, HalfRhombusType.fromTypeAndSide(SKINNY, side), x, y, scale, rotation);
     }
 
     public void set(PenroserContext penroserContext, int level, int side, float x, float y, float scale, int rotation) {
-        set(penroserContext, level, HalfRhombusType.getType(side, SKINNY), x, y, scale, rotation);
+        set(penroserContext, level, HalfRhombusType.fromTypeAndSide(SKINNY, side), x, y, scale, rotation);
     }
 
     @Override
