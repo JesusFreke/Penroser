@@ -41,5 +41,11 @@
                                     android:layout_width="fill_parent"
                                     android:layout_height="fill_parent"
                                     android:layout_below="@id/rhombi"/>
+    <Button android:id="@+id/ok"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/ok"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"/>
 
 </RelativeLayout>

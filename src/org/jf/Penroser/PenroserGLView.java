@@ -42,31 +42,14 @@ public class PenroserGLView extends GLSurfaceView implements PenroserGLRenderer.
     private static final String TAG="PenroserGLView";
 
     private PenroserGLRenderer renderer;
-    public final PenroserContext penroserContext;
 
     public PenroserGLView(Context context) {
         super(context);
-
-        if (!(context instanceof PenroserAndroidContext)) {
-            throw new RuntimeException("The Activity hosting a PenroserGLView must implement the PenroserAndroidContext interface");
-        }
-
-        String sharedPrefName = ((PenroserAndroidContext)context).getSharedPreferenceName();
-
-        penroserContext = new PenroserContext(context.getSharedPreferences(sharedPrefName, 0));
         init();
     }
 
     public PenroserGLView(Context context, AttributeSet attrs) {
         super(context, attrs);
-
-        if (!(context instanceof PenroserAndroidContext)) {
-            throw new RuntimeException("The context (Activity/Service) hosting a PenroserGLView must implement the PenroserAndroidContext interface");
-        }
-
-        String sharedPrefName = ((PenroserAndroidContext)context).getSharedPreferenceName();
-
-        penroserContext = new PenroserContext(context.getSharedPreferences(sharedPrefName, 0));
         init();
     }
 
@@ -97,21 +80,17 @@ public class PenroserGLView extends GLSurfaceView implements PenroserGLRenderer.
             }
         });
 
-        renderer = new PenroserGLRenderer(penroserContext, this);
+        renderer = new PenroserGLRenderer(this);
         this.setRenderer(renderer);
         this.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
+    }
+
+    public void setPreferences(PenroserPreferences preferences) {
+        this.renderer.setPreferences(preferences);
     }
 
     @Override
 	public boolean onTouchEvent(MotionEvent event) {
         return renderer.onTouchEvent(event);
 	}
-
-    public void setColor(HalfRhombusType rhombusType, int color) {
-        penroserContext.setRhombusColor(rhombusType, color);
-    }
-
-    public void reloadColors() {
-        renderer.reloadColors();
-    }
 }

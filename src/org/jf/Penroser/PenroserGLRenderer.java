@@ -73,14 +73,17 @@ public class PenroserGLRenderer implements GLSurfaceView.Renderer, MultiTouchCon
 
     private int width, height;
 
-    private PenroserContext penroserContext;
+    private PenroserContext penroserContext = new PenroserContext();
 
-    public PenroserGLRenderer(PenroserContext penroserContext, Callbacks callbacks) {
+    public PenroserGLRenderer(Callbacks callbacks) {
         this.callbacks = callbacks;
-        this.penroserContext = penroserContext;
 
         PenroserApp.halfRhombusPool.initToLevels(0, 0);
         reset();
+    }
+
+    public void setPreferences(PenroserPreferences preferences) {
+        penroserContext.setPreferences(preferences);
     }
 
     private void reset() {
@@ -111,10 +114,6 @@ public class PenroserGLRenderer implements GLSurfaceView.Renderer, MultiTouchCon
         viewport[4] = halfWidth;        viewport[5] = -halfHeight;
         viewport[6] = -halfWidth;       viewport[7] = -halfHeight;
         invertedMatrix.mapPoints(viewport);
-    }
-
-    public void reloadColors() {
-        penroserContext.reloadRhombusColors();
     }
 
     public void onSurfaceCreated(GL10 gl, EGLConfig eglConfig) {

@@ -45,5 +45,11 @@
     <org.jf.Penroser.PenroserGLView android:id="@+id/penroser_view"
                                     android:layout_width="fill_parent"
                                     android:layout_height="fill_parent"/>
+    <Button android:id="@+id/ok"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/ok"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"/>
 
 </LinearLayout>

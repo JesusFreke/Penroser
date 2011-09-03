@@ -35,19 +35,19 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.*;
 
-public class PenroserActivity extends PenroserBaseActivity
-{
-    private SharedPreferences preferences = null;
+public class PenroserActivity extends Activity {
+    private static final String PREFERENCE_NAME = "current_pref_activity";
 
+    private SharedPreferences sharedPreferences = null;
     private PenroserGLView penroserView = null;
+    private PenroserPreferences preferences = new PenroserPreferences();
 
     /** Called when the activity is first created. */
     @Override
-    public void onCreate(Bundle savedInstanceState)
-    {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        preferences = getSharedPreferences("penroser_activity_prefs", 0);
+        sharedPreferences = getSharedPreferences("preferences", MODE_PRIVATE);
 
         requestWindowFeature(Window.FEATURE_NO_TITLE);
 
@@ -56,6 +56,8 @@ public class PenroserActivity extends PenroserBaseActivity
         }
 
         penroserView = new PenroserGLView(this);
+        preferences.setPreferences(new PenroserPreferences(sharedPreferences, PREFERENCE_NAME));
+        penroserView.setPreferences(preferences);
         setContentView(penroserView);
     }
 
@@ -91,6 +93,7 @@ public class PenroserActivity extends PenroserBaseActivity
             case R.id.options:
                 Intent intent = new Intent();
                 intent.setComponent(new ComponentName(this, PenroserOptions.class));
+                intent.putExtra("preferences", preferences);
                 startActivityForResult(intent, 0);
                 return true;
         }
@@ -99,15 +102,20 @@ public class PenroserActivity extends PenroserBaseActivity
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        penroserView.reloadColors();
+        if (resultCode != -1) {
+            PenroserPreferences preferences = data.getExtras().getParcelable("preferences");
+            this.preferences.setPreferences(preferences);
+            this.preferences.saveTo(sharedPreferences, PREFERENCE_NAME);
+            this.penroserView.setPreferences(preferences);
+        }
     }
 
     private boolean getFullScreen() {
-        return preferences.getBoolean("full_screen", false);
+        return sharedPreferences.getBoolean("full_screen", false);
     }
 
     private void setFullScreen(boolean fullScreen) {
-        SharedPreferences.Editor editor = preferences.edit();
+        SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putBoolean("full_screen", fullScreen);
         editor.commit();
     }

@@ -28,8 +28,9 @@
 
 package org.jf.Penroser;
 
-import android.content.SharedPreferences;
+import android.content.*;
 import android.opengl.GLSurfaceView;
+import android.util.Log;
 import android.view.MotionEvent;
 import org.jf.GLWallpaper.GLWallpaperService;
 
@@ -38,8 +39,13 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.egl.EGLDisplay;
 
 public class PenroserLiveWallpaper extends GLWallpaperService {
+    private static final String TAG = "PenroserLiveWallpaper";
+    private static final String PREFERENCE_NAME = "current_pref_wallpaper";
 
-    private PenroserContext penroserContext;
+    /*package*/ static final String WALLPAPER_PREFS_UPDATED = "org.jf.Penroser.wallpaper_prefs_updated";
+
+    private SharedPreferences sharedPreferences;
+    private PenroserPreferences preferences;
 
     public PenroserLiveWallpaper() {
         super();
@@ -47,15 +53,29 @@ public class PenroserLiveWallpaper extends GLWallpaperService {
 
     @Override
     public Engine onCreateEngine() {
-        penroserContext = new PenroserContext(getSharedPreferences("penroser_live_wallpaper_prefs", 0));
+        sharedPreferences = getSharedPreferences("preferences", MODE_PRIVATE);
+        preferences = new PenroserPreferences(sharedPreferences, PREFERENCE_NAME);
         return new PenroserGLEngine();
     }
 
     class PenroserGLEngine extends GLEngine implements PenroserGLRenderer.Callbacks {
-        PenroserGLRenderer renderer = new PenroserGLRenderer(penroserContext, this);
+        PenroserGLRenderer renderer = new PenroserGLRenderer(this);
 
         public PenroserGLEngine() {
             super();
+
+            IntentFilter intentFilter = new IntentFilter(WALLPAPER_PREFS_UPDATED);
+            PenroserLiveWallpaper.this.registerReceiver(new BroadcastReceiver() {
+                        @Override
+                        public void onReceive(Context context, Intent intent) {
+                            Log.d(TAG, "onReceive - " + WALLPAPER_PREFS_UPDATED);
+                            PenroserPreferences preferences = (PenroserPreferences)intent.getExtras().getParcelable("preferences");
+                            PenroserLiveWallpaper.this.preferences.setPreferences(preferences);
+                            renderer.setPreferences(preferences);
+                        }
+                    }, intentFilter);
+
+            renderer.setPreferences(preferences);
 
             this.setTouchEventsEnabled(true);
 
@@ -87,14 +107,6 @@ public class PenroserLiveWallpaper extends GLWallpaperService {
 
             setRenderer(renderer);
             setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
-        }
-
-        @Override
-        public void onVisibilityChanged(boolean visible) {
-            if (visible) {
-                renderer.reloadColors();
-            }
-            super.onVisibilityChanged(visible);
         }
 
         @Override

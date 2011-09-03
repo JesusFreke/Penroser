@@ -45,21 +45,17 @@ class PenroserContext {
     private final float[][] vertices = new float[4][];
     private final HalfRhombusType[][] rhombusTypes = new HalfRhombusType[4][];
 
-    private int[] rhombusColors = new int[4];
-
     private int[] vertexVbos = new int[4];
     private int[] colorVbos = new int[4];
 
     //This is set when the colors are dynamically changed, so that the vbos will be regenerated with the new colors
     private boolean recreateColorVbos = false;
 
-    private final SharedPreferences preferences;
+    private PenroserPreferences preferences = new PenroserPreferences();
 
-    public PenroserContext(SharedPreferences preferences) {
+    public PenroserContext() {
         float[][] vertices = new float[1][];
         HalfRhombusType[][] rhombusTypes = new HalfRhombusType[1][];
-
-        this.preferences = preferences;
 
         SkinnyHalfRhombus.generateVertices(VBO_LEVEL, LEFT, vertices, rhombusTypes);
         this.vertices[0] = vertices[0];
@@ -76,9 +72,6 @@ class PenroserContext {
         FatHalfRhombus.generateVertices(VBO_LEVEL, RIGHT, vertices, rhombusTypes);
         this.vertices[3] = vertices[0];
         this.rhombusTypes[3] = rhombusTypes[0];
-
-        this.rhombusColors = new int[4];
-        reloadRhombusColors();
     }
 
     private static int generateVertexVbo(GL11 gl, int rhombusType, float[] vertices) {
@@ -109,34 +102,13 @@ class PenroserContext {
         return colorVbo;
     }
 
-        public static int getColorForRhombusType(SharedPreferences preferences, HalfRhombusType halfRhombusType) {
-        return preferences.getInt(halfRhombusType.colorKey, halfRhombusType.defaultColor);
-    }
-
-    public void reloadRhombusColors() {
-        rhombusColors[0] = preferences.getInt(HalfRhombusType.LEFT_SKINNY.colorKey, ColorUtil.swapOrder(HalfRhombusType.LEFT_SKINNY.defaultColor));
-        rhombusColors[1] = preferences.getInt(HalfRhombusType.RIGHT_SKINNY.colorKey, ColorUtil.swapOrder(HalfRhombusType.RIGHT_SKINNY.defaultColor));
-        rhombusColors[2] = preferences.getInt(HalfRhombusType.LEFT_FAT.colorKey, ColorUtil.swapOrder(HalfRhombusType.LEFT_FAT.defaultColor));
-        rhombusColors[3] = preferences.getInt(HalfRhombusType.RIGHT_FAT.colorKey, ColorUtil.swapOrder(HalfRhombusType.RIGHT_FAT.defaultColor));
+    public void setPreferences(PenroserPreferences preferences) {
+        this.preferences.setPreferences(preferences);
         this.recreateColorVbos = true;
     }
 
-    public int getRhombusColor(HalfRhombusType rhombusType) {
-        return ColorUtil.swapOrder(rhombusColors[rhombusType.index]);
-    }
-
-    public void setRhombusColor(HalfRhombusType rhombusType, int color) {
-        rhombusColors[rhombusType.index] = ColorUtil.swapOrder(color);
-        this.recreateColorVbos = true;
-    }
-
-    public void storeRhombusColors() {
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putInt(HalfRhombusType.LEFT_SKINNY.colorKey, rhombusColors[0]);
-        editor.putInt(HalfRhombusType.RIGHT_SKINNY.colorKey, rhombusColors[1]);
-        editor.putInt(HalfRhombusType.LEFT_FAT.colorKey, rhombusColors[2]);
-        editor.putInt(HalfRhombusType.RIGHT_FAT.colorKey, rhombusColors[3]);
-        editor.commit();
+    public void saveTo(SharedPreferences sharedPreferences, String sharedPreferenceName) {
+        this.preferences.saveTo(sharedPreferences, sharedPreferenceName);
     }
 
     public void onSurfaceCreated(GL11 gl) {
@@ -175,7 +147,7 @@ class PenroserContext {
 
         for (int i=0; i<rhombusTypes.length; i++) {
             int colorIndex = i*3;
-            int color = ColorUtil.swapOrder(this.getRhombusColor(rhombusTypes[i]));
+            int color = ColorUtil.swapOrder(preferences.getColor(rhombusTypes[i]));
 
             colors[colorIndex] = colors[colorIndex+1] = colors[colorIndex+2] = color;
         }

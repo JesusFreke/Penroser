@@ -30,20 +30,19 @@ package org.jf.Penroser;
 
 import afzkl.development.mColorPicker.views.ColorPickerView;
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
-public class PenroserColorPicker extends PenroserBaseActivity {
+public class PenroserColorPicker extends Activity {
     private ColorPickerView colorPicker;
     private PenroserGLView penroserView;
 
-    private String sharedPrefName;
+    private PenroserPreferences preferences = null;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        sharedPrefName = getIntent().getExtras().getString("sharedPrefName");
 
         setContentView(R.layout.color_picker);
 
@@ -51,13 +50,15 @@ public class PenroserColorPicker extends PenroserBaseActivity {
         penroserView = (PenroserGLView)findViewById(R.id.penroser_view);
 
         final HalfRhombusType rhombusType = (HalfRhombusType)getIntent().getExtras().getSerializable("rhombus");
-        final int color = getIntent().getExtras().getInt("color");
+        preferences = getIntent().getExtras().getParcelable("preferences");
+        penroserView.setPreferences(preferences);
 
-        colorPicker.setColor(color);
+        colorPicker.setColor(preferences.getColor(rhombusType));
 
         colorPicker.setOnColorChangedListener(new ColorPickerView.OnColorChangedListener() {
             public void onColorChanged(int color) {
-                penroserView.setColor(rhombusType, color);
+                preferences.setColor(rhombusType, color);
+                penroserView.setPreferences(preferences);
             }
         });
 
@@ -67,7 +68,9 @@ public class PenroserColorPicker extends PenroserBaseActivity {
 
         okButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                setResult(colorPicker.getColor());
+                Intent intent = new Intent();
+                intent.putExtra("color", colorPicker.getColor());
+                setResult(0, intent);
                 finish();
             }
         });
@@ -87,10 +90,5 @@ public class PenroserColorPicker extends PenroserBaseActivity {
             penroserView.onPause();
         }
         super.onPause();
-    }
-
-    @Override
-    public String getSharedPreferenceName() {
-        return sharedPrefName;
     }
 }

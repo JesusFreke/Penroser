@@ -28,9 +28,39 @@
 
 package org.jf.Penroser;
 
-public class PenroserWallpaperOptions extends PenroserOptions {
+import android.app.Activity;
+import android.content.ComponentName;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Bundle;
+
+public class PenroserWallpaperOptions extends Activity {
+    private static final String PREFERENCE_NAME = "current_pref_wallpaper";
+
+    private SharedPreferences sharedPreferences = null;
+
     @Override
-    public String getSharedPreferenceName() {
-        return "penroser_live_wallpaper_prefs";
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        sharedPreferences = getSharedPreferences("preferences", MODE_PRIVATE);
+
+        Intent intent = new Intent();
+        intent.setComponent(new ComponentName(this, PenroserOptions.class));
+        intent.putExtra("preferences", new PenroserPreferences(sharedPreferences, PREFERENCE_NAME));
+        startActivityForResult(intent, 0);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode != -1) {
+            PenroserPreferences preferences = data.getExtras().getParcelable("preferences");
+            preferences.saveTo(sharedPreferences, PREFERENCE_NAME);
+
+            Intent intent = new Intent(PenroserLiveWallpaper.WALLPAPER_PREFS_UPDATED);
+            intent.putExtra("preferences", preferences);
+            sendBroadcast(intent);
+        }
+        finish();
     }
 }
