@@ -30,11 +30,61 @@ package org.jf.Penroser;
 
 import android.app.Application;
 import android.content.SharedPreferences;
+import android.os.Handler;
 
 import java.util.Random;
+
 
 public class PenroserApp extends Application {
     //TODO: need to move this to GLContext
     public static final HalfRhombusPool halfRhombusPool = new HalfRhombusPool();
     public static final Random random = new Random();
+
+    private Handler handler;
+
+    public PenroserApp() {
+        super();
+
+        handler = new Handler();
+
+        handler.post(new Runnable() {
+            public void run() {
+                attemptUpgrade();
+            }
+        });
+    }
+
+    private void attemptUpgrade() {
+        SharedPreferences oldPreferences = getApplicationContext().getSharedPreferences("penroser_live_wallpaper_prefs", MODE_PRIVATE);
+        SharedPreferences newPreferences = getApplicationContext().getSharedPreferences("preferences", MODE_PRIVATE);
+
+        if (oldPreferences.contains("left_skinny_color")) {
+            PenroserPreferences preferences = new PenroserPreferences();
+            for (HalfRhombusType rhombusType: HalfRhombusType.values()) {
+                preferences.setColor(rhombusType, ColorUtil.swapOrder(oldPreferences.getInt(rhombusType.colorKey, rhombusType.defaultColor)));
+            }
+            preferences.saveTo(newPreferences, PenroserLiveWallpaper.PREFERENCE_NAME);
+            oldPreferences.edit().clear().commit();
+        }
+
+        oldPreferences = getApplicationContext().getSharedPreferences("penroser_activity_prefs", MODE_PRIVATE);
+        boolean clearPref = false;
+        if (oldPreferences.contains("left_skinny_color")) {
+            PenroserPreferences preferences = new PenroserPreferences();
+            for (HalfRhombusType rhombusType: HalfRhombusType.values()) {
+                preferences.setColor(rhombusType, ColorUtil.swapOrder(oldPreferences.getInt(rhombusType.colorKey, rhombusType.defaultColor)));
+            }
+            preferences.saveTo(newPreferences, PenroserActivity.PREFERENCE_NAME);
+            clearPref = true;
+        }
+        if (oldPreferences.contains("full_screen")) {
+            SharedPreferences.Editor editor = newPreferences.edit();
+            editor.putBoolean("full_screen", oldPreferences.getBoolean("full_screen", false));
+            editor.commit();
+            clearPref = true;
+        }
+        if (clearPref) {
+            oldPreferences.edit().clear().commit();
+        }
+    }
 }

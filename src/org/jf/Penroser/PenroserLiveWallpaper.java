@@ -40,7 +40,7 @@ import javax.microedition.khronos.egl.EGLDisplay;
 
 public class PenroserLiveWallpaper extends GLWallpaperService {
     private static final String TAG = "PenroserLiveWallpaper";
-    private static final String PREFERENCE_NAME = "current_pref_wallpaper";
+    public static final String PREFERENCE_NAME = "current_pref_wallpaper";
 
     /*package*/ static final String WALLPAPER_PREFS_UPDATED = "org.jf.Penroser.wallpaper_prefs_updated";
 

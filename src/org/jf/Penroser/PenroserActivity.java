@@ -36,7 +36,7 @@ import android.os.Bundle;
 import android.view.*;
 
 public class PenroserActivity extends Activity {
-    private static final String PREFERENCE_NAME = "current_pref_activity";
+    public static final String PREFERENCE_NAME = "current_pref_activity";
 
     private SharedPreferences sharedPreferences = null;
     private PenroserGLView penroserView = null;
