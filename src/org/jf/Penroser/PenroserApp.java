@@ -36,6 +36,12 @@ import java.util.Random;
 
 
 public class PenroserApp extends Application {
+    /*This is the number of levels to use for the static vbo data*/
+    /*package*/ static final int VBO_LEVEL=5;
+
+    /*The default initial scale, based on the number of levels down that we are pre-generating*/
+    public static final float DEFAULT_INITIAL_SCALE = (float)(500 * Math.pow((Math.sqrt(5)+1)/2, VBO_LEVEL-5));
+
     //TODO: need to move this to GLContext
     public static final HalfRhombusPool halfRhombusPool = new HalfRhombusPool();
     public static final Random random = new Random();

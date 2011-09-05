@@ -39,6 +39,7 @@ public class PenroserPreferences implements Parcelable {
     private static final String TAG = "PenroserPreferences";
 
     private int[] colors = new int[4];
+    private float scale;
 
     public PenroserPreferences() {
         initDefault();
@@ -63,12 +64,14 @@ public class PenroserPreferences implements Parcelable {
         for (int i=0; i<4; i++) {
             colors[i] = preferences.colors[i];
         }
+        this.scale = preferences.scale;
     }
 
     private void initDefault() {
         for (HalfRhombusType type: HalfRhombusType.values()) {
             colors[type.index] = type.defaultColor;
         }
+        scale = PenroserApp.DEFAULT_INITIAL_SCALE;
     }
 
     private void initFromJson(String jsonString) throws JSONException {
@@ -76,6 +79,7 @@ public class PenroserPreferences implements Parcelable {
         for (HalfRhombusType type: HalfRhombusType.values()) {
             colors[type.index] = json.optInt(type.colorKey, type.defaultColor);
         }
+        scale = (float)json.optDouble("scale", PenroserApp.DEFAULT_INITIAL_SCALE);
     }
 
     public int getColor(HalfRhombusType type) {
@@ -86,12 +90,21 @@ public class PenroserPreferences implements Parcelable {
         colors[type.index] = color;
     }
 
+    public float getScale() {
+        return scale;
+    }
+
+    public void setScale(float scale) {
+        this.scale = scale;
+    }
+
     public void saveTo(SharedPreferences sharedPreferences, String savedPreferenceName) {
         JSONObject object = new JSONObject();
         try {
             for (HalfRhombusType type: HalfRhombusType.values()) {
                 object.put(type.colorKey, colors[type.index]);
             }
+            object.put("scale", scale);
         } catch (JSONException ex) {
             Log.e(TAG, "Error creating JSON object for preferences", ex);
             return;
@@ -110,6 +123,7 @@ public class PenroserPreferences implements Parcelable {
         for (int i=0; i<colors.length; i++) {
             out.writeInt(colors[i]);
         }
+        out.writeFloat(scale);
     }
 
     public static final Parcelable.Creator<PenroserPreferences> CREATOR
@@ -127,5 +141,6 @@ public class PenroserPreferences implements Parcelable {
         for (int i=0; i<colors.length; i++) {
             colors[i] = in.readInt();
         }
+        scale = in.readFloat();
     }
 }

@@ -29,6 +29,8 @@
 package org.jf.Penroser;
 
 import android.app.Activity;
+import android.app.WallpaperManager;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -43,9 +45,22 @@ public class PenroserWallpaperOptions extends Activity {
 
         sharedPreferences = getSharedPreferences("preferences", MODE_PRIVATE);
 
+        PenroserPreferences preferences;
+
+        PenroserLiveWallpaper wallpaper = null;
+        if (PenroserLiveWallpaper.theService != null) {
+            wallpaper = PenroserLiveWallpaper.theService.get();
+        }
+
+        if (wallpaper != null) {
+            preferences = wallpaper.getPreferences();
+        } else {
+            preferences = new PenroserPreferences(sharedPreferences, PenroserLiveWallpaper.PREFERENCE_NAME);
+        }
+
         Intent intent = new Intent();
         intent.setComponent(new ComponentName(this, PenroserOptions.class));
-        intent.putExtra("preferences", new PenroserPreferences(sharedPreferences, PenroserLiveWallpaper.PREFERENCE_NAME));
+        intent.putExtra("preferences", preferences);
         startActivityForResult(intent, 0);
     }
 
@@ -54,10 +69,6 @@ public class PenroserWallpaperOptions extends Activity {
         if (resultCode != -1) {
             PenroserPreferences preferences = data.getExtras().getParcelable("preferences");
             preferences.saveTo(sharedPreferences, PenroserLiveWallpaper.PREFERENCE_NAME);
-
-            Intent intent = new Intent(PenroserLiveWallpaper.WALLPAPER_PREFS_UPDATED);
-            intent.putExtra("preferences", preferences);
-            sendBroadcast(intent);
         }
         finish();
     }

@@ -28,7 +28,6 @@
 
 package org.jf.Penroser;
 
-import android.content.SharedPreferences;
 import android.graphics.Matrix;
 import android.graphics.RectF;
 import android.opengl.GLSurfaceView;
@@ -43,9 +42,13 @@ import javax.microedition.khronos.opengles.GL11;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
+import static org.jf.Penroser.PenroserApp.DEFAULT_INITIAL_SCALE;
 
 public class PenroserGLRenderer implements GLSurfaceView.Renderer, MultiTouchController.MultiTouchObjectCanvas<Object> {
     private static final String TAG = "PenroserGLRenderer";
+
+    private static final float MINIMUM_SCALE = .1f * PenroserApp.DEFAULT_INITIAL_SCALE;
+    private static final float MAXIMUM_SCALE = 25f * PenroserApp.DEFAULT_INITIAL_SCALE;
 
     /**
      * Setting this to true causes the drawing logic to change, so that the tiles are kept in the same
@@ -53,8 +56,6 @@ public class PenroserGLRenderer implements GLSurfaceView.Renderer, MultiTouchCon
      */
     private static final boolean DRAW_VIEWPORT = false;
     private static final boolean LOG_DRAWTIMES = false;
-
-    private static final float INITIAL_SCALE = (float)(500 * Math.pow((Math.sqrt(5)+1)/2, PenroserContext.VBO_LEVEL-5));
 
     private final Callbacks callbacks;
 
@@ -82,13 +83,31 @@ public class PenroserGLRenderer implements GLSurfaceView.Renderer, MultiTouchCon
         reset();
     }
 
+    public PenroserPreferences getPreferences() {
+        PenroserPreferences prefs = penroserContext.getPreferences();
+        prefs.setScale(getScale());
+        return prefs;
+    }
+
     public void setPreferences(PenroserPreferences preferences) {
         penroserContext.setPreferences(preferences);
+
+        float currentScale = MatrixUtil.getMatrixScale(currentTransform);
+        float newScale = preferences.getScale();
+        float relativeScale = newScale/currentScale;
+
+        currentTransform.postScale(relativeScale, relativeScale);
     }
 
     private void reset() {
+        float scale = MatrixUtil.getMatrixScale(currentTransform);
+        if (scale < MINIMUM_SCALE) {
+            scale = MINIMUM_SCALE;
+        } else if (scale > MAXIMUM_SCALE) {
+            scale = MAXIMUM_SCALE;
+        }
         currentTransform.reset();
-        currentTransform.postScale(INITIAL_SCALE, INITIAL_SCALE);
+        currentTransform.postScale(scale, scale);
 
         int rhombusType = PenroserApp.random.nextInt(2);
         int rhombusSide = PenroserApp.random.nextInt(2);
@@ -246,8 +265,8 @@ public class PenroserGLRenderer implements GLSurfaceView.Renderer, MultiTouchCon
 
         currentTransform.postTranslate(newObjPosAndScale.getXOff(), newObjPosAndScale.getYOff());
         if (scale != 1) {
-            float newScale = (MatrixUtil.getMatrixScale(currentTransform) * scale) / INITIAL_SCALE;
-            if (newScale >= .1 && newScale <= 25) {
+            float newScale = MatrixUtil.getMatrixScale(currentTransform) * scale;
+            if (newScale >= MINIMUM_SCALE && newScale <= MAXIMUM_SCALE) {
                 currentTransform.postScale(scale, scale);
             }
         }
@@ -261,6 +280,10 @@ public class PenroserGLRenderer implements GLSurfaceView.Renderer, MultiTouchCon
 
         callbacks.requestRender();
         return true;
+    }
+
+    public float getScale() {
+        return MatrixUtil.getMatrixScale(currentTransform);
     }
 
     public void selectObject(Object obj, MultiTouchController.PointInfo touchPoint) {

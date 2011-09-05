@@ -85,6 +85,10 @@ public class PenroserGLView extends GLSurfaceView implements PenroserGLRenderer.
         this.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
     }
 
+    public float getScale() {
+        return renderer.getScale();
+    }
+
     public void setPreferences(PenroserPreferences preferences) {
         this.renderer.setPreferences(preferences);
     }

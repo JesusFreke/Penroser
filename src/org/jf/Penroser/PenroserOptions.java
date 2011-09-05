@@ -30,6 +30,7 @@ package org.jf.Penroser;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
@@ -68,6 +69,7 @@ public class PenroserOptions extends Activity {
         okButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent intent = new Intent();
+                preferences.setScale(penroserView.getScale());
                 intent.putExtra("preferences", preferences);
                 setResult(0, intent);
                 finish();
@@ -79,11 +81,13 @@ public class PenroserOptions extends Activity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode != -1) {
             int rhombusIndex = requestCode;
-            int color = data.getExtras().getInt("color");
+            PenroserPreferences preferences = data.getExtras().getParcelable("preferences");
 
             HalfRhombusType rhombusType = HalfRhombusType.fromIndex(rhombusIndex);
 
-            preferences.setColor(rhombusType, color);
+            int color = preferences.getColor(rhombusType);
+            preferences.setColor(rhombusType, preferences.getColor(rhombusType));
+            this.preferences.setPreferences(preferences);
             penroserView.setPreferences(preferences);
 
             HalfRhombusButton button = halfRhombusButtons[rhombusIndex];
@@ -118,6 +122,7 @@ public class PenroserOptions extends Activity {
             Intent intent = new Intent();
             intent.setClass(PenroserOptions.this, PenroserColorPicker.class);
             intent.putExtra("rhombus", ((HalfRhombusButton)v).getRhombusType());
+            preferences.setScale(penroserView.getScale());
             intent.putExtra("preferences", preferences);
             startActivityForResult(intent, ((HalfRhombusButton)v).getRhombusType().index);
         }

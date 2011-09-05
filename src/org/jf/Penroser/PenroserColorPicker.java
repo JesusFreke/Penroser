@@ -58,6 +58,7 @@ public class PenroserColorPicker extends Activity {
         colorPicker.setOnColorChangedListener(new ColorPickerView.OnColorChangedListener() {
             public void onColorChanged(int color) {
                 preferences.setColor(rhombusType, color);
+                preferences.setScale(penroserView.getScale());
                 penroserView.setPreferences(preferences);
             }
         });
@@ -69,7 +70,8 @@ public class PenroserColorPicker extends Activity {
         okButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent intent = new Intent();
-                intent.putExtra("color", colorPicker.getColor());
+                preferences.setScale(penroserView.getScale());
+                intent.putExtra("preferences", preferences);
                 setResult(0, intent);
                 finish();
             }

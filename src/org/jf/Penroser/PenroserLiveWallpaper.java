@@ -37,12 +37,14 @@ import org.jf.GLWallpaper.GLWallpaperService;
 import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.egl.EGLDisplay;
+import java.lang.ref.WeakReference;
 
 public class PenroserLiveWallpaper extends GLWallpaperService {
     private static final String TAG = "PenroserLiveWallpaper";
     public static final String PREFERENCE_NAME = "current_pref_wallpaper";
 
-    /*package*/ static final String WALLPAPER_PREFS_UPDATED = "org.jf.Penroser.wallpaper_prefs_updated";
+    public static WeakReference<PenroserLiveWallpaper> theService = null;
+    private static WeakReference<PenroserGLEngine> theEngine = null;
 
     private SharedPreferences sharedPreferences;
     private PenroserPreferences preferences;
@@ -51,29 +53,48 @@ public class PenroserLiveWallpaper extends GLWallpaperService {
         super();
     }
 
-    @Override
-    public Engine onCreateEngine() {
-        sharedPreferences = getSharedPreferences("preferences", MODE_PRIVATE);
-        preferences = new PenroserPreferences(sharedPreferences, PREFERENCE_NAME);
-        return new PenroserGLEngine();
+    public PenroserPreferences getPreferences() {
+        PenroserGLEngine engine = theEngine.get();
+        if (engine == null) {
+            return new PenroserPreferences(sharedPreferences, PenroserLiveWallpaper.PREFERENCE_NAME);
+        }
+        return engine.getPreferences();
     }
 
+    @Override
+    public void onCreate() {
+        sharedPreferences = getSharedPreferences("preferences", MODE_PRIVATE);
+        theService = new WeakReference<PenroserLiveWallpaper>(this);
+        super.onCreate();
+    }
+
+    @Override
+    public void onDestroy() {
+        if (theService != null) {
+            theService.clear();
+            theService = null;
+        }
+        if (theEngine != null) {
+            theEngine.clear();
+            theEngine = null;
+        }
+        super.onDestroy();
+    }
+
+    @Override
+    public Engine onCreateEngine() {
+        preferences = new PenroserPreferences(sharedPreferences, PREFERENCE_NAME);
+        PenroserGLEngine engine = new PenroserGLEngine();
+        theEngine = new WeakReference<PenroserGLEngine>(engine);
+        return engine;
+    }
+
+
     class PenroserGLEngine extends GLEngine implements PenroserGLRenderer.Callbacks {
-        PenroserGLRenderer renderer = new PenroserGLRenderer(this);
+        private PenroserGLRenderer renderer = new PenroserGLRenderer(this);
 
         public PenroserGLEngine() {
             super();
-
-            IntentFilter intentFilter = new IntentFilter(WALLPAPER_PREFS_UPDATED);
-            PenroserLiveWallpaper.this.registerReceiver(new BroadcastReceiver() {
-                        @Override
-                        public void onReceive(Context context, Intent intent) {
-                            Log.d(TAG, "onReceive - " + WALLPAPER_PREFS_UPDATED);
-                            PenroserPreferences preferences = (PenroserPreferences)intent.getExtras().getParcelable("preferences");
-                            PenroserLiveWallpaper.this.preferences.setPreferences(preferences);
-                            renderer.setPreferences(preferences);
-                        }
-                    }, intentFilter);
 
             renderer.setPreferences(preferences);
 
@@ -107,6 +128,30 @@ public class PenroserLiveWallpaper extends GLWallpaperService {
 
             setRenderer(renderer);
             setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
+        }
+
+        public PenroserPreferences getPreferences() {
+            return renderer.getPreferences();
+        }
+
+        @Override
+        public void onDestroy() {
+            if (theEngine != null) {
+                theEngine.clear();
+                theEngine = null;
+            }
+        }
+
+        @Override
+        public void onVisibilityChanged(boolean visible) {
+            if (!visible) {
+                preferences.setScale(renderer.getScale());
+                preferences.saveTo(sharedPreferences, PenroserLiveWallpaper.PREFERENCE_NAME);
+            } else {
+                preferences.setPreferences(new PenroserPreferences(sharedPreferences, PenroserLiveWallpaper.PREFERENCE_NAME));
+                renderer.setPreferences(preferences);
+            }
+            super.onVisibilityChanged(visible);
         }
 
         @Override

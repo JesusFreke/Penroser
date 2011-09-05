@@ -73,6 +73,8 @@ public class PenroserActivity extends Activity {
     protected void onPause() {
         if (penroserView != null) {
             penroserView.onPause();
+            preferences.setScale(penroserView.getScale());
+            preferences.saveTo(sharedPreferences, PenroserActivity.PREFERENCE_NAME);
         }
         super.onPause();
     }
@@ -93,6 +95,7 @@ public class PenroserActivity extends Activity {
             case R.id.options:
                 Intent intent = new Intent();
                 intent.setComponent(new ComponentName(this, PenroserOptions.class));
+                preferences.setScale(penroserView.getScale());
                 intent.putExtra("preferences", preferences);
                 startActivityForResult(intent, 0);
                 return true;

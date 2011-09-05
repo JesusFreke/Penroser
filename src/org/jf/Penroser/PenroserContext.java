@@ -37,11 +37,9 @@ import static org.jf.Penroser.HalfRhombusType.LEFT;
 import static org.jf.Penroser.HalfRhombusType.RIGHT;
 import static org.jf.Penroser.HalfRhombusType.FAT;
 import static org.jf.Penroser.HalfRhombusType.SKINNY;
+import static org.jf.Penroser.PenroserApp.VBO_LEVEL;
 
 class PenroserContext {
-    /*This is the number of levels to use for the static vbo data*/
-    /*package*/ static final int VBO_LEVEL=5;
-
     private final float[][] vertices = new float[4][];
     private final HalfRhombusType[][] rhombusTypes = new HalfRhombusType[4][];
 
@@ -100,6 +98,12 @@ class PenroserContext {
         gl.glBindBuffer(GL11.GL_ARRAY_BUFFER, 0);
 
         return colorVbo;
+    }
+
+    public PenroserPreferences getPreferences() {
+        PenroserPreferences prefs = new PenroserPreferences();
+        prefs.setPreferences(preferences);
+        return prefs;
     }
 
     public void setPreferences(PenroserPreferences preferences) {
