@@ -33,6 +33,9 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.ContextMenu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
@@ -43,6 +46,8 @@ public class PenroserOptions extends Activity {
     private PenroserPreferences preferences = null;
 
     private Handler handler = new Handler();
+
+    private Integer copiedColor = null;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,6 +64,8 @@ public class PenroserOptions extends Activity {
             HalfRhombusButton button = (HalfRhombusButton)findViewById(rhombusType.viewId);
             button.setOnClickListener(rhombusClickListener);
             button.setColor(preferences.getColor(rhombusType));
+
+            registerForContextMenu(button);
 
             halfRhombusButtons[rhombusType.index] = button;
         }
@@ -86,7 +93,6 @@ public class PenroserOptions extends Activity {
             HalfRhombusType rhombusType = HalfRhombusType.fromIndex(rhombusIndex);
 
             int color = preferences.getColor(rhombusType);
-            preferences.setColor(rhombusType, preferences.getColor(rhombusType));
             this.preferences.setPreferences(preferences);
             penroserView.setPreferences(preferences);
 
@@ -115,6 +121,41 @@ public class PenroserOptions extends Activity {
             penroserView.onPause();
         }
         super.onPause();
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.color_context, menu);
+        if (copiedColor == null) {
+            MenuItem pasteItem = menu.findItem(R.id.paste_color);
+            pasteItem.setEnabled(false);
+        }
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        HalfRhombusButton halfRhombusButton = (HalfRhombusButton)item.getMenuInfo();
+        switch (item.getItemId()) {
+            case R.id.edit_color:
+                halfRhombusButton.performClick();
+                return true;
+            case R.id.copy_color:
+                this.copiedColor = halfRhombusButton.getColor();
+                return true;
+            case R.id.paste_color:
+                if (copiedColor != null) {
+                    halfRhombusButton.setColor(this.copiedColor);
+
+                    preferences.setColor(halfRhombusButton.getRhombusType(), this.copiedColor);
+                    preferences.setScale(penroserView.getScale());
+                    penroserView.setPreferences(preferences);
+                }
+                return true;
+        }
+        return super.onContextItemSelected(item);
     }
 
     private final View.OnClickListener rhombusClickListener = new View.OnClickListener() {

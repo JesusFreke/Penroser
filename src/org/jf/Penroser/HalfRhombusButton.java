@@ -36,13 +36,14 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.widget.Button;
 import static org.jf.Penroser.HalfRhombusType.LEFT;
 import static org.jf.Penroser.HalfRhombusType.RIGHT;
 import static org.jf.Penroser.HalfRhombusType.FAT;
 import static org.jf.Penroser.HalfRhombusType.SKINNY;
 
-public class HalfRhombusButton extends Button {
+public class HalfRhombusButton extends Button implements ContextMenu.ContextMenuInfo {
     private static final String TAG = "HalfRhombusButton";
 
     private static final boolean DEBUG_MEASURE = false;
@@ -67,6 +68,11 @@ public class HalfRhombusButton extends Button {
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.HalfRhombusButton);
         rhombusType = HalfRhombusType.fromIndex(typedArray.getInt(R.styleable.HalfRhombusButton_type, 0));
         rotated = typedArray.getBoolean(R.styleable.HalfRhombusButton_rotated, false);
+    }
+
+    @Override
+    protected ContextMenu.ContextMenuInfo getContextMenuInfo() {
+        return this;
     }
 
     public HalfRhombusType getRhombusType() {

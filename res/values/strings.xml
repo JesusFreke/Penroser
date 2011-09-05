@@ -7,4 +7,7 @@
     <string name="options">Options</string>
     <string name="choose_colors">Choose Colors</string>
     <string name="ok">OK</string>
+    <string name="edit_color">Edit Color</string>
+    <string name="copy_color">Copy Color</string>
+    <string name="paste_color">Paste Color</string>
 </resources>
