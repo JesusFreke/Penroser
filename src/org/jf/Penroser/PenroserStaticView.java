@@ -89,6 +89,8 @@ public class PenroserStaticView extends View {
 
     public void setPreferences(PenroserPreferences preferences) {
         this.preferences = preferences;
+        this.bitmap = null;
+        this.invalidate();
     }
 
     public PenroserPreferences getPreferences() {
