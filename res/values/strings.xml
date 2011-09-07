@@ -11,4 +11,7 @@
     <string name="copy_color">Copy Color</string>
     <string name="paste_color">Paste Color</string>
     <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
+    <string name="make_copy">Make Copy</string>
+    <string name="save_as_new">Save as New</string>
 </resources>

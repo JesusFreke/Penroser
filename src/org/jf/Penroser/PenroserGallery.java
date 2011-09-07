@@ -34,8 +34,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.TypedValue;
-import android.view.View;
-import android.view.ViewGroup;
+import android.view.*;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
@@ -99,6 +98,8 @@ public class PenroserGallery extends Activity {
         sharedPreferences = getSharedPreferences("preferences", MODE_PRIVATE);
         String savedPrefsJson = sharedPreferences.getString("saved", null);
 
+        registerForContextMenu(gallery);
+
         int previewSize = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 180, getResources().getDisplayMetrics());
         for (PenroserPreferences preferences: parseSavedPreferences(savedPrefsJson)) {
             PenroserStaticView staticView = new PenroserStaticView(this);
@@ -109,6 +110,8 @@ public class PenroserGallery extends Activity {
 
         Button okButton = (Button)findViewById(R.id.ok);
         Button editButton = (Button)findViewById(R.id.edit);
+
+        final View currentColorsView = getLayoutInflater().inflate(R.layout.gallery_current_item, null);
 
         setResult(-1);
 
@@ -146,6 +149,7 @@ public class PenroserGallery extends Activity {
 
         gallery.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                openContextMenu(view);
             }
         });
 
@@ -170,7 +174,7 @@ public class PenroserGallery extends Activity {
                 View view;
 
                 if (position == 0) {
-                    view = getLayoutInflater().inflate(R.layout.gallery_current_item, null);
+                    view = currentColorsView;
                 } else {
                     view = savedPreferences.get(position-1);
                 }
@@ -182,6 +186,30 @@ public class PenroserGallery extends Activity {
                 return view;
             }
         });
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.gallery_context, menu);
+
+        if (((AdapterView.AdapterContextMenuInfo)menuInfo).position == 0) {
+            MenuItem copyItem = menu.findItem(R.id.make_copy);
+            copyItem.setTitle(R.string.save_as_new);
+
+            MenuItem deleteItem = menu.findItem(R.id.delete);
+            deleteItem.setEnabled(false);
+
+            MenuItem editItem = menu.findItem(R.id.edit);
+            editItem.setEnabled(false);
+        }
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        return super.onContextItemSelected(item);
     }
 
     @Override
