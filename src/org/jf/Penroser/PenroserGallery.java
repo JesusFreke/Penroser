@@ -32,7 +32,6 @@ import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.View;
@@ -41,7 +40,6 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.Gallery;
-import org.jf.GLPixelBuffer.GLPixelBuffer;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -55,7 +53,13 @@ public class PenroserGallery extends Activity {
     private SharedPreferences sharedPreferences;
     private PenroserPreferences currentPreferences;
 
+    private List<PenroserStaticView> savedPreferences = new ArrayList<PenroserStaticView>();
+
     private PenroserPreferences[] parseSavedPreferences(String savedPreferencesJson) {
+        if (savedPreferencesJson == null) {
+            return new PenroserPreferences[0];
+        }
+
         JSONArray jsonArray;
         try {
             jsonArray = new JSONArray(savedPreferencesJson);
@@ -64,7 +68,6 @@ public class PenroserGallery extends Activity {
         }
 
         List<PenroserPreferences> prefs = new ArrayList<PenroserPreferences>();
-
 
         for (int i=0; i<jsonArray.length(); i++) {
             try {
@@ -96,7 +99,13 @@ public class PenroserGallery extends Activity {
         sharedPreferences = getSharedPreferences("preferences", MODE_PRIVATE);
         String savedPrefsJson = sharedPreferences.getString("saved", null);
 
-        final PenroserPreferences[] savedPreferences = parseSavedPreferences(savedPrefsJson);
+        int previewSize = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 180, getResources().getDisplayMetrics());
+        for (PenroserPreferences preferences: parseSavedPreferences(savedPrefsJson)) {
+            PenroserStaticView staticView = new PenroserStaticView(this);
+            staticView.setPreferences(preferences);
+            staticView.prerender(previewSize, previewSize);
+            savedPreferences.add(staticView);
+        }
 
         Button okButton = (Button)findViewById(R.id.ok);
         Button editButton = (Button)findViewById(R.id.edit);
@@ -122,25 +131,12 @@ public class PenroserGallery extends Activity {
             }
         });
 
-        final Bitmap[] images = new Bitmap[savedPreferences.length];
-
-        final GLPixelBuffer glPixelBuffer = new GLPixelBuffer();
-        final PenroserStaticView[] previewViews = new PenroserStaticView[savedPreferences.length];
-        for (int i=0; i<savedPreferences.length; i++) {
-            PenroserStaticView staticView = new PenroserStaticView(PenroserGallery.this);
-            staticView.setPreferences(new PenroserPreferences(savedPreferences[i]));
-            int previewSize = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 180, getResources().getDisplayMetrics());
-
-            staticView.prerender(previewSize, previewSize);
-            previewViews[i] = staticView;
-        }
-
         gallery.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if (position == 0) {
                     penroserView.setPreferences(currentPreferences);
                 } else {
-                    penroserView.setPreferences(previewViews[position-1].getPreferences());
+                    penroserView.setPreferences(savedPreferences.get(position-1).getPreferences());
                 }
             }
 
@@ -155,14 +151,14 @@ public class PenroserGallery extends Activity {
 
         gallery.setAdapter(new BaseAdapter() {
             public int getCount() {
-                return savedPreferences.length + 1;
+                return savedPreferences.size() + 1;
             }
 
             public Object getItem(int position) {
                 if (position == 0) {
                     return currentPreferences;
                 } else {
-                    return previewViews[position-1].getPreferences();
+                    return savedPreferences.get(position-1).getPreferences();
                 }
             }
 
@@ -176,7 +172,7 @@ public class PenroserGallery extends Activity {
                 if (position == 0) {
                     view = getLayoutInflater().inflate(R.layout.gallery_current_item, null);
                 } else {
-                    view = previewViews[position-1];
+                    view = savedPreferences.get(position-1);
                 }
 
                 int previewSize = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 180, getResources().getDisplayMetrics());
@@ -196,6 +192,4 @@ public class PenroserGallery extends Activity {
             this.gallery.setSelection(0);
         }
     }
-
-
 }
