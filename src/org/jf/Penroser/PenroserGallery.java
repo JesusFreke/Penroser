@@ -83,6 +83,14 @@ public class PenroserGallery extends Activity {
         return prefArray;
     }
 
+    private String deparseSavedPreferences() {
+        JSONArray jsonArray = new JSONArray();
+        for (PenroserStaticView penroserStaticView: savedPreferences) {
+            jsonArray.put(penroserStaticView.getPreferences().toJsonObject());
+        }
+        return jsonArray.toString();
+    }
+
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
@@ -121,6 +129,12 @@ public class PenroserGallery extends Activity {
                 PenroserPreferences preferences = penroserView.getPreferences();
                 intent.putExtra("preferences", preferences);
                 setResult(0, intent);
+
+                String prefJson = deparseSavedPreferences();
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putString("saved", prefJson);
+                editor.commit();
+
                 finish();
             }
         });
@@ -209,15 +223,40 @@ public class PenroserGallery extends Activity {
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo menuInfo = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
+        switch (item.getItemId()) {
+            case R.id.edit:
+                Intent intent = new Intent();
+                intent.setClass(PenroserGallery.this, PenroserColorOptions.class);
+                intent.putExtra("preferences", penroserView.getPreferences());
+                startActivityForResult(intent, 1);
+                return true;
+            case R.id.make_copy:
+                return true;
+            case R.id.delete:
+                return true;
+        }
+
         return super.onContextItemSelected(item);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode != -1) {
-            PenroserPreferences preferences = data.getExtras().getParcelable("preferences");
-            currentPreferences = preferences;
-            this.gallery.setSelection(0);
+        if (requestCode == 0) {
+            //clicked the edit button
+            if (resultCode != -1) {
+                PenroserPreferences preferences = data.getExtras().getParcelable("preferences");
+                currentPreferences = preferences;
+                this.gallery.setSelection(0);
+            }
+        } else if (requestCode == 1) {
+            if (resultCode != -1) {
+                int position = gallery.getSelectedItemPosition();
+                PenroserPreferences preferences = data.getExtras().getParcelable("preferences");
+                //clicked the edit entry in a gallery context menu
+                savedPreferences.get(position-1).setPreferences(preferences);
+                penroserView.setPreferences(preferences);
+            }
         }
     }
 }
