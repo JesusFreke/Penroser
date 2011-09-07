@@ -111,6 +111,8 @@ public class PenroserGLRenderer implements GLSurfaceView.Renderer, MultiTouchCon
         currentTransform.reset();
         currentTransform.postScale(scale, scale);
 
+        lastDraw = 0;
+
         int rhombusType = PenroserApp.random.nextInt(2);
         int rhombusSide = PenroserApp.random.nextInt(2);
         if (rhombusType == 0) {
