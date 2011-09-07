@@ -244,6 +244,16 @@ public class PenroserGallery extends Activity {
                 gallery.setSelection(savedPreferences.size(), true);
                 return true;
             case R.id.delete:
+                savedPreferences.remove(menuInfo.position-1);
+                ((BaseAdapter)gallery.getAdapter()).notifyDataSetChanged();
+                if (menuInfo.position <= savedPreferences.size()) {
+                    gallery.setSelection(0, true);
+                    gallery.setSelection(menuInfo.position, true);
+                }
+                else {
+                    gallery.setSelection(0, true);
+                    gallery.setSelection(menuInfo.position-1, true);
+                }
                 return true;
         }
 
