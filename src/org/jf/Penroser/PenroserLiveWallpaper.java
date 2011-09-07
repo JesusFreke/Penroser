@@ -54,7 +54,10 @@ public class PenroserLiveWallpaper extends GLWallpaperService {
     }
 
     public PenroserPreferences getPreferences() {
-        PenroserGLEngine engine = theEngine.get();
+        PenroserGLEngine engine = null;
+        if (theEngine != null) {
+            engine = theEngine.get();
+        }
         if (engine == null) {
             return new PenroserPreferences(sharedPreferences, PenroserLiveWallpaper.PREFERENCE_NAME);
         }
