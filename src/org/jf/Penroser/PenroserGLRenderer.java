@@ -42,6 +42,8 @@ import javax.microedition.khronos.opengles.GL11;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
+import java.util.concurrent.Semaphore;
+
 import static org.jf.Penroser.PenroserApp.DEFAULT_INITIAL_SCALE;
 
 public class PenroserGLRenderer implements GLSurfaceView.Renderer, MultiTouchController.MultiTouchObjectCanvas<Object> {
@@ -164,75 +166,92 @@ public class PenroserGLRenderer implements GLSurfaceView.Renderer, MultiTouchCon
         gl.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     }
 
+    private static Semaphore renderSemaphore = new Semaphore(1, true);
+
     private float[] androidMatrixValues = new float[9];
     private float[] glMatrixValues = new float[16];
     private float[] velocities = new float[2];
     public void onDrawFrame(GL10 gl) {
-        long start = System.nanoTime();
-        int num=0;
-        if (gl instanceof GL11) {
-            GL11 gl11 = (GL11)gl;
+        boolean retryAcquire;
 
-            gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
-
-            gl.glPushMatrix();
-
-            if (lastDraw != 0 && !momentumController.touchActive()) {
-                float seconds = (start-lastDraw)/1E9f;
-                momentumController.getVelocities(start, velocities);
-                currentTransform.postTranslate(seconds*velocities[0], seconds*velocities[1]);
+        do {
+            retryAcquire = false;
+            try {
+                renderSemaphore.acquire();
+            } catch (InterruptedException ex) {
+                retryAcquire = true;
             }
-            lastDraw = start;
+        } while (retryAcquire);
 
-            if (DRAW_VIEWPORT) {
-                gl.glScalef(100, 100, 0);
-            } else {
-                currentTransform.getValues(androidMatrixValues);
-                MatrixUtil.convertMatrix(androidMatrixValues, glMatrixValues);
-                gl.glMultMatrixf(glMatrixValues, 0);
-            }
+        try {
+            long start = System.nanoTime();
+            int num=0;
+            if (gl instanceof GL11) {
+                GL11 gl11 = (GL11)gl;
 
-            calculateViewport();
+                gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 
-            int intersectingEdges = halfRhombus.getIntersectingEdges(viewport);
-            while (intersectingEdges != 0) {
-                if ((intersectingEdges & 1) != 0) {
-                    int parentType = halfRhombus.getRandomParentType(0);
-                    halfRhombus = halfRhombus.getParent(parentType);
-                } else if ((intersectingEdges & 2) != 0) {
-                    int parentType = halfRhombus.getRandomParentType(1);
-                    halfRhombus = halfRhombus.getParent(parentType);
+                gl.glPushMatrix();
+
+                if (lastDraw != 0 && !momentumController.touchActive()) {
+                    float seconds = (start-lastDraw)/1E9f;
+                    momentumController.getVelocities(start, velocities);
+                    currentTransform.postTranslate(seconds*velocities[0], seconds*velocities[1]);
+                }
+                lastDraw = start;
+
+                if (DRAW_VIEWPORT) {
+                    gl.glScalef(100, 100, 0);
                 } else {
-                    int parentType = halfRhombus.getRandomParentType(2);
-                    halfRhombus = halfRhombus.getParent(parentType);
+                    currentTransform.getValues(androidMatrixValues);
+                    MatrixUtil.convertMatrix(androidMatrixValues, glMatrixValues);
+                    gl.glMultMatrixf(glMatrixValues, 0);
                 }
 
-                intersectingEdges = halfRhombus.getIntersectingEdges(viewport);
-                Log.v(TAG, "Generated parent: level = " + halfRhombus.level);
+                calculateViewport();
+
+                int intersectingEdges = halfRhombus.getIntersectingEdges(viewport);
+                while (intersectingEdges != 0) {
+                    if ((intersectingEdges & 1) != 0) {
+                        int parentType = halfRhombus.getRandomParentType(0);
+                        halfRhombus = halfRhombus.getParent(parentType);
+                    } else if ((intersectingEdges & 2) != 0) {
+                        int parentType = halfRhombus.getRandomParentType(1);
+                        halfRhombus = halfRhombus.getParent(parentType);
+                    } else {
+                        int parentType = halfRhombus.getRandomParentType(2);
+                        halfRhombus = halfRhombus.getParent(parentType);
+                    }
+
+                    intersectingEdges = halfRhombus.getIntersectingEdges(viewport);
+                    Log.v(TAG, "Generated parent: level = " + halfRhombus.level);
+                }
+
+                PenroserApp.halfRhombusPool.initToLevels(halfRhombus.level, 0);
+
+
+                viewportEnvelope.left = MathUtil.min(viewport[0], viewport[2], viewport[4], viewport[6]);
+                viewportEnvelope.top = MathUtil.min(viewport[1], viewport[3], viewport[5], viewport[7]);
+                viewportEnvelope.right = MathUtil.max(viewport[0], viewport[2], viewport[4], viewport[6]);
+                viewportEnvelope.bottom = MathUtil.max(viewport[1], viewport[3], viewport[5], viewport[7]);
+                num += halfRhombus.draw(gl11, viewportEnvelope, level);
+                if (num == 0) {
+                    Log.e(TAG, "Oops, the viewport somehow got out of the drawn region. Resetting viewport and tiling");
+                    reset();
+                }
+
+                if (DRAW_VIEWPORT) {
+                    drawViewport(gl11, viewport);
+                }
+
+                gl.glPopMatrix();
             }
-
-            PenroserApp.halfRhombusPool.initToLevels(halfRhombus.level, 0);
-
-
-            viewportEnvelope.left = MathUtil.min(viewport[0], viewport[2], viewport[4], viewport[6]);
-            viewportEnvelope.top = MathUtil.min(viewport[1], viewport[3], viewport[5], viewport[7]);
-            viewportEnvelope.right = MathUtil.max(viewport[0], viewport[2], viewport[4], viewport[6]);
-            viewportEnvelope.bottom = MathUtil.max(viewport[1], viewport[3], viewport[5], viewport[7]);
-            num += halfRhombus.draw(gl11, viewportEnvelope, level);
-            if (num == 0) {
-                Log.e(TAG, "Oops, the viewport somehow got out of the drawn region. Resetting viewport and tiling");
-                reset();
+            if (LOG_DRAWTIMES) {
+                long end = System.nanoTime();
+                Log.v("PenroserGLView", "Drawing took " + (end-start)/1E6d + " ms, with " + num + " leaf tiles drawn");
             }
-
-            if (DRAW_VIEWPORT) {
-                drawViewport(gl11, viewport);
-            }
-
-            gl.glPopMatrix();
-        }
-        if (LOG_DRAWTIMES) {
-            long end = System.nanoTime();
-            Log.v("PenroserGLView", "Drawing took " + (end-start)/1E6d + " ms, with " + num + " leaf tiles drawn");
+        } finally {
+            renderSemaphore.release();
         }
     }
 
