@@ -101,7 +101,7 @@ public class PenroserGLRenderer implements GLSurfaceView.Renderer, MultiTouchCon
         currentTransform.postScale(relativeScale, relativeScale);
     }
 
-    private void reset() {
+    public void reset() {
         float scale = MatrixUtil.getMatrixScale(currentTransform);
         if (scale < MINIMUM_SCALE) {
             scale = MINIMUM_SCALE;
