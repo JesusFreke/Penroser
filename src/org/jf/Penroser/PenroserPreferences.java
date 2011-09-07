@@ -32,6 +32,7 @@ import android.content.SharedPreferences;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -114,23 +115,28 @@ public class PenroserPreferences implements Parcelable {
     }
 
     public void saveTo(SharedPreferences sharedPreferences, String savedPreferenceName) {
-        JSONObject object = new JSONObject();
-        try {
-            for (HalfRhombusType type: HalfRhombusType.values()) {
-                object.put(type.colorKey, colors[type.index]);
-            }
-            object.put("scale", scale);
-        } catch (JSONException ex) {
-            Log.e(TAG, "Error creating JSON object for preferences", ex);
-            return;
-        }
+        JSONObject jsonObject = toJsonObject();
 
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString(savedPreferenceName, object.toString());
+        editor.putString(savedPreferenceName, jsonObject.toString());
         editor.commit();
     }
 
-    public int  describeContents() {
+    public JSONObject toJsonObject() {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            for (HalfRhombusType type: HalfRhombusType.values()) {
+                jsonObject.put(type.colorKey, colors[type.index]);
+            }
+            jsonObject.put("scale", scale);
+        } catch (JSONException ex) {
+            Log.e(TAG, "Error creating JSON object for preferences", ex);
+            return null;
+        }
+        return jsonObject;
+    }
+
+    public int describeContents() {
         return 0;
     }
 
