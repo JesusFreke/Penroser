@@ -94,7 +94,7 @@ public class PenroserActivity extends Activity {
                 return true;
             case R.id.options:
                 Intent intent = new Intent();
-                intent.setComponent(new ComponentName(this, PenroserOptions.class));
+                intent.setComponent(new ComponentName(this, PenroserGallery.class));
                 preferences.setScale(penroserView.getScale());
                 intent.putExtra("preferences", preferences);
                 startActivityForResult(intent, 0);

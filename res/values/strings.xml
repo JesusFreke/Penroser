@@ -10,4 +10,5 @@
     <string name="edit_color">Edit Color</string>
     <string name="copy_color">Copy Color</string>
     <string name="paste_color">Paste Color</string>
+    <string name="edit">Edit</string>
 </resources>

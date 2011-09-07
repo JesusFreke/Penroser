@@ -30,7 +30,6 @@ package org.jf.Penroser;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.ContextMenu;
@@ -39,7 +38,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
-public class PenroserOptions extends Activity {
+public class PenroserColorOptions extends Activity {
     private HalfRhombusButton halfRhombusButtons[] = new HalfRhombusButton[4];
     private PenroserGLView penroserView = null;
 
@@ -161,7 +160,7 @@ public class PenroserOptions extends Activity {
     private final View.OnClickListener rhombusClickListener = new View.OnClickListener() {
         public void onClick(View v) {
             Intent intent = new Intent();
-            intent.setClass(PenroserOptions.this, PenroserColorPicker.class);
+            intent.setClass(PenroserColorOptions.this, PenroserColorPicker.class);
             intent.putExtra("rhombus", ((HalfRhombusButton)v).getRhombusType());
             preferences.setScale(penroserView.getScale());
             intent.putExtra("preferences", preferences);

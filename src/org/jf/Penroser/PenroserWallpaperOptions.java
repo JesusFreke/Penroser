@@ -29,8 +29,6 @@
 package org.jf.Penroser;
 
 import android.app.Activity;
-import android.app.WallpaperManager;
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -59,7 +57,7 @@ public class PenroserWallpaperOptions extends Activity {
         }
 
         Intent intent = new Intent();
-        intent.setComponent(new ComponentName(this, PenroserOptions.class));
+        intent.setComponent(new ComponentName(this, PenroserGallery.class));
         intent.putExtra("preferences", preferences);
         startActivityForResult(intent, 0);
     }

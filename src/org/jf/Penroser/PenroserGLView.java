@@ -93,6 +93,10 @@ public class PenroserGLView extends GLSurfaceView implements PenroserGLRenderer.
         this.renderer.setPreferences(preferences);
     }
 
+    public PenroserPreferences getPreferences() {
+        return this.renderer.getPreferences();
+    }
+
     @Override
 	public boolean onTouchEvent(MotionEvent event) {
         return renderer.onTouchEvent(event);

@@ -17,11 +17,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".PenroserOptions"
+        <activity android:name=".PenroserColorOptions"
                   android:label="@string/choose_colors"/>
         <activity android:name=".PenroserColorPicker"/>
         <activity android:name=".PenroserWallpaperOptions"
                   android:exported="true"/>
+        <activity android:name=".PenroserActivty"/>
+        <activity android:name=".PenroserGallery"/>
         <service android:name=".PenroserLiveWallpaper"
                  android:label="Penroser"
                  android:permission="android.permission.BIND_WALLPAPER">
