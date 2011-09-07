@@ -54,6 +54,8 @@ public class PenroserGallery extends Activity {
 
     private List<PenroserStaticView> savedPreferences = new ArrayList<PenroserStaticView>();
 
+    int previewSize;
+
     private PenroserPreferences[] parseSavedPreferences(String savedPreferencesJson) {
         if (savedPreferencesJson == null) {
             return new PenroserPreferences[0];
@@ -108,7 +110,8 @@ public class PenroserGallery extends Activity {
 
         registerForContextMenu(gallery);
 
-        int previewSize = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 180, getResources().getDisplayMetrics());
+        previewSize = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 180, getResources().getDisplayMetrics());
+
         for (PenroserPreferences preferences: parseSavedPreferences(savedPrefsJson)) {
             PenroserStaticView staticView = new PenroserStaticView(this);
             staticView.setPreferences(preferences);
@@ -210,9 +213,6 @@ public class PenroserGallery extends Activity {
         inflater.inflate(R.menu.gallery_context, menu);
 
         if (((AdapterView.AdapterContextMenuInfo)menuInfo).position == 0) {
-            MenuItem copyItem = menu.findItem(R.id.make_copy);
-            copyItem.setTitle(R.string.save_as_new);
-
             MenuItem deleteItem = menu.findItem(R.id.delete);
             deleteItem.setEnabled(false);
 
@@ -232,6 +232,16 @@ public class PenroserGallery extends Activity {
                 startActivityForResult(intent, 1);
                 return true;
             case R.id.make_copy:
+                PenroserStaticView staticView = new PenroserStaticView(this);
+                if (menuInfo.position == 0) {
+                    staticView.setPreferences(currentPreferences);
+                } else {
+                    staticView.setPreferences(savedPreferences.get(menuInfo.position-1).getPreferences());
+                }
+                staticView.prerender(previewSize, previewSize);
+                savedPreferences.add(staticView);
+                ((BaseAdapter)gallery.getAdapter()).notifyDataSetChanged();
+                gallery.setSelection(savedPreferences.size(), true);
                 return true;
             case R.id.delete:
                 return true;
