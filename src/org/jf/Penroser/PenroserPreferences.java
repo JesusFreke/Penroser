@@ -45,19 +45,42 @@ public class PenroserPreferences implements Parcelable {
         initDefault();
     }
 
-    public PenroserPreferences(SharedPreferences sharedPreferences, String savedPreferenceName) {
-        String jsonString = sharedPreferences.getString(savedPreferenceName, null);
+    public PenroserPreferences(PenroserPreferences preferences) {
+        this.colors = preferences.colors.clone();
+        this.scale = preferences.scale;
+    }
 
-        if (jsonString == null) {
-            initDefault();
-            return;
-        } else {
-            try {
-                initFromJson(jsonString);
-            } catch (JSONException ex) {
+    public PenroserPreferences(SharedPreferences sharedPreferences, String savedPreferenceName) {
+        try {
+            String jsonString = sharedPreferences.getString(savedPreferenceName, null);
+            if (jsonString == null) {
                 initDefault();
+                return;
             }
+
+            initFromJsonString(jsonString);
+        } catch (JSONException ex) {
+            initDefault();
         }
+    }
+
+    public PenroserPreferences(String jsonString) throws JSONException {
+        initFromJsonString(jsonString);
+    }
+
+    public PenroserPreferences(JSONObject jsonObject) throws JSONException {
+        initFromJson(jsonObject);
+    }
+
+    private void initFromJsonString(String jsonString) throws JSONException {
+        initFromJson(new JSONObject(jsonString));
+    }
+
+    private void initFromJson(JSONObject json) throws JSONException {
+        for (HalfRhombusType type: HalfRhombusType.values()) {
+            colors[type.index] = json.optInt(type.colorKey, type.defaultColor);
+        }
+        scale = (float)json.optDouble("scale", PenroserApp.DEFAULT_INITIAL_SCALE);
     }
 
     public void setPreferences(PenroserPreferences preferences) {
@@ -72,14 +95,6 @@ public class PenroserPreferences implements Parcelable {
             colors[type.index] = type.defaultColor;
         }
         scale = PenroserApp.DEFAULT_INITIAL_SCALE;
-    }
-
-    private void initFromJson(String jsonString) throws JSONException {
-        JSONObject json = new JSONObject(jsonString);
-        for (HalfRhombusType type: HalfRhombusType.values()) {
-            colors[type.index] = json.optInt(type.colorKey, type.defaultColor);
-        }
-        scale = (float)json.optDouble("scale", PenroserApp.DEFAULT_INITIAL_SCALE);
     }
 
     public int getColor(HalfRhombusType type) {
