@@ -47,7 +47,6 @@ public class PenroserLiveWallpaper extends GLWallpaperService {
     private static WeakReference<PenroserGLEngine> theEngine = null;
 
     private SharedPreferences sharedPreferences;
-    private PenroserPreferences preferences;
 
     public PenroserLiveWallpaper() {
         super();
@@ -86,7 +85,6 @@ public class PenroserLiveWallpaper extends GLWallpaperService {
 
     @Override
     public Engine onCreateEngine() {
-        preferences = new PenroserPreferences(sharedPreferences, PREFERENCE_NAME);
         PenroserGLEngine engine = new PenroserGLEngine();
         theEngine = new WeakReference<PenroserGLEngine>(engine);
         return engine;
@@ -99,7 +97,7 @@ public class PenroserLiveWallpaper extends GLWallpaperService {
         public PenroserGLEngine() {
             super();
 
-            renderer.setPreferences(preferences);
+            renderer.setPreferences(new PenroserPreferences(sharedPreferences, PenroserLiveWallpaper.PREFERENCE_NAME));
 
             this.setTouchEventsEnabled(true);
 
@@ -148,11 +146,9 @@ public class PenroserLiveWallpaper extends GLWallpaperService {
         @Override
         public void onVisibilityChanged(boolean visible) {
             if (!visible) {
-                preferences.setScale(renderer.getScale());
-                preferences.saveTo(sharedPreferences, PenroserLiveWallpaper.PREFERENCE_NAME);
+                renderer.getPreferences().saveTo(sharedPreferences, PenroserLiveWallpaper.PREFERENCE_NAME);
             } else {
-                preferences.setPreferences(new PenroserPreferences(sharedPreferences, PenroserLiveWallpaper.PREFERENCE_NAME));
-                renderer.setPreferences(preferences);
+                renderer.setPreferences(new PenroserPreferences(sharedPreferences, PenroserLiveWallpaper.PREFERENCE_NAME));
             }
             super.onVisibilityChanged(visible);
         }

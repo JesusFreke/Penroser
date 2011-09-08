@@ -40,7 +40,6 @@ public class PenroserActivity extends Activity {
 
     private SharedPreferences sharedPreferences = null;
     private PenroserGLView penroserView = null;
-    private PenroserPreferences preferences = new PenroserPreferences();
 
     /** Called when the activity is first created. */
     @Override
@@ -56,8 +55,7 @@ public class PenroserActivity extends Activity {
         }
 
         penroserView = new PenroserGLView(this);
-        preferences.setPreferences(new PenroserPreferences(sharedPreferences, PREFERENCE_NAME));
-        penroserView.setPreferences(preferences);
+        penroserView.setPreferences(new PenroserPreferences(sharedPreferences, PREFERENCE_NAME));
         setContentView(penroserView);
     }
 
@@ -73,8 +71,7 @@ public class PenroserActivity extends Activity {
     protected void onPause() {
         if (penroserView != null) {
             penroserView.onPause();
-            preferences.setScale(penroserView.getScale());
-            preferences.saveTo(sharedPreferences, PenroserActivity.PREFERENCE_NAME);
+            penroserView.getPreferences().saveTo(sharedPreferences, PenroserActivity.PREFERENCE_NAME);
         }
         super.onPause();
     }
@@ -95,8 +92,7 @@ public class PenroserActivity extends Activity {
             case R.id.options:
                 Intent intent = new Intent();
                 intent.setComponent(new ComponentName(this, PenroserGallery.class));
-                preferences.setScale(penroserView.getScale());
-                intent.putExtra("preferences", preferences);
+                intent.putExtra("preferences", penroserView.getPreferences());
                 startActivityForResult(intent, 0);
                 return true;
         }
@@ -107,8 +103,7 @@ public class PenroserActivity extends Activity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode != -1) {
             PenroserPreferences preferences = data.getExtras().getParcelable("preferences");
-            this.preferences.setPreferences(preferences);
-            this.preferences.saveTo(sharedPreferences, PREFERENCE_NAME);
+            preferences.saveTo(sharedPreferences, PREFERENCE_NAME);
             this.penroserView.setPreferences(preferences);
         }
     }

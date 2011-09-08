@@ -39,8 +39,6 @@ public class PenroserColorPicker extends Activity {
     private ColorPickerView colorPicker;
     private PenroserGLView penroserView;
 
-    private PenroserPreferences preferences = null;
-
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
@@ -50,15 +48,15 @@ public class PenroserColorPicker extends Activity {
         penroserView = (PenroserGLView)findViewById(R.id.penroser_view);
 
         final HalfRhombusType rhombusType = (HalfRhombusType)getIntent().getExtras().getSerializable("rhombus");
-        preferences = getIntent().getExtras().getParcelable("preferences");
+        PenroserPreferences preferences = getIntent().getExtras().getParcelable("preferences");
         penroserView.setPreferences(preferences);
 
         colorPicker.setColor(preferences.getColor(rhombusType));
 
         colorPicker.setOnColorChangedListener(new ColorPickerView.OnColorChangedListener() {
             public void onColorChanged(int color) {
+                PenroserPreferences preferences = penroserView.getPreferences();
                 preferences.setColor(rhombusType, color);
-                preferences.setScale(penroserView.getScale());
                 penroserView.setPreferences(preferences);
             }
         });
@@ -70,8 +68,7 @@ public class PenroserColorPicker extends Activity {
         okButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent intent = new Intent();
-                preferences.setScale(penroserView.getScale());
-                intent.putExtra("preferences", preferences);
+                intent.putExtra("preferences", penroserView.getPreferences());
                 setResult(0, intent);
                 finish();
             }
