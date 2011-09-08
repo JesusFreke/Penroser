@@ -95,7 +95,7 @@ public class PenroserGLRenderer implements GLSurfaceView.Renderer, MultiTouchCon
         penroserContext.setPreferences(preferences);
 
         float currentScale = MatrixUtil.getMatrixScale(currentTransform);
-        float newScale = preferences.getScale();
+        float newScale = preferences.getScale() * PenroserApp.DEFAULT_INITIAL_SCALE;
         float relativeScale = newScale/currentScale;
 
         currentTransform.postScale(relativeScale, relativeScale);
@@ -304,7 +304,7 @@ public class PenroserGLRenderer implements GLSurfaceView.Renderer, MultiTouchCon
     }
 
     public float getScale() {
-        return MatrixUtil.getMatrixScale(currentTransform);
+        return MatrixUtil.getMatrixScale(currentTransform) / PenroserApp.DEFAULT_INITIAL_SCALE;
     }
 
     public void selectObject(Object obj, MultiTouchController.PointInfo touchPoint) {

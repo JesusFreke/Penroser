@@ -81,7 +81,7 @@ public class PenroserPreferences implements Parcelable {
         for (HalfRhombusType type: HalfRhombusType.values()) {
             colors[type.index] = json.optInt(type.colorKey, type.defaultColor);
         }
-        scale = (float)json.optDouble("scale", PenroserApp.DEFAULT_INITIAL_SCALE);
+        scale = (float)json.optDouble("scale", 1);
     }
 
     public void setPreferences(PenroserPreferences preferences) {
@@ -95,7 +95,7 @@ public class PenroserPreferences implements Parcelable {
         for (HalfRhombusType type: HalfRhombusType.values()) {
             colors[type.index] = type.defaultColor;
         }
-        scale = PenroserApp.DEFAULT_INITIAL_SCALE;
+        scale = 1;
     }
 
     public int getColor(HalfRhombusType type) {

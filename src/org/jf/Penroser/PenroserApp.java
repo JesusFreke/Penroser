@@ -97,9 +97,9 @@ public class PenroserApp extends Application {
             SharedPreferences.Editor edit = newPreferences.edit();
             edit.putString("saved",
                     "[" +
-                        "{\"scale\":500,\"left_skinny_color\":0,\"left_fat_color\":7509713,\"right_fat_color\":0,\"right_skinny_color\":7509713}, " +
-                        "{\"scale\":500,\"left_skinny_color\":2112,\"left_fat_color\":33331,\"right_fat_color\":9498,\"right_skinny_color\":11382}, " +
-                        "{\"scale\":183.91622924804688,\"left_skinny_color\":13920,\"left_fat_color\":0,\"right_fat_color\":0,\"right_skinny_color\":27554}" +
+                        "{\"scale\":1,\"left_skinny_color\":0,\"left_fat_color\":7509713,\"right_fat_color\":0,\"right_skinny_color\":7509713}, " +
+                        "{\"scale\":1,\"left_skinny_color\":2112,\"left_fat_color\":33331,\"right_fat_color\":9498,\"right_skinny_color\":11382}, " +
+                        "{\"scale\":0.367832458,\"left_skinny_color\":13920,\"left_fat_color\":0,\"right_fat_color\":0,\"right_skinny_color\":27554}" +
                     "]");
             edit.putInt("first_run", 0);
             edit.commit();
