@@ -13,4 +13,5 @@
     <string name="edit">Edit</string>
     <string name="delete">Delete</string>
     <string name="make_copy">Make Copy</string>
+    <string name="set_wallpaper">Set as Wallpaper</string>
 </resources>

@@ -29,6 +29,8 @@
 package org.jf.Penroser;
 
 import android.app.Activity;
+import android.app.WallpaperInfo;
+import android.app.WallpaperManager;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -94,6 +96,17 @@ public class PenroserActivity extends Activity {
                 intent.setComponent(new ComponentName(this, PenroserGallery.class));
                 intent.putExtra("preferences", penroserView.getPreferences());
                 startActivityForResult(intent, 0);
+                return true;
+            case R.id.set_wallpaper:
+                penroserView.getPreferences().saveTo(sharedPreferences, PenroserLiveWallpaper.PREFERENCE_NAME);
+
+                WallpaperInfo wallpaperInfo = WallpaperManager.getInstance(this).getWallpaperInfo();
+                if (wallpaperInfo == null || wallpaperInfo.getComponent().compareTo(new ComponentName(this, PenroserLiveWallpaper.class)) != 0) {
+                    Intent i = new Intent(WallpaperManager.ACTION_LIVE_WALLPAPER_CHOOSER);
+                    startActivity(i);
+                }
+                finish();
+
                 return true;
         }
         return false;
