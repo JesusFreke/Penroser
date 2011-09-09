@@ -107,6 +107,8 @@ public class PenroserGLRenderer implements GLSurfaceView.Renderer, MultiTouchCon
             scale = MINIMUM_SCALE;
         } else if (scale > MAXIMUM_SCALE) {
             scale = MAXIMUM_SCALE;
+        } else if (Float.isNaN(scale)) {
+            scale = PenroserApp.DEFAULT_INITIAL_SCALE;
         }
         currentTransform.reset();
         currentTransform.postScale(scale, scale);
