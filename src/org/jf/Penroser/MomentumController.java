@@ -82,6 +82,10 @@ public class MomentumController {
         releaseTime = -1;
         touchActive = false;
 
+        randomizeVelocity();
+    }
+
+    private void randomizeVelocity() {
         xVNorm = PenroserApp.random.nextFloat()-.5f;
         yVNorm = PenroserApp.random.nextFloat()-.5f;
         xyV = (float)Math.sqrt(xVNorm*xVNorm + yVNorm*yVNorm);
@@ -157,8 +161,12 @@ public class MomentumController {
         }
 
         xyV = (float)Math.sqrt(xVNorm * xVNorm + yVNorm * yVNorm);
-        xVNorm = xVNorm / xyV;
-        yVNorm = yVNorm / xyV;
+        if (xyV != 0) {
+            xVNorm = xVNorm / xyV;
+            yVNorm = yVNorm / xyV;
+        } else {
+            randomizeVelocity();
+        }
     }
 
     public void getVelocities(long currentTime, float[] velocities) {
