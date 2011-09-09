@@ -33,12 +33,8 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.TypedValue;
 import android.view.*;
-import android.widget.AdapterView;
-import android.widget.BaseAdapter;
-import android.widget.Button;
-import android.widget.Gallery;
+import android.widget.*;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -53,8 +49,6 @@ public class PenroserGallery extends Activity {
     private PenroserPreferences currentPreferences;
 
     private List<PenroserStaticView> savedPreferences = new ArrayList<PenroserStaticView>();
-
-    int previewSize;
 
     private PenroserPreferences[] parseSavedPreferences(String savedPreferencesJson) {
         if (savedPreferencesJson == null) {
@@ -110,19 +104,19 @@ public class PenroserGallery extends Activity {
 
         registerForContextMenu(gallery);
 
-        previewSize = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 180, getResources().getDisplayMetrics());
-
         for (PenroserPreferences preferences: parseSavedPreferences(savedPrefsJson)) {
             PenroserStaticView staticView = new PenroserStaticView(this);
             staticView.setPreferences(preferences);
-            staticView.prerender(previewSize, previewSize);
             savedPreferences.add(staticView);
         }
 
         Button okButton = (Button)findViewById(R.id.ok);
         Button editButton = (Button)findViewById(R.id.edit);
 
-        final View currentColorsView = getLayoutInflater().inflate(R.layout.gallery_current_item, null);
+        final SquareTextView currentColorsView = new SquareTextView(this);
+        currentColorsView.setGravity(Gravity.CENTER);
+        currentColorsView.setText("(Current)");
+        currentColorsView.setTextColor(0xFFFFFFFF);
 
         setResult(-1);
 
@@ -178,9 +172,10 @@ public class PenroserGallery extends Activity {
             public Object getItem(int position) {
                 if (position == 0) {
                     return currentPreferences;
-                } else {
+                } else if (position <= savedPreferences.size()) {
                     return savedPreferences.get(position-1).getPreferences();
                 }
+                return null;
             }
 
             public long getItemId(int position) {
@@ -196,9 +191,7 @@ public class PenroserGallery extends Activity {
                     view = savedPreferences.get(position-1);
                 }
 
-                int previewSize = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 180, getResources().getDisplayMetrics());
-
-                Gallery.LayoutParams params = new Gallery.LayoutParams(previewSize, previewSize);
+                Gallery.LayoutParams params = new Gallery.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.FILL_PARENT);
                 view.setLayoutParams(params);
                 return view;
             }
@@ -238,7 +231,6 @@ public class PenroserGallery extends Activity {
                 } else {
                     staticView.setPreferences(savedPreferences.get(menuInfo.position-1).getPreferences());
                 }
-                staticView.prerender(previewSize, previewSize);
                 savedPreferences.add(staticView);
                 ((BaseAdapter)gallery.getAdapter()).notifyDataSetChanged();
                 gallery.setSelection(savedPreferences.size(), true);

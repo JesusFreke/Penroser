@@ -31,14 +31,23 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="fill_parent"
               android:layout_height="fill_parent">
-    <Gallery android:id="@+id/gallery"
-             android:layout_width="fill_parent"
-             android:layout_height="200dip"
-             android:spacing="10dip"/>
-    <org.jf.Penroser.PenroserGLView android:id="@+id/penroser_view"
-                                    android:layout_width="fill_parent"
-                                    android:layout_height="fill_parent"
-                                    android:layout_below="@+id/gallery"/>
+    <LinearLayout android:layout_height="fill_parent"
+                  android:layout_width="fill_parent"
+                  android:orientation="vertical">
+        <Gallery android:id="@+id/gallery"
+                 android:layout_width="fill_parent"
+                 android:layout_height="0dip"
+                 android:layout_weight="35"
+                 android:spacing="10dip"
+                 android:paddingBottom="5dip"
+                 android:paddingTop="5dip"/>
+
+        <org.jf.Penroser.PenroserGLView android:id="@+id/penroser_view"
+                                        android:layout_width="fill_parent"
+                                        android:layout_height="0dip"
+                                        android:layout_weight="65"
+                                        android:layout_below="@+id/gallery"/>
+    </LinearLayout>
     <Button android:id="@+id/ok"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
