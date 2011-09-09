@@ -22,7 +22,6 @@
         <activity android:name=".PenroserColorPicker"/>
         <activity android:name=".PenroserWallpaperOptions"
                   android:exported="true"/>
-        <activity android:name=".PenroserActivty"/>
         <activity android:name=".PenroserGallery"/>
         <service android:name=".PenroserLiveWallpaper"
                  android:label="Penroser"
