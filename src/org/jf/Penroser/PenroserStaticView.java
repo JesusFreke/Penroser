@@ -140,12 +140,14 @@ public class PenroserStaticView extends View {
         int width = getWidth();
         int height = getHeight();
 
-        Paint p = new Paint();
+        if (width > 0 && height > 0) {
+            Paint p = new Paint();
 
-        if (bitmap == null || bitmap.getWidth() != width || bitmap.getHeight() != height) {
-            new GenerateBitmapTask().execute(width, height);
-        } else {
-            canvas.drawBitmap(bitmap, 0, 0, p);
+            if (bitmap == null || bitmap.getWidth() != width || bitmap.getHeight() != height) {
+                new GenerateBitmapTask().execute(width, height);
+            } else {
+                canvas.drawBitmap(bitmap, 0, 0, p);
+            }
         }
     }
 
