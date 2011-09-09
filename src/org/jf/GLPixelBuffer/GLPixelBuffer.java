@@ -124,7 +124,12 @@ public class GLPixelBuffer {
         this.eglContextClientVersion = eglContextClientVersion;
     }
 
-    public Bitmap draw(int width, int height) {
+    public interface Drawer {
+        Bitmap draw();
+        void destroy();
+    }
+
+    public Drawer createDrawer(final int width, final int height) {
         if (renderer == null) {
             throw new RuntimeException("No renderer has been set");
         }
@@ -139,8 +144,8 @@ public class GLPixelBuffer {
             eglPbufferSurfaceFactory = new DefaultPbufferSurfaceFactory();
         }
 
-        EGL10 egl = (EGL10)EGLContext.getEGL();
-        EGLDisplay eglDisplay = egl.eglGetDisplay(EGL_DEFAULT_DISPLAY);
+        final EGL10 egl = (EGL10)EGLContext.getEGL();
+        final EGLDisplay eglDisplay = egl.eglGetDisplay(EGL_DEFAULT_DISPLAY);
         if (eglDisplay == EGL10.EGL_NO_DISPLAY) {
             throw new RuntimeException("eglGetDisplay failed");
         }
@@ -149,14 +154,14 @@ public class GLPixelBuffer {
         if(!egl.eglInitialize(eglDisplay, version)) {
             throw new RuntimeException("eglInitialize failed");
         }
-        EGLConfig eglConfig = eglConfigChooser.chooseConfig(egl, eglDisplay);
+        final EGLConfig eglConfig = eglConfigChooser.chooseConfig(egl, eglDisplay);
 
-        EGLContext eglContext = eglContextFactory.createContext(egl, eglDisplay, eglConfig);
+        final EGLContext eglContext = eglContextFactory.createContext(egl, eglDisplay, eglConfig);
         if (eglContext == null || eglContext == EGL10.EGL_NO_CONTEXT) {
             throw new RuntimeException("eglCreateContext failed (" + egl.eglGetError() + ")");
         }
 
-        EGLSurface eglSurface = eglPbufferSurfaceFactory.createPbufferSurface(egl, eglDisplay, eglConfig, width, height);
+        final EGLSurface eglSurface = eglPbufferSurfaceFactory.createPbufferSurface(egl, eglDisplay, eglConfig, width, height);
         if (eglSurface == null || eglSurface == EGL10.EGL_NO_SURFACE) {
             throw new RuntimeException("eglCreatePbufferSurface failed (" + egl.eglGetError() + ")");
         }
@@ -169,22 +174,45 @@ public class GLPixelBuffer {
             throw new RuntimeException("eglMakeCurrent failed (" + egl.eglGetError() + ")");
         }
 
-        GL gl = eglContext.getGL();
-        if (glWrapper != null) {
-            gl = glWrapper.wrap(gl);
-        }
+
+        GL glTemp = eglContext.getGL();
+        final GL gl = glWrapper==null?glTemp:glWrapper.wrap(glTemp);
 
         renderer.onSurfaceCreated((GL10)gl, eglConfig);
         renderer.onSurfaceChanged((GL10)gl, width, height);
 
-        renderer.onDrawFrame((GL10)gl);
-        Bitmap bmp = convertToBitmap((GL10)gl, width, height);
+        return new Drawer() {
+            private boolean destroyed = false;
 
-        eglPbufferSurfaceFactory.destroySurface(egl, eglDisplay, eglSurface);
-        eglContextFactory.destroyContext(egl, eglDisplay, eglContext);
-        egl.eglTerminate(eglDisplay);
+            public Bitmap draw() {
+                renderer.onDrawFrame((GL10)gl);
+                return convertToBitmap((GL10)gl, width, height);
+            }
 
-        return bmp;
+            public void destroy() {
+                destroyed = true;
+                eglPbufferSurfaceFactory.destroySurface(egl, eglDisplay, eglSurface);
+                eglContextFactory.destroyContext(egl, eglDisplay, eglContext);
+                egl.eglTerminate(eglDisplay);
+            }
+
+            @Override
+            protected void finalize() throws Throwable {
+                if (!destroyed) {
+                    destroy();
+                }
+                super.finalize();
+            }
+        };
+    }
+
+    public Bitmap draw(int width, int height) {
+        Drawer drawer = createDrawer(width, height);
+        try {
+            return drawer.draw();
+        } finally {
+            drawer.destroy();
+        }
     }
 
     private Bitmap convertToBitmap(final GL10 gl, final int width, final int height) {
