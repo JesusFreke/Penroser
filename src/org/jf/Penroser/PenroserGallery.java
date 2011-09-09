@@ -104,8 +104,10 @@ public class PenroserGallery extends Activity {
 
         registerForContextMenu(gallery);
 
+        PenroserStaticView previousStaticView = null;
         for (PenroserPreferences preferences: parseSavedPreferences(savedPrefsJson)) {
-            PenroserStaticView staticView = new PenroserStaticView(this);
+            PenroserStaticView staticView = new PenroserStaticView(this, previousStaticView);
+            previousStaticView = staticView;
             staticView.setPreferences(preferences);
             savedPreferences.add(staticView);
         }
@@ -225,7 +227,15 @@ public class PenroserGallery extends Activity {
                 startActivityForResult(intent, 1);
                 return true;
             case R.id.make_copy:
-                PenroserStaticView staticView = new PenroserStaticView(this);
+                PenroserStaticView otherView = null;
+                if (menuInfo.targetView instanceof PenroserStaticView) {
+                    otherView = (PenroserStaticView)menuInfo.targetView;
+                } else {
+                    if (savedPreferences.size() > 0) {
+                        otherView = savedPreferences.get(0);
+                    }
+                }
+                PenroserStaticView staticView = new PenroserStaticView(this, otherView);
                 if (menuInfo.position == 0) {
                     staticView.setPreferences(currentPreferences);
                 } else {

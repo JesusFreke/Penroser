@@ -45,46 +45,48 @@ import javax.microedition.khronos.egl.EGLDisplay;
 
 public class PenroserStaticView extends View {
     private Bitmap bitmap = null;
-    private static final GLPixelBuffer glPixelBuffer;
-    private static final PenroserGLRenderer renderer;
+    private final GLPixelBuffer glPixelBuffer;
+    private final PenroserGLRenderer renderer;
 
     private PenroserPreferences preferences;
 
-    static {
-        glPixelBuffer = new GLPixelBuffer();
+    public PenroserStaticView(Context context, PenroserStaticView penroserStaticView) {
+        super(context);
+        if (penroserStaticView != null) {
+            this.glPixelBuffer = penroserStaticView.glPixelBuffer;
+            this.renderer = penroserStaticView.renderer;
+        } else {
+            glPixelBuffer = new GLPixelBuffer();
 
-        glPixelBuffer.setEGLConfigChooser(new GLSurfaceView.EGLConfigChooser() {
-            public EGLConfig chooseConfig(EGL10 egl10, EGLDisplay eglDisplay) {
-                int[] config = new int[]{
-                        EGL10.EGL_SAMPLE_BUFFERS, 1,
-                        EGL10.EGL_NONE
-                };
-
-                EGLConfig[] returnedConfig = new EGLConfig[1];
-                int[] returnedConfigCount = new int[1];
-
-                egl10.eglChooseConfig(eglDisplay, config, returnedConfig, 1, returnedConfigCount);
-
-                if (returnedConfigCount[0] == 0) {
-                    config = new int[]{
+            glPixelBuffer.setEGLConfigChooser(new GLSurfaceView.EGLConfigChooser() {
+                public EGLConfig chooseConfig(EGL10 egl10, EGLDisplay eglDisplay) {
+                    int[] config = new int[]{
+                            EGL10.EGL_SAMPLE_BUFFERS, 1,
                             EGL10.EGL_NONE
                     };
+
+                    EGLConfig[] returnedConfig = new EGLConfig[1];
+                    int[] returnedConfigCount = new int[1];
+
                     egl10.eglChooseConfig(eglDisplay, config, returnedConfig, 1, returnedConfigCount);
+
                     if (returnedConfigCount[0] == 0) {
-                        throw new RuntimeException("Couldn't choose an opengl config");
+                        config = new int[]{
+                                EGL10.EGL_NONE
+                        };
+                        egl10.eglChooseConfig(eglDisplay, config, returnedConfig, 1, returnedConfigCount);
+                        if (returnedConfigCount[0] == 0) {
+                            throw new RuntimeException("Couldn't choose an opengl config");
+                        }
                     }
+
+                    return returnedConfig[0];
                 }
+            });
 
-                return returnedConfig[0];
-            }
-        });
-
-        renderer = new PenroserGLRenderer(null);
-        glPixelBuffer.setRenderer(renderer);
-    }
-
-    public PenroserStaticView(Context context) {
-        super(context);
+            renderer = new PenroserGLRenderer(null);
+            glPixelBuffer.setRenderer(renderer);
+        }
     }
 
     public void setPreferences(PenroserPreferences preferences) {
@@ -101,12 +103,35 @@ public class PenroserStaticView extends View {
 
     private Handler handler = new Handler();
 
-    private class GenerateBitmapTask extends AsyncTask<Integer, Void, Void> {
-        protected Void doInBackground(Integer... dimensions) {
-            int width = dimensions[0];
-            int height = dimensions[1];
-            synchronized (glPixelBuffer) {
-                android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_URGENT_DISPLAY);
+    private static class RenderThread extends Thread {
+        public Handler handler;
+
+        @Override
+        public void run() {
+            android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_URGENT_DISPLAY);
+            Looper.prepare();
+
+            handler = new Handler();
+
+            Looper.loop();
+        }
+    }
+
+    private static RenderThread renderThread;
+    static {
+        renderThread = new RenderThread();
+        renderThread.start();
+    }
+
+    public void prerender(int width, int height) {
+        if (bitmap == null || bitmap.getWidth() != width || bitmap.getHeight() != height) {
+            enqueueRender(width, height);
+        }
+    }
+
+    private void enqueueRender(final int width, final int height) {
+        renderThread.handler.post(new Runnable() {
+            public void run() {
                 if (bitmap == null || bitmap.getWidth() != width || bitmap.getHeight() != height) {
                     renderer.setPreferences(preferences);
                     renderer.reset();
@@ -116,35 +141,26 @@ public class PenroserStaticView extends View {
                     long end = System.nanoTime();
                     Log.d("PenroserStaticView", "drawing took " + (end-start)/1E6f + "ms");
 
-
                     handler.post(new Runnable() {
                         public void run() {
                             invalidate();
                         }
                     });
                 }
-
-                android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
             }
-            return null;
-        }
-     }
-
-
-    public void prerender(int width, int height) {
-        new GenerateBitmapTask().execute(width, height);
+        });
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
-        int width = getWidth();
-        int height = getHeight();
+        final int width = getWidth();
+        final int height = getHeight();
 
         if (width > 0 && height > 0) {
             Paint p = new Paint();
 
             if (bitmap == null || bitmap.getWidth() != width || bitmap.getHeight() != height) {
-                new GenerateBitmapTask().execute(width, height);
+                enqueueRender(width, height);
             } else {
                 canvas.drawBitmap(bitmap, 0, 0, p);
             }

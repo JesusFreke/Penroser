@@ -84,6 +84,8 @@ public class GLPixelBuffer {
     private GLSurfaceView.EGLConfigChooser eglConfigChooser;
     private int eglContextClientVersion;
 
+    private Drawer lastDrawer = null;
+
     public void setGLWrapper(final GLSurfaceView.GLWrapper glWrapper) {
         this.glWrapper = glWrapper;
     }
@@ -124,12 +126,20 @@ public class GLPixelBuffer {
         this.eglContextClientVersion = eglContextClientVersion;
     }
 
-    public interface Drawer {
-        Bitmap draw();
-        void destroy();
+    public void destroy() {
+        if (lastDrawer != null) {
+            lastDrawer.destroy();
+        }
     }
 
-    public Drawer createDrawer(final int width, final int height) {
+    private interface Drawer {
+        Bitmap draw();
+        void destroy();
+        int getWidth();
+        int getHeight();
+    }
+
+    private Drawer createDrawer(final int width, final int height) {
         if (renderer == null) {
             throw new RuntimeException("No renderer has been set");
         }
@@ -185,6 +195,10 @@ public class GLPixelBuffer {
             private boolean destroyed = false;
 
             public Bitmap draw() {
+                if (!egl.eglMakeCurrent(eglDisplay, eglSurface, eglSurface, eglContext)) {
+                    throw new RuntimeException("eglMakeCurrent failed (" + egl.eglGetError() + ")");
+                }
+
                 renderer.onDrawFrame((GL10)gl);
                 return convertToBitmap((GL10)gl, width, height);
             }
@@ -194,6 +208,14 @@ public class GLPixelBuffer {
                 eglPbufferSurfaceFactory.destroySurface(egl, eglDisplay, eglSurface);
                 eglContextFactory.destroyContext(egl, eglDisplay, eglContext);
                 egl.eglTerminate(eglDisplay);
+            }
+
+            public int getWidth() {
+                return width;
+            }
+
+            public int getHeight() {
+                return height;
             }
 
             @Override
@@ -207,12 +229,16 @@ public class GLPixelBuffer {
     }
 
     public Bitmap draw(int width, int height) {
-        Drawer drawer = createDrawer(width, height);
-        try {
-            return drawer.draw();
-        } finally {
-            drawer.destroy();
+        if (lastDrawer != null && lastDrawer.getWidth() == width && lastDrawer.getHeight() == height) {
+            return lastDrawer.draw();
         }
+
+        if (lastDrawer != null) {
+            lastDrawer.destroy();
+        }
+
+        lastDrawer = createDrawer(width, height);
+        return lastDrawer.draw();
     }
 
     private Bitmap convertToBitmap(final GL10 gl, final int width, final int height) {
