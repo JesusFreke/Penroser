@@ -156,30 +156,50 @@ public class PenroserStaticView extends View {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        boolean widthCanShrink=true, heightCanShrink=true;
         int width=0, height=0;
 
         switch (MeasureSpec.getMode(widthMeasureSpec)) {
             case MeasureSpec.UNSPECIFIED:
-                width = 0;
+                width = getDefaultSize(getSuggestedMinimumWidth(), widthMeasureSpec);
+                widthCanShrink = true;
                 break;
             case MeasureSpec.AT_MOST:
-                width = (int)(MeasureSpec.getSize(widthMeasureSpec) * .8f);
+                width = MeasureSpec.getSize(widthMeasureSpec);
+                widthCanShrink = true;
                 break;
             case MeasureSpec.EXACTLY:
                 width = MeasureSpec.getSize(widthMeasureSpec);
+                widthCanShrink = false;
                 break;
         }
 
         switch (MeasureSpec.getMode(heightMeasureSpec)) {
             case MeasureSpec.UNSPECIFIED:
-                height = 0;
+                height = getDefaultSize(getSuggestedMinimumHeight(), heightMeasureSpec);
+                heightCanShrink = true;
                 break;
             case MeasureSpec.AT_MOST:
-                height = (int)(MeasureSpec.getSize(heightMeasureSpec) * .8f);
+                height = MeasureSpec.getSize(heightMeasureSpec);
+                heightCanShrink = true;
                 break;
             case MeasureSpec.EXACTLY:
                 height = MeasureSpec.getSize(heightMeasureSpec);
+                heightCanShrink = false;
                 break;
+        }
+
+        if (!widthCanShrink) {
+            if (heightCanShrink) {
+                height = Math.min(width, height);
+            }
+        } else {
+            if (heightCanShrink) {
+                width = 0;
+                height = 0;
+            } else {
+                width = Math.min(width, height);
+            }
         }
 
         setMeasuredDimension(width, height);
