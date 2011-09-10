@@ -34,10 +34,13 @@ import android.app.WallpaperManager;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.*;
 
 public class PenroserActivity extends Activity {
+    private static final String TAG = "PenroserActivity";
     public static final String PREFERENCE_NAME = "current_pref_activity";
 
     private SharedPreferences sharedPreferences = null;
@@ -57,8 +60,32 @@ public class PenroserActivity extends Activity {
         }
 
         penroserView = new PenroserGLView(this);
-        penroserView.setPreferences(new PenroserPreferences(sharedPreferences, PREFERENCE_NAME));
+
+
+        Intent intent = getIntent();
+        PenroserPreferences preferences = null;
+        if (intent != null && intent.getAction() != null &&
+                (intent.getAction().equals("android.intent.action.VIEW") ||
+                intent.getAction().equals("android.nfc.action.NDEF_DISCOVERED"))) {
+            Uri uri = intent.getData();
+
+            preferences = buildPreferencesFroUri(uri);
+        }
+        if (preferences == null) {
+            preferences = new PenroserPreferences(sharedPreferences, PREFERENCE_NAME);
+        }
+        penroserView.setPreferences(preferences);
+
         setContentView(penroserView);
+    }
+
+    private PenroserPreferences buildPreferencesFroUri(Uri uri) {
+        try {
+            return new PenroserPreferences(uri);
+        } catch (Exception ex) {
+            Log.e(TAG, "Error while parsing uri", ex);
+            return null;
+        }
     }
 
     @Override

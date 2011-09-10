@@ -29,6 +29,7 @@
 package org.jf.Penroser;
 
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
@@ -71,6 +72,64 @@ public class PenroserPreferences implements Parcelable {
 
     public PenroserPreferences(JSONObject jsonObject) throws JSONException {
         initFromJson(jsonObject);
+    }
+
+    public PenroserPreferences(Uri uri) {
+        if (!uri.getScheme().equals("penroser") &&
+                !(uri.getHost().equals("penroser.com") && uri.getPath().equals("/preference"))) {
+
+            Log.e(TAG, uri.toString() + " is not a valid penroser preference uri");
+            throw new RuntimeException(uri.toString() + " is not a valid penroser preference uri");
+        }
+
+        for (HalfRhombusType rhombusType: HalfRhombusType.values()) {
+
+            String colorStr = uri.getQueryParameter(rhombusType.colorKey);
+            colorStr = colorStr.substring(colorStr.indexOf('=')+1);
+
+            if (colorStr == null) {
+                Log.w(TAG, "Could not find color: " + rhombusType.colorKey + " - using default color");
+                setColor(rhombusType, rhombusType.defaultColor);
+            } else {
+                int color;
+                try {
+                    color = Integer.decode(colorStr);
+                } catch (NumberFormatException ex) {
+                    Log.w(TAG, "Could not parse color: " + rhombusType.colorKey + "=" + colorStr +
+                            " - using default color");
+                    color = rhombusType.defaultColor;
+                }
+                color = color & 0x00FFFFFF; //strip off the alpha
+                setColor(rhombusType, color);
+            }
+        }
+
+        String scaleStr = uri.getQueryParameter("scale");
+        float scale;
+        if (scaleStr == null) {
+            Log.w(TAG, "Could not find scale parameter. Using default.");
+            scale = 1f;
+        } else {
+            try {
+                scale = Float.parseFloat(scaleStr);
+            } catch( NumberFormatException ex) {
+                Log.w(TAG, "Could not parse scale value: " + scaleStr + " - using default scale");
+                scale = 1f;
+            }
+        }
+        if (Float.isNaN(scale)) {
+            Log.w(TAG, "Scale value is NaN  - using default scale");
+            scale = 1f;
+        }
+        if (scale < PenroserGLRenderer.MINIMUM_SCALE/PenroserApp.DEFAULT_INITIAL_SCALE) {
+            Log.w(TAG, "Scale value is less than the minimum - using minimum scale");
+            scale = PenroserGLRenderer.MINIMUM_SCALE/PenroserApp.DEFAULT_INITIAL_SCALE;
+        }
+        if (scale > PenroserGLRenderer.MAXIMUM_SCALE/PenroserApp.DEFAULT_INITIAL_SCALE) {
+            Log.w(TAG, "Scale value is greater than the maximum - using maximum scale");
+            scale = PenroserGLRenderer.MAXIMUM_SCALE/PenroserApp.DEFAULT_INITIAL_SCALE;
+        }
+        setScale(scale);
     }
 
     private void initFromJsonString(String jsonString) throws JSONException {
@@ -134,6 +193,34 @@ public class PenroserPreferences implements Parcelable {
             return null;
         }
         return jsonObject;
+    }
+
+    public Uri toPenroserSchemeUri() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("penroser:?");
+        for (HalfRhombusType rhombusType: HalfRhombusType.values()) {
+            sb.append(rhombusType.colorKey);
+            sb.append("=0x");
+            sb.append(Integer.toHexString(getColor(rhombusType)));
+            sb.append("&");
+        }
+        sb.append("scale=");
+        sb.append(getScale());
+        return Uri.parse(sb.toString());
+    }
+
+    public Uri toPenroserHttpUri() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("http://penroser.com/preference?");
+        for (HalfRhombusType rhombusType: HalfRhombusType.values()) {
+            sb.append(rhombusType.colorKey);
+            sb.append("=0x");
+            sb.append(Integer.toHexString(getColor(rhombusType)));
+            sb.append("&");
+        }
+        sb.append("scale=");
+        sb.append(getScale());
+        return Uri.parse(sb.toString());
     }
 
     public int describeContents() {

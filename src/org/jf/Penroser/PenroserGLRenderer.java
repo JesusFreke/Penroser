@@ -49,8 +49,8 @@ import static org.jf.Penroser.PenroserApp.DEFAULT_INITIAL_SCALE;
 public class PenroserGLRenderer implements GLSurfaceView.Renderer, MultiTouchController.MultiTouchObjectCanvas<Object> {
     private static final String TAG = "PenroserGLRenderer";
 
-    private static final float MINIMUM_SCALE = .1f * PenroserApp.DEFAULT_INITIAL_SCALE;
-    private static final float MAXIMUM_SCALE = 25f * PenroserApp.DEFAULT_INITIAL_SCALE;
+    public static final float MINIMUM_SCALE = .1f * PenroserApp.DEFAULT_INITIAL_SCALE;
+    public static final float MAXIMUM_SCALE = 25f * PenroserApp.DEFAULT_INITIAL_SCALE;
 
     /**
      * Setting this to true causes the drawing logic to change, so that the tiles are kept in the same
