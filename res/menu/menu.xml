@@ -3,6 +3,8 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/set_wallpaper"
           android:title="@string/set_wallpaper"/>
+    <item android:id="@+id/share_color_scheme"
+          android:title="@string/share_color_scheme"/>
     <item android:id="@+id/full_screen"
           android:title="@string/full_screen"/>
     <item android:id="@+id/options"

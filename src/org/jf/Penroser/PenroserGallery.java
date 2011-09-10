@@ -257,6 +257,12 @@ public class PenroserGallery extends Activity {
                     gallery.setSelection(menuInfo.position-1, true);
                 }
                 return true;
+            case R.id.share:
+                Intent i = new Intent(Intent.ACTION_SEND);
+                i.putExtra(Intent.EXTRA_TEXT, penroserView.getPreferences().toPenroserHttpUri().toString());
+                i.setType("text/plain");
+                startActivity(Intent.createChooser(i, "Share via"));
+                return true;
         }
 
         return super.onContextItemSelected(item);

@@ -135,6 +135,12 @@ public class PenroserActivity extends Activity {
                 finish();
 
                 return true;
+            case R.id.share_color_scheme:
+                Intent i = new Intent(Intent.ACTION_SEND);
+                i.putExtra(Intent.EXTRA_TEXT, penroserView.getPreferences().toPenroserHttpUri().toString());
+                i.setType("text/plain");
+                startActivity(Intent.createChooser(i, "Share via"));
+                return true;
         }
         return false;
     }
