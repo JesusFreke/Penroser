@@ -30,7 +30,6 @@ package org.jf.Penroser;
 
 import android.content.*;
 import android.opengl.GLSurfaceView;
-import android.util.Log;
 import android.view.MotionEvent;
 import org.jf.GLWallpaper.GLWallpaperService;
 
@@ -38,29 +37,25 @@ import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.egl.EGLDisplay;
 import java.lang.ref.WeakReference;
+import java.util.Iterator;
+import java.util.LinkedList;
 
 public class PenroserLiveWallpaper extends GLWallpaperService {
     private static final String TAG = "PenroserLiveWallpaper";
     public static final String PREFERENCE_NAME = "current_pref_wallpaper";
 
     public static WeakReference<PenroserLiveWallpaper> theService = null;
-    private static WeakReference<PenroserGLEngine> theEngine = null;
+
+    /**
+     * a list of the currently active engines, sorted by their last visible time, such that the most recently
+     * visible engine is the first item in the list
+     */
+    private static LinkedList<WeakReference<PenroserGLEngine>> engines = new LinkedList<WeakReference<PenroserGLEngine>>();
 
     private SharedPreferences sharedPreferences;
 
     public PenroserLiveWallpaper() {
         super();
-    }
-
-    public PenroserPreferences getPreferences() {
-        PenroserGLEngine engine = null;
-        if (theEngine != null) {
-            engine = theEngine.get();
-        }
-        if (engine == null) {
-            return new PenroserPreferences(sharedPreferences, PenroserLiveWallpaper.PREFERENCE_NAME);
-        }
-        return engine.getPreferences();
     }
 
     @Override
@@ -76,9 +71,13 @@ public class PenroserLiveWallpaper extends GLWallpaperService {
             theService.clear();
             theService = null;
         }
-        if (theEngine != null) {
-            theEngine.clear();
-            theEngine = null;
+        synchronized (engines) {
+            for (WeakReference<PenroserGLEngine> engineRef: engines) {
+                if (engineRef.get() != null) {
+                    engineRef.clear();
+                }
+            }
+            engines.clear();
         }
         super.onDestroy();
     }
@@ -86,10 +85,37 @@ public class PenroserLiveWallpaper extends GLWallpaperService {
     @Override
     public Engine onCreateEngine() {
         PenroserGLEngine engine = new PenroserGLEngine();
-        theEngine = new WeakReference<PenroserGLEngine>(engine);
+        synchronized(engines) {
+            engines.addLast(new WeakReference<PenroserGLEngine>(engine));
+        }
         return engine;
     }
 
+    public static boolean isAnyEngineVisible() {
+        synchronized (engines) {
+            for (WeakReference<PenroserGLEngine> engineRef: engines) {
+                PenroserGLEngine engine = engineRef.get();
+                if (engine != null) {
+                    if (engine.isVisible()) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    public static PenroserPreferences getLastVisiblePreferences() {
+        synchronized (engines) {
+            for (WeakReference<PenroserGLEngine> engineRef: engines) {
+                PenroserGLEngine engine = engineRef.get();
+                if (engine != null) {
+                    return engine.getPreferences();
+                }
+            }
+        }
+        return null;
+    }
 
     class PenroserGLEngine extends GLEngine implements PenroserGLRenderer.Callbacks {
         private PenroserGLRenderer renderer = new PenroserGLRenderer(this);
@@ -137,9 +163,15 @@ public class PenroserLiveWallpaper extends GLWallpaperService {
 
         @Override
         public void onDestroy() {
-            if (theEngine != null) {
-                theEngine.clear();
-                theEngine = null;
+            synchronized (engines) {
+                Iterator<WeakReference<PenroserGLEngine>> iterator = engines.iterator();
+                while (iterator.hasNext()) {
+                    PenroserGLEngine engine = iterator.next().get();
+                    if (engine == this) {
+                        iterator.remove();
+                        return;
+                    }
+                }
             }
         }
 
@@ -149,6 +181,19 @@ public class PenroserLiveWallpaper extends GLWallpaperService {
                 renderer.getPreferences().saveTo(sharedPreferences, PenroserLiveWallpaper.PREFERENCE_NAME);
             } else {
                 renderer.setPreferences(new PenroserPreferences(sharedPreferences, PenroserLiveWallpaper.PREFERENCE_NAME));
+
+                synchronized (engines) {
+                    Iterator<WeakReference<PenroserGLEngine>> iterator = engines.iterator();
+                    while (iterator.hasNext()) {
+                        WeakReference<PenroserGLEngine> engineRef = iterator.next();
+                        PenroserGLEngine engine = engineRef.get();
+                        if (engine == this) {
+                            iterator.remove();
+                            engines.addFirst(engineRef);
+                            break;
+                        }
+                    }
+                }
             }
             super.onVisibilityChanged(visible);
         }

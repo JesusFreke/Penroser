@@ -36,6 +36,7 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.*;
@@ -61,6 +62,7 @@ public class PenroserActivity extends Activity {
         }
 
         penroserView = new PenroserGLView(this);
+        penroserView.onPause();
 
 
         Intent intent = getIntent();
@@ -92,7 +94,23 @@ public class PenroserActivity extends Activity {
     @Override
     protected void onResume() {
         if (penroserView != null) {
-            penroserView.onResume();
+            //work-around on 2.1. Needed because the wallpaper's visibility isn't changed until after we are displayed,
+            //and if we try to resume the penroserView while the other one is still running, we end up getting into a
+            //deadlock
+            AsyncTask<Void, Void, Object> task = new AsyncTask<Void, Void, Object>() {
+                @Override
+                protected Object doInBackground(Void... params) {
+                    while (PenroserLiveWallpaper.isAnyEngineVisible()) {
+                        try {
+                            Thread.sleep(100);
+                        } catch (InterruptedException ex) {
+                        }
+                    }
+                    penroserView.onResume();
+                    return null;
+                }
+            };
+            task.execute();
         }
         super.onResume();
     }

@@ -43,16 +43,9 @@ public class PenroserWallpaperOptions extends Activity {
 
         sharedPreferences = getSharedPreferences("preferences", MODE_PRIVATE);
 
-        PenroserPreferences preferences;
+        PenroserPreferences preferences = PenroserLiveWallpaper.getLastVisiblePreferences();
 
-        PenroserLiveWallpaper wallpaper = null;
-        if (PenroserLiveWallpaper.theService != null) {
-            wallpaper = PenroserLiveWallpaper.theService.get();
-        }
-
-        if (wallpaper != null) {
-            preferences = wallpaper.getPreferences();
-        } else {
+        if (preferences == null) {
             preferences = new PenroserPreferences(sharedPreferences, PenroserLiveWallpaper.PREFERENCE_NAME);
         }
 

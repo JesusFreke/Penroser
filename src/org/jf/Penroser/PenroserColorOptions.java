@@ -30,6 +30,7 @@ package org.jf.Penroser;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.ContextMenu;
@@ -100,12 +101,22 @@ public class PenroserColorOptions extends Activity {
     protected void onResume() {
         if (penroserView != null) {
             //work-around on 2.1. Needed because the wallpaper's visibility isn't changed until after we are displayed,
-            //and we hang on start up because the wallpaper still has the gl context... I think
-            handler.post(new Runnable() {
-                public void run() {
+            //and if we try to resume the penroserView while the other one is still running, we end up getting into a
+            //deadlock
+            AsyncTask<Void, Void, Object> task = new AsyncTask<Void, Void, Object>() {
+                @Override
+                protected Object doInBackground(Void... params) {
+                    while (PenroserLiveWallpaper.isAnyEngineVisible()) {
+                        try {
+                            Thread.sleep(100);
+                        } catch (InterruptedException ex) {
+                        }
+                    }
                     penroserView.onResume();
+                    return null;
                 }
-            });
+            };
+            task.execute();
         }
         super.onResume();
     }

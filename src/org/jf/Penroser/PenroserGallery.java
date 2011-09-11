@@ -29,11 +29,12 @@
 package org.jf.Penroser;
 
 import android.app.Activity;
-import android.app.backup.BackupManager;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.*;
 import android.widget.*;
 import org.json.JSONArray;
@@ -96,9 +97,12 @@ public class PenroserGallery extends Activity {
         setContentView(R.layout.gallery);
 
         penroserView = (PenroserGLView)findViewById(R.id.penroser_view);
+        penroserView.onPause();
+
         gallery = (Gallery)findViewById(R.id.gallery);
 
         penroserView.setPreferences(currentPreferences);
+
 
         sharedPreferences = getSharedPreferences("preferences", MODE_PRIVATE);
         String savedPrefsJson = sharedPreferences.getString("saved", null);
@@ -197,6 +201,39 @@ public class PenroserGallery extends Activity {
                 return view;
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        Log.v("PenroserGallery", "onResume()");
+        if (penroserView != null) {
+            //work-around on 2.1. Needed because the wallpaper's visibility isn't changed until after we are displayed,
+            //and if we try to resume the penroserView while the other one is still running, we end up getting into a
+            //deadlock
+            AsyncTask<Void, Void, Object> task = new AsyncTask<Void, Void, Object>() {
+                @Override
+                protected Object doInBackground(Void... params) {
+                    while (PenroserLiveWallpaper.isAnyEngineVisible()) {
+                        try {
+                            Thread.sleep(100);
+                        } catch (InterruptedException ex) {
+                        }
+                    }
+                    penroserView.onResume();
+                    return null;
+                }
+            };
+            task.execute();
+        }
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        if (penroserView != null) {
+            penroserView.onPause();
+        }
+        super.onPause();
     }
 
     @Override
