@@ -53,6 +53,8 @@ public class PenroserActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        ((PenroserApp)getApplication()).attemptUpgrade();
+
         sharedPreferences = getSharedPreferences("preferences", MODE_PRIVATE);
 
         requestWindowFeature(Window.FEATURE_NO_TITLE);

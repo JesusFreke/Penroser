@@ -92,6 +92,8 @@ public class PenroserGallery extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        ((PenroserApp)getApplication()).attemptUpgrade();
+
         currentPreferences = getIntent().getExtras().getParcelable("preferences");
 
         setContentView(R.layout.gallery);

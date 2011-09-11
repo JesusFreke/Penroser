@@ -50,6 +50,8 @@ public class PenroserColorOptions extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        ((PenroserApp)getApplication()).attemptUpgrade();
+
         setContentView(R.layout.options);
 
         penroserView = (PenroserGLView)findViewById(R.id.penroser_view);

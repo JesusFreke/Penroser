@@ -43,6 +43,8 @@ public class PenroserColorPicker extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        ((PenroserApp)getApplication()).attemptUpgrade();
+
         setContentView(R.layout.color_picker);
 
         colorPicker = (ColorPickerView)findViewById(R.id.color_picker);

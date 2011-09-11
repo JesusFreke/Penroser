@@ -60,6 +60,7 @@ public class PenroserLiveWallpaper extends GLWallpaperService {
 
     @Override
     public void onCreate() {
+        ((PenroserApp)getApplication()).attemptUpgrade();
         sharedPreferences = getSharedPreferences("preferences", MODE_PRIVATE);
         theService = new WeakReference<PenroserLiveWallpaper>(this);
         super.onCreate();

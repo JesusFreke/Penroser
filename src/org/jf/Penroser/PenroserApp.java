@@ -41,6 +41,8 @@ public class PenroserApp extends Application {
     /*This is the number of levels to use for the static vbo data*/
     /*package*/ static final int VBO_LEVEL=5;
 
+    private static boolean needsUpgrade = true;
+
     /*The default initial scale, based on the number of levels down that we are pre-generating*/
     public static final float DEFAULT_INITIAL_SCALE = (float)(500 * Math.pow((Math.sqrt(5)+1)/2, VBO_LEVEL-5));
 
@@ -48,59 +50,53 @@ public class PenroserApp extends Application {
     public static final HalfRhombusPool halfRhombusPool = new HalfRhombusPool();
     public static final Random random = new Random();
 
-    private Handler handler;
-
     public PenroserApp() {
         super();
-
-        handler = new Handler();
     }
 
-    @Override
-    public void onCreate() {
-        attemptUpgrade();
-    }
+    public void attemptUpgrade() {
+        if (needsUpgrade) {
+            SharedPreferences oldPreferences = getApplicationContext().getSharedPreferences("penroser_live_wallpaper_prefs", MODE_PRIVATE);
+            SharedPreferences newPreferences = getApplicationContext().getSharedPreferences("preferences", MODE_PRIVATE);
 
-    private void attemptUpgrade() {
-        SharedPreferences oldPreferences = getApplicationContext().getSharedPreferences("penroser_live_wallpaper_prefs", MODE_PRIVATE);
-        SharedPreferences newPreferences = getApplicationContext().getSharedPreferences("preferences", MODE_PRIVATE);
-
-        if (oldPreferences.contains("left_skinny_color")) {
-            PenroserPreferences preferences = new PenroserPreferences();
-            for (HalfRhombusType rhombusType: HalfRhombusType.values()) {
-                preferences.setColor(rhombusType, ColorUtil.swapOrder(oldPreferences.getInt(rhombusType.colorKey, rhombusType.defaultColor)));
+            if (oldPreferences.contains("left_skinny_color")) {
+                PenroserPreferences preferences = new PenroserPreferences();
+                for (HalfRhombusType rhombusType: HalfRhombusType.values()) {
+                    preferences.setColor(rhombusType, ColorUtil.swapOrder(oldPreferences.getInt(rhombusType.colorKey, rhombusType.defaultColor)));
+                }
+                preferences.saveTo(newPreferences, PenroserLiveWallpaper.PREFERENCE_NAME);
+                oldPreferences.edit().clear().commit();
             }
-            preferences.saveTo(newPreferences, PenroserLiveWallpaper.PREFERENCE_NAME);
-            oldPreferences.edit().clear().commit();
-        }
 
-        oldPreferences = getApplicationContext().getSharedPreferences("penroser_activity_prefs", MODE_PRIVATE);
-        boolean clearPref = false;
-        if (oldPreferences.contains("left_skinny_color")) {
-            PenroserPreferences preferences = new PenroserPreferences();
-            for (HalfRhombusType rhombusType: HalfRhombusType.values()) {
-                preferences.setColor(rhombusType, ColorUtil.swapOrder(oldPreferences.getInt(rhombusType.colorKey, rhombusType.defaultColor)));
+            oldPreferences = getApplicationContext().getSharedPreferences("penroser_activity_prefs", MODE_PRIVATE);
+            boolean clearPref = false;
+            if (oldPreferences.contains("left_skinny_color")) {
+                PenroserPreferences preferences = new PenroserPreferences();
+                for (HalfRhombusType rhombusType: HalfRhombusType.values()) {
+                    preferences.setColor(rhombusType, ColorUtil.swapOrder(oldPreferences.getInt(rhombusType.colorKey, rhombusType.defaultColor)));
+                }
+                preferences.saveTo(newPreferences, PenroserActivity.PREFERENCE_NAME);
+                clearPref = true;
             }
-            preferences.saveTo(newPreferences, PenroserActivity.PREFERENCE_NAME);
-            clearPref = true;
-        }
-        if (oldPreferences.contains("full_screen")) {
-            SharedPreferenceUtil.savePreference(newPreferences, "full_screen", oldPreferences.getBoolean("full_screen", false), false);
-            clearPref = true;
-        }
-        if (clearPref) {
-            oldPreferences.edit().clear().commit();
-        }
+            if (oldPreferences.contains("full_screen")) {
+                SharedPreferenceUtil.savePreference(newPreferences, "full_screen", oldPreferences.getBoolean("full_screen", false), false);
+                clearPref = true;
+            }
+            if (clearPref) {
+                oldPreferences.edit().clear().commit();
+            }
 
-        if (newPreferences.getInt("first_run", 1) != 0) {
-            SharedPreferenceUtil.savePreference(newPreferences, "saved",
-                    "[" +
-                            "{\"scale\":1,\"left_skinny_color\":0,\"left_fat_color\":7509713,\"right_fat_color\":0,\"right_skinny_color\":7509713}, " +
-                            "{\"scale\":1,\"left_skinny_color\":2112,\"left_fat_color\":33331,\"right_fat_color\":9498,\"right_skinny_color\":11382}, " +
-                            "{\"scale\":0.367832458,\"left_skinny_color\":13920,\"left_fat_color\":0,\"right_fat_color\":0,\"right_skinny_color\":27554}" +
-                            "]");
+            if (newPreferences.getInt("first_run", 1) != 0) {
+                SharedPreferenceUtil.savePreference(newPreferences, "saved",
+                        "[" +
+                                "{\"scale\":1,\"left_skinny_color\":0,\"left_fat_color\":7509713,\"right_fat_color\":0,\"right_skinny_color\":7509713}, " +
+                                "{\"scale\":1,\"left_skinny_color\":2112,\"left_fat_color\":33331,\"right_fat_color\":9498,\"right_skinny_color\":11382}, " +
+                                "{\"scale\":0.367832458,\"left_skinny_color\":13920,\"left_fat_color\":0,\"right_fat_color\":0,\"right_skinny_color\":27554}" +
+                                "]");
 
-            SharedPreferenceUtil.savePreference(newPreferences, "first_run", 0, 1);
+                SharedPreferenceUtil.savePreference(newPreferences, "first_run", 0, 1);
+            }
+            needsUpgrade = false;
         }
     }
 }
