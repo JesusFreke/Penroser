@@ -31,6 +31,7 @@ package org.jf.Penroser;
 import android.app.Activity;
 import android.app.WallpaperInfo;
 import android.app.WallpaperManager;
+import android.app.backup.BackupManager;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -159,9 +160,7 @@ public class PenroserActivity extends Activity {
     }
 
     private void setFullScreen(boolean fullScreen) {
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putBoolean("full_screen", fullScreen);
-        editor.commit();
+        SharedPreferenceUtil.savePreference(sharedPreferences, "full_screen", fullScreen, false);
     }
 
     private void toggleFullScreen() {

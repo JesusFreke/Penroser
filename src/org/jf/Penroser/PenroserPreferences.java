@@ -28,6 +28,7 @@
 
 package org.jf.Penroser;
 
+import android.app.backup.BackupManager;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Parcel;
@@ -176,9 +177,7 @@ public class PenroserPreferences implements Parcelable {
     public void saveTo(SharedPreferences sharedPreferences, String savedPreferenceName) {
         JSONObject jsonObject = toJsonObject();
 
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString(savedPreferenceName, jsonObject.toString());
-        editor.commit();
+        SharedPreferenceUtil.savePreference(sharedPreferences, savedPreferenceName, jsonObject.toString());
     }
 
     public JSONObject toJsonObject() {

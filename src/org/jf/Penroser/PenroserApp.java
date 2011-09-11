@@ -29,8 +29,10 @@
 package org.jf.Penroser;
 
 import android.app.Application;
+import android.app.backup.BackupManager;
 import android.content.SharedPreferences;
 import android.os.Handler;
+import android.util.Log;
 
 import java.util.Random;
 
@@ -52,12 +54,11 @@ public class PenroserApp extends Application {
         super();
 
         handler = new Handler();
+    }
 
-        handler.post(new Runnable() {
-            public void run() {
-                attemptUpgrade();
-            }
-        });
+    @Override
+    public void onCreate() {
+        attemptUpgrade();
     }
 
     private void attemptUpgrade() {
@@ -84,9 +85,7 @@ public class PenroserApp extends Application {
             clearPref = true;
         }
         if (oldPreferences.contains("full_screen")) {
-            SharedPreferences.Editor editor = newPreferences.edit();
-            editor.putBoolean("full_screen", oldPreferences.getBoolean("full_screen", false));
-            editor.commit();
+            SharedPreferenceUtil.savePreference(newPreferences, "full_screen", oldPreferences.getBoolean("full_screen", false), false);
             clearPref = true;
         }
         if (clearPref) {
@@ -94,15 +93,14 @@ public class PenroserApp extends Application {
         }
 
         if (newPreferences.getInt("first_run", 1) != 0) {
-            SharedPreferences.Editor edit = newPreferences.edit();
-            edit.putString("saved",
+            SharedPreferenceUtil.savePreference(newPreferences, "saved",
                     "[" +
-                        "{\"scale\":1,\"left_skinny_color\":0,\"left_fat_color\":7509713,\"right_fat_color\":0,\"right_skinny_color\":7509713}, " +
-                        "{\"scale\":1,\"left_skinny_color\":2112,\"left_fat_color\":33331,\"right_fat_color\":9498,\"right_skinny_color\":11382}, " +
-                        "{\"scale\":0.367832458,\"left_skinny_color\":13920,\"left_fat_color\":0,\"right_fat_color\":0,\"right_skinny_color\":27554}" +
-                    "]");
-            edit.putInt("first_run", 0);
-            edit.commit();
+                            "{\"scale\":1,\"left_skinny_color\":0,\"left_fat_color\":7509713,\"right_fat_color\":0,\"right_skinny_color\":7509713}, " +
+                            "{\"scale\":1,\"left_skinny_color\":2112,\"left_fat_color\":33331,\"right_fat_color\":9498,\"right_skinny_color\":11382}, " +
+                            "{\"scale\":0.367832458,\"left_skinny_color\":13920,\"left_fat_color\":0,\"right_fat_color\":0,\"right_skinny_color\":27554}" +
+                            "]");
+
+            SharedPreferenceUtil.savePreference(newPreferences, "first_run", 0, 1);
         }
     }
 }

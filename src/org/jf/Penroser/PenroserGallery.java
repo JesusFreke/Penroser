@@ -29,6 +29,7 @@
 package org.jf.Penroser;
 
 import android.app.Activity;
+import android.app.backup.BackupManager;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -130,9 +131,7 @@ public class PenroserGallery extends Activity {
                 setResult(0, intent);
 
                 String prefJson = deparseSavedPreferences();
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putString("saved", prefJson);
-                editor.commit();
+                SharedPreferenceUtil.savePreference(sharedPreferences, "saved", prefJson);
 
                 finish();
             }

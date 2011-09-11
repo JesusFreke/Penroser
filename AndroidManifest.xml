@@ -8,7 +8,9 @@
     <uses-feature android:name="android.software.live_wallpaper" />
     <application android:label="@string/app_name"
                  android:icon="@drawable/icon"
-                 android:name=".PenroserApp">
+                 android:name=".PenroserApp"
+                 android:backupAgent=".PenroserBackupAgent"
+                 android:restoreAnyVersion="true">
         <activity android:name=".PenroserActivity"
                   android:label="@string/app_name"
                   android:theme="@android:style/Theme.NoTitleBar">
@@ -53,5 +55,7 @@
             </intent-filter>
             <meta-data android:name="android.service.wallpaper" android:resource="@xml/penroser" />
         </service>
+        <meta-data android:name="com.google.android.backup.api_key"
+                   android:value="AEdPqrEAAAAIZXp-cuYWz3NfODzq6nxF-XZNpVLoFnXYu7Me3g" />
     </application>
 </manifest> 
